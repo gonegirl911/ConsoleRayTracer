@@ -1,6 +1,6 @@
 namespace ConsoleRayTracer;
 
-readonly struct Camera
+readonly struct Camera : ICamera
 {
     private readonly Vector3 _origin;
     private readonly Vector3 _lower_left_corner;

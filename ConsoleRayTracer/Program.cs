@@ -1,7 +1,12 @@
 ﻿using ConsoleRayTracer;
+using System.Runtime.Versioning;
 
+[SupportedOSPlatform("windows")]
 class Program
 {
+    const int WIDTH = 120;
+    const int HEIGHT = 100;
+
     static readonly Random random = new();
 
     static void Main()
@@ -10,7 +15,12 @@ class Program
         const float BRIGHTNESS = 1.5f;
         const float REFLECTION = 0.3f;
 
-        Light light = new(new LightSource[] { new(new(0f, 1002.5f, 1000f), INTENSITY) });
+        App<WindowsTerminal, RayTracer> app = new(
+            terminal: new(WIDTH, HEIGHT),
+            renderer: new()
+        );
+
+        Light light = new(new LightSource[] { new(new(0f, 1000f, 1000f), INTENSITY) });
 
         World world = new(
             Enumerable.Range(0, 10)
@@ -25,45 +35,18 @@ class Program
                 .ToArray()
         );
 
-        for (var i = 0; ; i++)
+        app.StartMainLoop((app, frame) =>
         {
             Camera camera = new(
-                lookFrom: new(-10f, 2.5f, i * 0.125f),
+                lookFrom: new(-10f, 2.5f, frame * 0.125f),
                 lookAt: new(0f, 1f, 0f),
                 vUp: Vector3.UnitY,
                 vFov: 25f,
-                aspectRatio: (float)Screen.WIDTH / Screen.HEIGHT
+                aspectRatio: (float)WIDTH / HEIGHT
             );
 
-            Parallel.For(0, Screen.HEIGHT, y =>
-            {
-                for (var x = 0; x < Screen.WIDTH; x++)
-                {
-                    Screen.Set(x, y, PixelColor(x, y, world, camera, light));
-                }
-            });
-
-            Screen.Draw();
-        }
-    }
-
-    static float PixelColor(int x, int y, in World world, in Camera camera, in Light light) =>
-        RayTrace(world, light, camera.GetRay((float)x / Screen.WIDTH, (float)y / Screen.HEIGHT));
-
-    static float RayTrace(in World world, in Light light, Ray ray, int depth = 50)
-    {
-        if (depth == 0f)
-        {
-            return 0f;
-        }
-        if (world.Hit(ray, 0.001f, float.MaxValue) is HitRecord record)
-        {
-            var diffused = light.Enlighten(world, record);
-            var reflected = ray.Direction - 2 * Vector3.Dot(ray.Direction, record.Normal) * record.Normal;
-            var k = record.Reflection;
-            return Math.Clamp(k * RayTrace(world, light, new(record.Point, reflected), depth - 1) + (1 - k) * diffused, 0f, 1f);
-        }
-        return 0f;
+            app.Render(world, camera, light);
+        });
     }
 
     static float RandomInRange(float start, float end) =>

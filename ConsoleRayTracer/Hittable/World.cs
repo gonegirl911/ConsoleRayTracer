@@ -1,32 +1,18 @@
-namespace ConsoleRayTracer;
-
-interface IHittable
-{
-    HitRecord? Hit(in Ray ray, float tMin, float tMax);
-}
-
-readonly record struct HitRecord(
-    float T,
-    Vector3 Point,
-    Vector3 Normal,
-    bool FrontFace,
-    float Brightness,
-    float Reflection
-);
+﻿namespace ConsoleRayTracer;
 
 readonly struct World : IHittable
 {
-    public readonly IEnumerable<IHittable> Shapes { get; }
+    public readonly IEnumerable<IHittable> Hittables { get; }
 
-    public World(IEnumerable<IHittable> shapes) => Shapes = shapes;
+    public World(IEnumerable<IHittable> hittables) => Hittables = hittables;
 
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
         var closest = tMax;
         HitRecord? hitRecord = null;
-        foreach (var shape in Shapes)
+        foreach (var hittable in Hittables)
         {
-            if (shape.Hit(ray, tMin, closest) is HitRecord record)
+            if (hittable.Hit(ray, tMin, closest) is HitRecord record)
             {
                 closest = record.T;
                 hitRecord = record;
@@ -34,14 +20,6 @@ readonly struct World : IHittable
         }
         return hitRecord;
     }
-}
-
-readonly record struct Translate<H>(H Shape, Vector3 Offset) : IHittable where H : IHittable
-{
-    public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
-        Shape.Hit(ray with { Origin = ray.Origin - Offset }, tMin, tMax) is HitRecord record
-            ? record with { Point = record.Point + Offset }
-            : null;
 }
 
 readonly record struct Plane(Vector3 Normal, float Brightness, float Reflection) : IHittable
