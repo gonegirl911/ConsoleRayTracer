@@ -38,7 +38,7 @@ class Program
             vFov: 25f,
             aspectRatio: (float)WIDTH / HEIGHT,
             speed: 3f,
-            sensitivity: 0.1f
+            sensitivity: 0.2f
         );
 
         app.StartMainLoop((window, dt) =>
