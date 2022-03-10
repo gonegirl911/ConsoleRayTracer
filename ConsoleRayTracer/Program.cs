@@ -11,41 +11,40 @@ class Program
 
     static void Main()
     {
-        const float INTENSITY = 1.5f;
-        const float BRIGHTNESS = 1.5f;
-        const float REFLECTION = 0.3f;
-
         App<WindowsTerminal, RayTracer> app = new(
             terminal: new(WIDTH, HEIGHT),
             renderer: new()
         );
 
-        Light light = new(new LightSource[] { new(new(0f, 1000f, 1000f), INTENSITY) });
+        Light light = new(new LightSource[] { new(new(0f, 1000f, 1000f), 1.5f) });
 
         World world = new(
             Enumerable.Range(0, 10)
                 .Select(_ =>
                 {
-                    var x = RandomInRange(-5f, 5f);
-                    var y = RandomInRange(0.4f, 1.5f);
-                    var z = RandomInRange(-5f, 5f);
-                    return new Translate<Sphere>(new(y, BRIGHTNESS, REFLECTION), new(x, y, z)) as IHittable;
+                    var x = RandomInRange(-7f, 7f);
+                    var y = RandomInRange(0.5f, 1.5f);
+                    var z = RandomInRange(-7f, 7f);
+                    return new Translate<Sphere>(new(y, 1.5f, 0.3f), new(x, y, z)) as IHittable;
                 })
-                .Append(new ConsoleRayTracer.Plane(Vector3.UnitY, 2f, 0.7f))
+                .Append(new ConsoleRayTracer.Plane(Vector3.UnitY, 2.1f, 0.7f))
                 .ToArray()
         );
 
-        app.StartMainLoop((app, frame) =>
-        {
-            Camera camera = new(
-                lookFrom: new(-10f, 2.5f, frame * 0.125f),
-                lookAt: new(0f, 1f, 0f),
-                vUp: Vector3.UnitY,
-                vFov: 25f,
-                aspectRatio: (float)WIDTH / HEIGHT
-            );
+        Camera camera = new(
+            lookFrom: new(-10f, 2.5f, 10f),
+            lookAt: new(0f, 1f, 0f),
+            vUp: Vector3.UnitY,
+            vFov: 25f,
+            aspectRatio: (float)WIDTH / HEIGHT,
+            speed: 3f,
+            sensitivity: 0.1f
+        );
 
-            app.Render(world, camera, light);
+        app.StartMainLoop((window, dt) =>
+        {
+            camera.Move(window.KeyPressed(), dt / 1000);
+            window.Draw(world, camera, light);
         });
     }
 

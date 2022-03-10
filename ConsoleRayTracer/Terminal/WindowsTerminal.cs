@@ -52,4 +52,32 @@ class WindowsTerminal : ITerminal
             ref _rect
         );
     }
+
+    public ConsoleKey KeyPressed()
+    {
+        if ((GetKeyState((VirtualKeyStates)0x57) & KEY_PRESSED) != 0)
+            return ConsoleKey.W;
+        else if ((GetKeyState((VirtualKeyStates)0x41) & KEY_PRESSED) != 0)
+            return ConsoleKey.A;
+        else if ((GetKeyState((VirtualKeyStates)0x53) & KEY_PRESSED) != 0)
+            return ConsoleKey.S;
+        else if ((GetKeyState((VirtualKeyStates)0x44) & KEY_PRESSED) != 0)
+            return ConsoleKey.D;
+
+        else if ((GetKeyState(VirtualKeyStates.VK_UP) & KEY_PRESSED) != 0)
+            return ConsoleKey.UpArrow;
+        else if ((GetKeyState(VirtualKeyStates.VK_LEFT) & KEY_PRESSED) != 0)
+            return ConsoleKey.LeftArrow;
+        else if ((GetKeyState(VirtualKeyStates.VK_DOWN) & KEY_PRESSED) != 0)
+            return ConsoleKey.DownArrow;
+        else if ((GetKeyState(VirtualKeyStates.VK_RIGHT) & KEY_PRESSED) != 0)
+            return ConsoleKey.RightArrow;
+
+        else if ((GetKeyState(VirtualKeyStates.VK_SPACE) & KEY_PRESSED) != 0)
+            return ConsoleKey.Spacebar;
+        else if ((GetKeyState((VirtualKeyStates)0x5A) & KEY_PRESSED) != 0)
+            return ConsoleKey.Z;
+
+        return 0;
+    }
 }
