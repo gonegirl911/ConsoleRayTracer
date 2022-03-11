@@ -39,6 +39,7 @@ readonly struct Window<T, R> where T : ITerminal where R : IRenderer
         where L : ILight
     {
         var window = this;
+
         Parallel.For(0, _terminal.Height, y =>
         {
             Parallel.For(0, window._terminal.Width, x =>

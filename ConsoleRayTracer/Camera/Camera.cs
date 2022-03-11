@@ -1,7 +1,9 @@
 namespace ConsoleRayTracer;
 
-struct Camera : ICamera
+class Camera : ICamera
 {
+    private const float SAFE_FRAC_PI_2 = (float)(Math.PI / 2 - 0.0001);
+
     private Vector3 _origin;
     private Vector3 _forward;
     private Vector3 _right;
@@ -10,6 +12,8 @@ struct Camera : ICamera
     private readonly float _w;
     private readonly float _h;
 
+    private Vector3 _vForward;
+    private Vector3 _vUp;
     private float _yaw;
     private float _pitch;
 
@@ -33,9 +37,11 @@ struct Camera : ICamera
         _forward = Vector3.Normalize(lookAt - lookFrom);
         _right = Vector3.Normalize(Vector3.Cross(vUp, _forward));
         _up = Vector3.Cross(_forward, _right);
+        _vForward = Vector3.Normalize(_forward with { Y = 0 });
+        _vUp = vUp;
 
-        _yaw = (float)Math.Atan2(_forward.X, _forward.Z);
-        _pitch = (float)Math.Asin(-_forward.Y);
+        _yaw = (float)Math.Atan2(_forward.Z, _forward.X);
+        _pitch = (float)Math.Asin(_forward.Y);
 
         _origin = lookFrom;
         _speed = speed;
@@ -49,12 +55,12 @@ struct Camera : ICamera
     {
         _origin += key switch
         {
-            ConsoleKey.W => _speed * dt * _forward,
+            ConsoleKey.W => _speed * dt * _vForward,
             ConsoleKey.A => _speed * dt * -_right,
-            ConsoleKey.S => _speed * dt * -_forward,
+            ConsoleKey.S => _speed * dt * -_vForward,
             ConsoleKey.D => _speed * dt * _right,
-            ConsoleKey.Spacebar => _speed * dt * _up,
-            ConsoleKey.Z => _speed * dt * -_up,
+            ConsoleKey.Spacebar => _speed * dt * _vUp,
+            ConsoleKey.Z => _speed * dt * -_vUp,
             _ => new(0f),
         };
 
@@ -72,13 +78,15 @@ struct Camera : ICamera
             _ => 0f,
         };
 
-        _pitch = Math.Clamp(-(float)Math.PI / 2, _pitch, (float)Math.PI / 2);
+        _yaw %= (float)(Math.PI * 2);
+        _pitch = Math.Clamp(_pitch, -SAFE_FRAC_PI_2, SAFE_FRAC_PI_2);
 
         var (sinYaw, cosYaw) = Math.SinCos(_yaw);
         var (sinPitch, cosPitch) = Math.SinCos(_pitch);
 
-        //_forward = new((float)(cosYaw * cosPitch), (float)sinPitch, (float)(sinYaw * cosPitch));
-        //_right = new((float)-sinYaw, 0f, (float)cosYaw);
-        //_up = Vector3.Cross(_forward, _right);
+        _forward = new((float)(cosYaw * cosPitch), (float)sinPitch, (float)(sinYaw * cosPitch));
+        _right = Vector3.Normalize(Vector3.Cross(_vUp, _forward));
+        _up = Vector3.Cross(_forward, _right);
+        _vForward = Vector3.Normalize(_forward with { Y = 0 });
     }
 }
