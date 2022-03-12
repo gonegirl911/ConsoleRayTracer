@@ -54,5 +54,5 @@ readonly struct Window<T, R> where T : ITerminal where R : IRenderer
         _terminal.Draw();
     }
 
-    public ConsoleKey KeyPressed() => _terminal.KeyPressed();
+    public ConsoleKey? KeyPressed() => _terminal.KeyPressed();
 }

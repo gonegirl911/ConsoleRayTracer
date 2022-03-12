@@ -1,11 +1,7 @@
 ﻿namespace ConsoleRayTracer;
 
-readonly struct World : IHittable
+readonly record struct World(IEnumerable<IHittable> Hittables) : IHittable
 {
-    public readonly IEnumerable<IHittable> Hittables { get; }
-
-    public World(IEnumerable<IHittable> hittables) => Hittables = hittables;
-
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
         var closest = tMax;

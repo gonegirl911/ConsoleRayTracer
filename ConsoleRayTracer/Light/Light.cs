@@ -1,11 +1,7 @@
 namespace ConsoleRayTracer;
 
-readonly struct Light : ILight
+readonly record struct Light(IEnumerable<LightSource> Sources) : ILight
 {
-    public readonly IEnumerable<LightSource> Sources { get; }
-
-    public Light(IEnumerable<LightSource> sources) => Sources = sources;
-
     public float Illuminate<H>(in H hittable, in HitRecord record) where H : IHittable
     {
         var light = 0f;

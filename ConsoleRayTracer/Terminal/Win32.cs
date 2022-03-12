@@ -36,34 +36,10 @@ static class Win32
     );
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct COORD
-    {
-        public short X;
-        public short Y;
-
-        public COORD(short x, short y)
-        {
-            X = x;
-            Y = y;
-        }
-    }
+    public readonly record struct COORD(short X, short Y);
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct SMALL_RECT
-    {
-        public short Left;
-        public short Top;
-        public short Right;
-        public short Bottom;
-
-        public SMALL_RECT(short left, short top, short right, short bottom)
-        {
-            Left = left;
-            Top = top;
-            Right = right;
-            Bottom = bottom;
-        }
-    }
+    public readonly record struct SMALL_RECT(short Left, short Top, short Right, short Bottom);
 
     [StructLayout(LayoutKind.Explicit)]
     public struct CHAR_INFO
@@ -96,7 +72,7 @@ static class Win32
 
     public const int KEY_PRESSED = 0x8000;
 
-    public enum VirtualKeyStates : int
+    public enum VirtualKeyStates
     {
         VK_LBUTTON = 0x01,
         VK_RBUTTON = 0x02,

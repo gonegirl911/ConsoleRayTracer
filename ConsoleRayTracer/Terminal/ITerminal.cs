@@ -7,5 +7,5 @@ interface ITerminal
 
     void SetPixel(int x, int y, float color);
     void Draw();
-    ConsoleKey KeyPressed();
+    ConsoleKey? KeyPressed();
 }
