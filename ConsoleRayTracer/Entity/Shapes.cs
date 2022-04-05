@@ -1,14 +1,14 @@
 ﻿namespace ConsoleRayTracer;
 
-readonly record struct World(IEnumerable<IHittable> Hittables) : IHittable
+readonly record struct World(IEnumerable<IEntity> Entities) : IAnimatedEntity
 {
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
         var closest = tMax;
         HitRecord? hitRecord = null;
-        foreach (var hittable in Hittables)
+        foreach (var entity in Entities)
         {
-            if (hittable.Hit(ray, tMin, closest) is HitRecord record)
+            if (entity.Hit(ray, tMin, closest) is HitRecord record)
             {
                 closest = record.T;
                 hitRecord = record;
@@ -16,9 +16,20 @@ readonly record struct World(IEnumerable<IHittable> Hittables) : IHittable
         }
         return hitRecord;
     }
+
+    public void Update(float dt)
+    {
+        foreach (var entity in Entities)
+        {
+            if (entity is IAnimatedEntity e)
+            {
+                e.Update(dt);
+            }
+        }
+    }
 }
 
-readonly record struct Plane(Vector3 Normal, float Brightness, float Reflection) : IHittable
+readonly record struct Plane(Vector3 Normal) : IEntity
 {
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
@@ -36,11 +47,11 @@ readonly record struct Plane(Vector3 Normal, float Brightness, float Reflection)
 
         var point = ray.PointAt(t);
         var (frontFace, normal) = ray.OppositeNormal(Normal);
-        return new(t, point, normal, frontFace, Brightness, Reflection);
+        return new(t, point, normal, frontFace);
     }
 }
 
-readonly record struct Sphere(float Radius, float Brightness, float Reflection) : IHittable
+readonly record struct Sphere(float Radius) : IEntity
 {
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
@@ -69,6 +80,6 @@ readonly record struct Sphere(float Radius, float Brightness, float Reflection) 
         var point = ray.PointAt(t);
         var outwardNormal = point / Radius;
         var (frontFace, normal) = ray.OppositeNormal(outwardNormal);
-        return new(t, point, normal, frontFace, Brightness, Reflection);
+        return new(t, point, normal, frontFace);
     }
 }

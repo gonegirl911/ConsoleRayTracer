@@ -75,6 +75,12 @@ class WindowsTerminal : ITerminal
             return ConsoleKey.Spacebar;
         else if ((GetKeyState((VirtualKeyStates)0x5A) & KEY_PRESSED) != 0)
             return ConsoleKey.Z;
+        else if ((GetKeyState((VirtualKeyStates)0x50) & KEY_PRESSED) != 0)
+            return ConsoleKey.P;
+        else if ((GetKeyState((VirtualKeyStates)0x4B) & KEY_PRESSED) != 0)
+            return ConsoleKey.K;
+        else if ((GetKeyState((VirtualKeyStates)0x4C) & KEY_PRESSED) != 0)
+            return ConsoleKey.L;
         else
             return null;
     }

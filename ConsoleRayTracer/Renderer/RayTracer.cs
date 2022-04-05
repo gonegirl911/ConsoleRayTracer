@@ -2,28 +2,28 @@
 
 readonly struct RayTracer : IRenderer
 {
-    public float PixelColor<H, C, L>(float s, float t, in H hittable, in C camera, in L light)
-        where H : IHittable
+    public float PixelColor<E, C, L>(float s, float t, in E entity, in L light, in C camera)
+        where E : IEntity
+        where L : IEntity
         where C : ICamera
-        where L : ILight
     {
-        return RayTrace(hittable, light, camera.GetRay(s, t));
+        return RayTrace(entity, light, camera.GetRay(s, t));
     }
 
-    private float RayTrace<H, L>(in H hittable, in L light, in Ray ray, int depth = 50)
-        where H : IHittable
-        where L : ILight
+    private float RayTrace<E, L>(in E entity, in L light, in Ray ray, int depth = 50)
+        where E : IEntity
+        where L : IEntity
     {
         if (depth == 0f)
         {
             return 0f;
         }
-        if (hittable.Hit(ray, 0.001f, float.MaxValue) is HitRecord record)
+        if (entity.Hit(ray, 0.001f, float.MaxValue) is HitRecord record)
         {
-            var diffused = light.Illuminate(hittable, record);
+            var diffused = light.Illuminate(entity, record);
             var reflected = ray.Direction - 2 * Vector3.Dot(ray.Direction, record.Normal) * record.Normal;
-            var k = record.Reflection;
-            return Math.Clamp(k * RayTrace(hittable, light, new(record.Point, reflected), depth - 1) + (1 - k) * diffused, 0f, 1f);
+            var k = record.Reflectance;
+            return Math.Clamp(k * RayTrace(entity, light, new(record.Point, reflected), depth - 1) + (1 - k) * diffused, 0f, 1f);
         }
         return 0f;
     }

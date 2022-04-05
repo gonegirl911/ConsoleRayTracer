@@ -52,8 +52,7 @@ class Camera : ICamera
 
     public void Move(ConsoleKey? key, float dt)
     {
-        var dp = _speed * dt;
-
+        var dp = _speed * dt / 1000;
         var forward = Vector3.Normalize(_forward with { Y = 0 });
         var right = _right;
         var up = _vUp;
@@ -72,7 +71,7 @@ class Camera : ICamera
 
     private Vector3 Rotate(ConsoleKey? key, float dt)
     {
-        var dr = _sensitivity * dt;
+        var dr = _sensitivity * dt / 1000;
 
         _yaw += key switch
         {
@@ -80,7 +79,6 @@ class Camera : ICamera
             ConsoleKey.RightArrow => -dr,
             _ => 0f,
         };
-
         _pitch += key switch
         {
             ConsoleKey.UpArrow => dr,

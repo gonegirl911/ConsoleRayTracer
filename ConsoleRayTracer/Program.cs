@@ -1,13 +1,12 @@
 ﻿using ConsoleRayTracer;
 using System.Runtime.Versioning;
+using Plane = ConsoleRayTracer.Plane;
 
 [SupportedOSPlatform("windows")]
 class Program
 {
     const int WIDTH = 120;
     const int HEIGHT = 100;
-
-    static readonly Random random = new();
 
     static void Main()
     {
@@ -16,8 +15,6 @@ class Program
             renderer: new()
         );
 
-        Light light = new(new LightSource[] { new(new(0f, 1000f, 1000f), 1.5f) });
-
         World world = new(
             Enumerable.Range(0, 10)
                 .Select(_ =>
@@ -25,15 +22,91 @@ class Program
                     var x = RandomInRange(-7f, 7f);
                     var y = RandomInRange(0.5f, 1.5f);
                     var z = RandomInRange(-7f, 7f);
-                    return new Translate<Sphere>(new(y, 1.5f, 0.3f), new(x, y, z)) as IHittable;
+                    return new Apply<Sphere>(
+                        Entity: new(y),
+                        Offset: new(x, y, z),
+                        Brightness: 1.5f,
+                        Reflectance: 0.3f
+                    ) as IEntity;
                 })
-                .Append(new ConsoleRayTracer.Plane(Vector3.UnitY, 2.1f, 0.7f))
+                .Append(new Animated<Apply<Sphere>>(
+                    Entity: new(
+                        Entity: new(1f),
+                        Offset: new(0f, 1f, 0f),
+                        Brightness: 1.5f
+                    ),
+                    Offset: new Chain<Vector3>(new IAnimation<Vector3>[]
+                    {   
+                        new Animation<Vector3, CircularPath<AxisY>, LinearInterpolator>(
+                            Motion: new(10f, new()),
+                            Interpolator: new(),
+                            Duration: 2000f
+                        ),
+                        new Animation<Vector3, LinearPath, DecelerateInterpolator>(
+                            Motion: new(new(0f, 10f, 0f)),
+                            Interpolator: new(2f),
+                            Duration: 750f
+                        ),
+                        new Animation<Vector3, LinearPath, AccelerateInterpolator>(
+                            Motion: new(new(0f, -10f, 0f)),
+                            Interpolator: new(2f),
+                            Duration: 750f
+                        ),
+                        new Animation<Vector3, LinearPath, DecelerateInterpolator>(
+                            Motion: new(new(0f, 2f, 0f)),
+                            Interpolator: new(2f),
+                            Duration: 150f
+                        ),
+                        new Animation<Vector3, LinearPath, AccelerateInterpolator>(
+                            Motion: new(new(0f, -2f, 0f)),
+                            Interpolator: new(2f),
+                            Duration: 150f
+                        ),
+                    }),
+                    Reflectance: new Chain<float>(new IAnimation<float>[]
+                    {
+                        new Animation<float, LinearMotion, LinearInterpolator>(
+                            Motion: new(0f, 1f),
+                            Interpolator: new(),
+                            Duration: 1900f
+                        ),
+                        new Animation<float, LinearMotion, LinearInterpolator>(
+                            Motion: new(0f, -1f),
+                            Interpolator: new(),
+                            Duration: 1900f
+                        )
+                    })
+                 ))
+                .Append(new Apply<Plane>(
+                    Entity: new(Vector3.UnitY),
+                    Brightness: 2.1f,
+                    Reflectance: 0.7f
+                 ))
                 .ToArray()
         );
 
+        Light light = new(new IEntity[]
+        {
+            new Animated<Apply<LightSource>>(
+                Entity: new(
+                    Entity: new(),
+                    Brightness: 1.5f
+                ),
+                Offset: new Animation<Vector3, CircularPath<AxisZ>, FunctionalInterpolator>(
+                    Motion: new(1000f, new()),
+                    Interpolator: new(input =>
+                        input >= 0f
+                            ? input < 0.9f ? input * 5 / 9 : input * 5
+                            : input < -0.1f ? input * 5 / 9 - 4f / 9 : input * 5
+                    ),
+                    Duration: 20_000f
+                )
+            ),
+        });
+
         Camera camera = new(
-            lookFrom: new(-10f, 2.5f, 10f),
-            lookAt: new(0f, 1f, 0f),
+            lookFrom: new(10f, 10f, -25f),
+            lookAt: new(0f, 4f, 0f),
             vUp: Vector3.UnitY,
             vFov: 25f,
             aspectRatio: (float)WIDTH / HEIGHT,
@@ -41,13 +114,19 @@ class Program
             sensitivity: 0.5f
         );
 
+        Animator animator = new(0.2f);
+
         app.StartMainLoop((window, dt) =>
         {
-            camera.Move(window.KeyPressed(), dt / 1000);
-            window.Draw(world, camera, light);
+            var key = window.KeyPressed();
+            animator.Update(key, world, light, dt);
+            camera.Move(key, dt);
+            window.Draw(world, light, camera);
         });
     }
 
+    static readonly Random _random = new();
+
     static float RandomInRange(float start, float end) =>
-        start + (float)random.NextDouble() * (end - start);
+        start + (float)_random.NextDouble() * (end - start);
 }
