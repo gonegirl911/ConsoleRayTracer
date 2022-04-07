@@ -12,13 +12,13 @@ readonly record struct Light(IEnumerable<IEntity> Sources) : IAnimatedEntity
         return accum;
     }
 
-    public void Update(float dt)
+    public void Update(float timeElapsed)
     {
         foreach (var source in Sources)
         {
             if (source is IAnimatedEntity e)
             {
-                e.Update(dt);
+                e.Update(timeElapsed);
             }
         }
     }

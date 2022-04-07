@@ -4,9 +4,11 @@ class Animator
 {
     private readonly float _sensitivity;
     private readonly float _changeRate;
+
     private float _speed;
     private bool _isRunning;
     private bool _acceptPause = true;
+    private float _timeElapsed = 0f;
 
     public Animator(float sensitivity, float speed = 1f, bool isRunning = true)
     {
@@ -35,8 +37,8 @@ class Animator
             _ => (_speed, 0f),
         };
 
-        dt = _isRunning ? dt * _speed : change;
-        entity.Update(dt);
-        light.Update(dt);
+        _timeElapsed += _isRunning ? dt * _speed : change;
+        entity.Update(_timeElapsed);
+        light.Update(_timeElapsed);
     }
 }

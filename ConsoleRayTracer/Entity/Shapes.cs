@@ -17,13 +17,13 @@ readonly record struct World(IEnumerable<IEntity> Entities) : IAnimatedEntity
         return hitRecord;
     }
 
-    public void Update(float dt)
+    public void Update(float timeElapsed)
     {
         foreach (var entity in Entities)
         {
             if (entity is IAnimatedEntity e)
             {
-                e.Update(dt);
+                e.Update(timeElapsed);
             }
         }
     }

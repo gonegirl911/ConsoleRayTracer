@@ -35,7 +35,7 @@ class Program
                         Offset: new(0f, 1f, 0f),
                         Brightness: 1.5f
                     ),
-                    Offset: new Chain<Vector3>(new IAnimation<Vector3>[]
+                    Offset: new PathChain(new IAnimation<Vector3>[]
                     {   
                         new Animation<Vector3, CircularPath<AxisY>, LinearInterpolator>(
                             Motion: new(10f, new()),
@@ -63,15 +63,15 @@ class Program
                             Duration: 150f
                         ),
                     }),
-                    Reflectance: new Chain<float>(new IAnimation<float>[]
+                    Reflectance: new MotionChain(new IAnimation<float>[]
                     {
                         new Animation<float, LinearMotion, LinearInterpolator>(
-                            Motion: new(0f, 1f),
+                            Motion: new(1f),
                             Interpolator: new(),
                             Duration: 1900f
                         ),
                         new Animation<float, LinearMotion, LinearInterpolator>(
-                            Motion: new(0f, -1f),
+                            Motion: new(-1f),
                             Interpolator: new(),
                             Duration: 1900f
                         )
@@ -105,8 +105,8 @@ class Program
         });
 
         Camera camera = new(
-            lookFrom: new(10f, 10f, -25f),
-            lookAt: new(0f, 4f, 0f),
+            lookFrom: new(-16f, 8f, -16f),
+            lookAt: new(0f, 3f, 0f),
             vUp: Vector3.UnitY,
             vFov: 25f,
             aspectRatio: (float)WIDTH / HEIGHT,
@@ -114,7 +114,7 @@ class Program
             sensitivity: 0.5f
         );
 
-        Animator animator = new(0.2f);
+        Animator animator = new(sensitivity: 0.2f);
 
         app.StartMainLoop((window, dt) =>
         {

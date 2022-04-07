@@ -2,7 +2,7 @@
 
 interface IAnimatedEntity : IEntity
 {
-    void Update(float dt);
+    void Update(float timeElapsed);
 }
 
 record Animated<E>(
@@ -13,7 +13,6 @@ record Animated<E>(
 ) : IAnimatedEntity
     where E : IEntity
 {
-    private float _timeElapsed = 0f;
     private Vector3 _offset = new(0f);
     private float _brightness = 1f;
     private float _reflectance = 0f;
@@ -26,11 +25,10 @@ record Animated<E>(
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity =>
         Entity.Illuminate(new Apply<I>(entity, -_offset), record with { Point = record.Point - _offset }) * _brightness;
 
-    public void Update(float dt)
+    public void Update(float timeElapsed)
     {
-        _timeElapsed += dt;
-        _offset = Offset?.GetValue(_timeElapsed) ?? new(0f);
-        _brightness = Brightness?.GetValue(_timeElapsed) ?? 1f;
-        _reflectance = Reflectance?.GetValue(_timeElapsed) ?? 0f;
+        _offset = Offset?.GetValue(timeElapsed) ?? new(0f);
+        _brightness = Brightness?.GetValue(timeElapsed) ?? 1f;
+        _reflectance = Reflectance?.GetValue(timeElapsed) ?? 0f;
     }
 }

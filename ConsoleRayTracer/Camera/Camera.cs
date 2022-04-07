@@ -5,18 +5,17 @@ class Camera : ICamera
     private const float SAFE_FRAC_PI_2 = (float)Math.PI / 2 - 0.0001f;
 
     private Vector3 _origin;
-    private float _yaw;
-    private float _pitch;
-
     private Vector3 _forward;
     private Vector3 _right;
     private Vector3 _up;
+
+    private float _yaw;
+    private float _pitch;
 
     private readonly float _w;
     private readonly float _h;
 
     private readonly Vector3 _vUp;
-
     private readonly float _speed;
     private readonly float _sensitivity;
 
@@ -30,10 +29,7 @@ class Camera : ICamera
         float sensitivity
     )
     {
-        var theta = vFov * (float)Math.PI / 180;
-        _h = (float)Math.Tan(theta / 2) * 2;
-        _w = _h * aspectRatio;
-
+        _origin = lookFrom;
         _forward = Vector3.Normalize(lookAt - lookFrom);
         _right = Vector3.Normalize(Vector3.Cross(vUp, _forward));
         _up = Vector3.Cross(_forward, _right);
@@ -41,7 +37,9 @@ class Camera : ICamera
         _yaw = (float)Math.Atan2(_forward.Z, _forward.X);
         _pitch = (float)Math.Asin(_forward.Y);
 
-        _origin = lookFrom;
+        _h = (float)Math.Tan(vFov * Math.PI / 360) * 2;
+        _w = _h * aspectRatio;
+
         _vUp = vUp;
         _speed = speed;
         _sensitivity = sensitivity;

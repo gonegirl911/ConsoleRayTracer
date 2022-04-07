@@ -45,9 +45,7 @@ readonly record struct AnticipateOvershootInterpolator(float Tension) : IInterpo
 
 readonly record struct CycleInterpolator(float Cycles)
 {
-    private readonly double _factor = 2 * Math.PI * Cycles;
-
-    public float GetIterpolation(float input) => (float)Math.Sin(_factor * input);
+    public float GetIterpolation(float input) => (float)Math.Sin(2 * Math.PI * Cycles * input);
 }
 
 readonly record struct FunctionalInterpolator(Func<float, float> Func) : IInterpolator

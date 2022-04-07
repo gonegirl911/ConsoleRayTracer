@@ -12,16 +12,19 @@ readonly record struct Ray(Vector3 Origin, Vector3 Direction)
 
 static class Vector3Extensions
 {
-    public static void Set(ref this Vector3 vector3, int axis, float value)
+    public static ref float Get(ref this Vector3 vector3, int axis)
     {
-        if (axis == 0)
-            vector3.X = value;
-        else if (axis == 1)
-            vector3.Y = value;
-        else if (axis == 2)
-            vector3.Z = value;
-        else
-            throw new IndexOutOfRangeException("axis must be between 0 and 2");
+        switch (axis)
+        {
+            case 0:
+                return ref vector3.X;
+            case 1:
+                return ref vector3.Y;
+            case 2:
+                return ref vector3.Z;
+            default:
+                throw new IndexOutOfRangeException("axis must be between 0 and 2");
+        }            
     }
 }
 
