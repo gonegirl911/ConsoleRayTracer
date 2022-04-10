@@ -13,7 +13,7 @@ class Animator
     public Animator(float sensitivity, float speed = 1f, bool isRunning = true)
     {
         _sensitivity = sensitivity;
-        _changeRate = sensitivity * 100;
+        _changeRate = sensitivity * 100f;
         _speed = speed;
         _isRunning = isRunning;
     }
@@ -22,19 +22,15 @@ class Animator
         where E : IAnimatedEntity
         where L : IAnimatedEntity
     {
-        (_isRunning, _acceptPause) = (key, _acceptPause) switch
+        (_speed, _isRunning, _acceptPause, var change) = (key, _isRunning, _acceptPause) switch
         {
-            (ConsoleKey.P, true) => (!_isRunning, false),
-            (ConsoleKey.P, false) => (_isRunning, false),
-            _ => (_isRunning, true),
-        };
-        (_speed, var change) = (key, _isRunning) switch
-        {
-            (ConsoleKey.K, true) => (_speed - _sensitivity, 0f),
-            (ConsoleKey.L, true) => (_speed + _sensitivity, 0f),
-            (ConsoleKey.K, false) => (_speed, -_changeRate),
-            (ConsoleKey.L, false) => (_speed, _changeRate),
-            _ => (_speed, 0f),
+            (ConsoleKey.P, _, true) => (_speed, !_isRunning, false, 0f),
+            (ConsoleKey.P, _, false) => (_speed, _isRunning, false, 0f),
+            (ConsoleKey.K, true, _) => (_speed - _sensitivity, _isRunning, true, 0f),
+            (ConsoleKey.L, true, _) => (_speed + _sensitivity, _isRunning, true, 0f),
+            (ConsoleKey.K, false, _) => (_speed, _isRunning, true, -_changeRate),
+            (ConsoleKey.L, false, _) => (_speed, _isRunning, true, _changeRate),
+            _ => (_speed, _isRunning, true, 0f),
         };
 
         _timeElapsed += _isRunning ? dt * _speed : change;

@@ -5,8 +5,8 @@ using Plane = ConsoleRayTracer.Plane;
 [SupportedOSPlatform("windows")]
 class Program
 {
-    const int WIDTH = 120;
-    const int HEIGHT = 100;
+    const short WIDTH = 120;
+    const short HEIGHT = 100;
 
     static void Main()
     {
@@ -74,7 +74,7 @@ class Program
                             Motion: new(-1f),
                             Interpolator: new(),
                             Duration: 1900f
-                        )
+                        ),
                     })
                  ))
                 .Append(new Apply<Plane>(
@@ -94,11 +94,7 @@ class Program
                 ),
                 Offset: new Animation<Vector3, CircularPath<AxisZ>, FunctionalInterpolator>(
                     Motion: new(1000f, new()),
-                    Interpolator: new(input =>
-                        input >= 0f
-                            ? input < 0.9f ? input * 5 / 9 : input * 5
-                            : input < -0.1f ? input * 5 / 9 - 4f / 9 : input * 5
-                    ),
+                    Interpolator: new(input => input < 0.9f ? input * 5f / 9f : input * 5f),
                     Duration: 20_000f
                 )
             ),

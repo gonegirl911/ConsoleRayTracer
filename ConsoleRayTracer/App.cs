@@ -1,4 +1,6 @@
-﻿namespace ConsoleRayTracer;
+﻿using System.Diagnostics;
+
+namespace ConsoleRayTracer;
 
 class App<T, R> where T : ITerminal where R : IRenderer
 {
@@ -11,13 +13,14 @@ class App<T, R> where T : ITerminal where R : IRenderer
 
     public void StartMainLoop(Action<Window<T, R>, float> action)
     {
-        var lastFrame = DateTime.Now;
+        var stopwatch = Stopwatch.StartNew();
+        var lastFrame = 0L;
         while (true)
         {
-            var now = DateTime.Now;
+            var now = stopwatch.ElapsedMilliseconds;
             var dt = now - lastFrame;
             lastFrame = now;
-            action(_window, (float)dt.TotalMilliseconds);
+            action(_window, dt);
         }
     }
 }
@@ -38,12 +41,15 @@ class Window<T, R> where T : ITerminal where R : IRenderer
         where L : IEntity
         where C : ICamera
     {
+        var scaleX = 1f / _terminal.Width;
+        var scaleY = 1f / _terminal.Height;
+
         Parallel.For(0, _terminal.Height, y =>
         {
             Parallel.For(0, _terminal.Width, x =>
             {
-                var s = (float)x / _terminal.Width;
-                var t = (float)y / _terminal.Height;
+                var s = x * scaleX;
+                var t = y * scaleY;
                 var pixelColor = _renderer.PixelColor(s, t, entity, light, camera);
                 _terminal.SetPixel(x, y, pixelColor);
             });

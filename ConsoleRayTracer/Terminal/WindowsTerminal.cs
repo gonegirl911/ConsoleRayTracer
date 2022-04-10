@@ -7,10 +7,10 @@ namespace ConsoleRayTracer;
 [SupportedOSPlatform("windows")]
 class WindowsTerminal : ITerminal
 {
-    private static readonly char[] ASCII = " .:+%#@".ToCharArray();
-
     public short Width { get; }
     public short Height { get; }
+
+    private static readonly char[] ASCII = " .:+%#@".ToCharArray();
 
     private readonly IntPtr _handle;
     private readonly CHAR_INFO[] _buf;
@@ -40,7 +40,7 @@ class WindowsTerminal : ITerminal
     }
 
     public void SetPixel(int x, int y, float color) =>
-        _buf[(Height - y - 1) * Width + x] = new(ASCII[(int)Math.Round(color * (ASCII.Length - 1))]);
+        _buf[(Height - y - 1) * Width + x] = new(ASCII[(int)(color * ASCII.Length - 1e-12)]);
 
     public void Draw()
     {
