@@ -5,8 +5,8 @@ using Plane = ConsoleRayTracer.Plane;
 [SupportedOSPlatform("windows")]
 class Program
 {
-    const short WIDTH = 120;
-    const short HEIGHT = 100;
+    const short WIDTH = 90;
+    const short HEIGHT = 75;
 
     static void Main()
     {
@@ -15,75 +15,97 @@ class Program
             renderer: new()
         );
 
-        World world = new(
-            Enumerable.Range(0, 10)
-                .Select(_ =>
+        World world = new(new IEntity[]
+        {
+            new Apply<Cylinder>(
+                Entity: new(1f, 4f),
+                Offset: new(-5f, 0f, 0f),
+                Brightness: 1.5f,
+                Reflectance: 0.3f
+            ),
+            new Apply<Cone>(
+                Entity: new(1f, 4f),
+                Brightness: 1.5f,
+                Reflectance: 0.3f
+            ),
+            new Apply<Cylinder>(
+                Entity: new(1f, 4f),
+                Offset: new(5f, 0f, 0f),
+                Brightness: 1.5f,
+                Reflectance: 0.3f
+            ),
+            new Apply<Sphere>(
+                Entity: new(1f),
+                Offset: new(-5f, 6f, 0f),
+                Brightness: 1.5f,
+                Reflectance: 0.3f
+            ),
+            new Apply<RectPrism>(
+                Entity: new(2f, 2f, 2f),
+                Offset: new(0f, 5f, 0f),
+                Brightness: 1.5f,
+                Reflectance: 0.3f
+            ),
+            new Apply<Sphere>(
+                Entity: new(1f),
+                Offset: new(5f, 6f, 0f),
+                Brightness: 1.5f,
+                Reflectance: 0.3f
+            ),
+            new Animated<Apply<Sphere>>(
+                Entity: new(
+                    Entity: new(1f),
+                    Offset: new(0f, 1f, 0f),
+                    Brightness: 1.5f
+                ),
+                Offset: new PathChain(new IAnimation<Vector3>[]
                 {
-                    var x = RandomInRange(-7f, 7f);
-                    var y = RandomInRange(0.5f, 1.5f);
-                    var z = RandomInRange(-7f, 7f);
-                    return new Apply<Sphere>(
-                        Entity: new(y),
-                        Offset: new(x, y, z),
-                        Brightness: 1.5f,
-                        Reflectance: 0.3f
-                    ) as IEntity;
-                })
-                .Append(new Animated<Apply<Sphere>>(
-                    Entity: new(
-                        Entity: new(1f),
-                        Offset: new(0f, 1f, 0f),
-                        Brightness: 1.5f
+                    new Animation<Vector3, CircularPath<AxisY>, LinearInterpolator>(
+                        Motion: new(10f, new()),
+                        Interpolator: new(),
+                        Duration: 2000f
                     ),
-                    Offset: new PathChain(new IAnimation<Vector3>[]
-                    {   
-                        new Animation<Vector3, CircularPath<AxisY>, LinearInterpolator>(
-                            Motion: new(10f, new()),
-                            Interpolator: new(),
-                            Duration: 2000f
-                        ),
-                        new Animation<Vector3, LinearPath, DecelerateInterpolator>(
-                            Motion: new(new(0f, 10f, 0f)),
-                            Interpolator: new(2f),
-                            Duration: 750f
-                        ),
-                        new Animation<Vector3, LinearPath, AccelerateInterpolator>(
-                            Motion: new(new(0f, -10f, 0f)),
-                            Interpolator: new(2f),
-                            Duration: 750f
-                        ),
-                        new Animation<Vector3, LinearPath, DecelerateInterpolator>(
-                            Motion: new(new(0f, 2f, 0f)),
-                            Interpolator: new(2f),
-                            Duration: 150f
-                        ),
-                        new Animation<Vector3, LinearPath, AccelerateInterpolator>(
-                            Motion: new(new(0f, -2f, 0f)),
-                            Interpolator: new(2f),
-                            Duration: 150f
-                        ),
-                    }),
-                    Reflectance: new MotionChain(new IAnimation<float>[]
-                    {
-                        new Animation<float, LinearMotion, LinearInterpolator>(
-                            Motion: new(1f),
-                            Interpolator: new(),
-                            Duration: 1900f
-                        ),
-                        new Animation<float, LinearMotion, LinearInterpolator>(
-                            Motion: new(-1f),
-                            Interpolator: new(),
-                            Duration: 1900f
-                        ),
-                    })
-                 ))
-                .Append(new Apply<Plane>(
-                    Entity: new(Vector3.UnitY),
-                    Brightness: 2.1f,
-                    Reflectance: 0.7f
-                 ))
-                .ToArray()
-        );
+                    new Animation<Vector3, LinearPath, DecelerateInterpolator>(
+                        Motion: new(new(0f, 10f, 0f)),
+                        Interpolator: new(2f),
+                        Duration: 750f
+                    ),
+                    new Animation<Vector3, LinearPath, AccelerateInterpolator>(
+                        Motion: new(new(0f, -10f, 0f)),
+                        Interpolator: new(2f),
+                        Duration: 750f
+                    ),
+                    new Animation<Vector3, LinearPath, DecelerateInterpolator>(
+                        Motion: new(new(0f, 2f, 0f)),
+                        Interpolator: new(2f),
+                        Duration: 150f
+                    ),
+                    new Animation<Vector3, LinearPath, AccelerateInterpolator>(
+                        Motion: new(new(0f, -2f, 0f)),
+                        Interpolator: new(2f),
+                        Duration: 150f
+                    ),
+                }),
+                Reflectance: new MotionChain(new IAnimation<float>[]
+                {
+                    new Animation<float, LinearMotion, LinearInterpolator>(
+                        Motion: new(1f),
+                        Interpolator: new(),
+                        Duration: 1900f
+                    ),
+                    new Animation<float, LinearMotion, LinearInterpolator>(
+                        Motion: new(-1f),
+                        Interpolator: new(),
+                        Duration: 1900f
+                    ),
+                })
+            ),
+            new Apply<Plane>(
+                Entity: new(Vector3.UnitY),
+                Brightness: 2.1f,
+                Reflectance: 0.7f
+            ),
+        });
 
         Light light = new(new IEntity[]
         {
@@ -101,7 +123,7 @@ class Program
         });
 
         Camera camera = new(
-            lookFrom: new(-16f, 8f, -16f),
+            lookFrom: new(-10f, 8f, -20f),
             lookAt: new(0f, 3f, 0f),
             vUp: Vector3.UnitY,
             vFov: 25f,
@@ -120,9 +142,4 @@ class Program
             window.Draw(world, light, camera);
         });
     }
-
-    static readonly Random _random = new();
-
-    static float RandomInRange(float start, float end) =>
-        start + (float)_random.NextDouble() * (end - start);
 }

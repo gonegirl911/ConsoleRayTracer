@@ -33,6 +33,7 @@ interface IAxis
     int Axis { get; }
     int Main { get; }
     int Secondary { get; }
+    Vector3 Vector3 { get; }
 }
 
 readonly struct AxisX : IAxis
@@ -40,6 +41,7 @@ readonly struct AxisX : IAxis
     public int Axis => 0;
     public int Main => 2;
     public int Secondary => 1;
+    public Vector3 Vector3 => Vector3.UnitX;
 }
 
 readonly struct AxisY : IAxis
@@ -47,6 +49,7 @@ readonly struct AxisY : IAxis
     public int Axis => 1;
     public int Main => 0;
     public int Secondary => 2;
+    public Vector3 Vector3 => Vector3.UnitY;
 }
 
 readonly struct AxisZ : IAxis
@@ -54,4 +57,5 @@ readonly struct AxisZ : IAxis
     public int Axis => 2;
     public int Main => 0;
     public int Secondary => 1;
+    public Vector3 Vector3 => Vector3.UnitZ;
 }

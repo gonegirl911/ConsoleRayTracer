@@ -3,7 +3,6 @@
 class Animator
 {
     private readonly float _sensitivity;
-    private readonly float _changeRate;
 
     private float _speed;
     private bool _isRunning;
@@ -13,7 +12,6 @@ class Animator
     public Animator(float sensitivity, float speed = 1f, bool isRunning = true)
     {
         _sensitivity = sensitivity;
-        _changeRate = sensitivity * 100f;
         _speed = speed;
         _isRunning = isRunning;
     }
@@ -28,12 +26,12 @@ class Animator
             (ConsoleKey.P, _, false) => (_speed, _isRunning, false, 0f),
             (ConsoleKey.K, true, _) => (_speed - _sensitivity, _isRunning, true, 0f),
             (ConsoleKey.L, true, _) => (_speed + _sensitivity, _isRunning, true, 0f),
-            (ConsoleKey.K, false, _) => (_speed, _isRunning, true, -_changeRate),
-            (ConsoleKey.L, false, _) => (_speed, _isRunning, true, _changeRate),
+            (ConsoleKey.K, false, _) => (_speed, _isRunning, true, -_speed),
+            (ConsoleKey.L, false, _) => (_speed, _isRunning, true, _speed),
             _ => (_speed, _isRunning, true, 0f),
         };
 
-        _timeElapsed += _isRunning ? dt * _speed : change;
+        _timeElapsed += _isRunning ? dt * _speed : dt * change;
         entity.Update(_timeElapsed);
         light.Update(_timeElapsed);
     }
