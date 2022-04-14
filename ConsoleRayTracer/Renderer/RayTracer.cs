@@ -2,7 +2,7 @@
 
 readonly struct RayTracer : IRenderer
 {
-    public float PixelColor<E, C, L>(float s, float t, in E entity, in L light, in C camera)
+    public float PixelColor<E, L, C>(float s, float t, in E entity, in L light, in C camera)
         where E : IEntity
         where L : IEntity
         where C : ICamera

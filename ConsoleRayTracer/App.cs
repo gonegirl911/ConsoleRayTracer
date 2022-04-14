@@ -36,7 +36,7 @@ class Window<T, R> where T : ITerminal where R : IRenderer
         _renderer = renderer;
     }
 
-    public void Draw<E, C, L>(E entity, L light, C camera)
+    public void Draw<E, L, C>(E entity, L light, C camera)
         where E : IEntity
         where L : IEntity
         where C : ICamera

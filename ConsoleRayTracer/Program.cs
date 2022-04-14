@@ -1,6 +1,5 @@
 ﻿using ConsoleRayTracer;
 using System.Runtime.Versioning;
-using Plane = ConsoleRayTracer.Plane;
 
 [SupportedOSPlatform("windows")]
 class Program
@@ -100,8 +99,8 @@ class Program
                     ),
                 })
             ),
-            new Apply<Plane>(
-                Entity: new(Vector3.UnitY),
+            new Apply<Plane<AxisY>>(
+                Entity: new(new()),
                 Brightness: 2.1f,
                 Reflectance: 0.7f
             ),
