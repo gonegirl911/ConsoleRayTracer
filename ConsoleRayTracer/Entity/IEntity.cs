@@ -10,7 +10,6 @@ readonly record struct HitRecord(
     float T,
     Vector3 Point,
     Vector3 Normal,
-    bool FrontFace,
     float Brightness = 1f,
     float Reflectance = 0f
 );
