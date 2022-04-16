@@ -42,8 +42,7 @@ class WindowsTerminal : ITerminal
     public void SetPixel(int x, int y, float color) =>
         _buf[(Height - y - 1) * Width + x] = new(ASCII[(int)(color * ASCII.Length - 1e-12)]);
 
-    public void Draw()
-    {
+    public void Draw() =>
         WriteConsoleOutput(
             _handle,
             _buf,
@@ -51,7 +50,6 @@ class WindowsTerminal : ITerminal
             new(0, 0),
             ref _rect
         );
-    }
 
     public ConsoleKey? KeyPressed()
     {
