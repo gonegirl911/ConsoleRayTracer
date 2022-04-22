@@ -17,8 +17,8 @@ record Animated<E>(
     private float _brightness = 1f;
     private float _reflectance = 0f;
 
-    public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
-        Entity.Hit(ray with { Origin = ray.Origin - _offset }, tMin, tMax) is HitRecord record
+    public HitRecord? Hit(in Ray ray) =>
+        Entity.Hit(ray with { Origin = ray.Origin - _offset }) is HitRecord record
             ? record with { Point = record.Point + _offset, Brightness = _brightness, Reflectance = _reflectance }
             : null;
 

@@ -2,7 +2,7 @@
 
 interface IEntity
 {
-    HitRecord? Hit(in Ray ray, float tMin, float tMax) => null;
+    HitRecord? Hit(in Ray ray) => null;
     float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity => 0f;
 }
 
@@ -26,8 +26,8 @@ readonly record struct Apply<E>(
     private readonly float _brightness = Brightness ?? 1f;
     private readonly float _reflectance = Reflectance ?? 0f;
 
-    public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
-        Entity.Hit(ray with { Origin = ray.Origin - _offset }, tMin, tMax) is HitRecord record
+    public HitRecord? Hit(in Ray ray) =>
+        Entity.Hit(ray with { Origin = ray.Origin - _offset }) is HitRecord record
             ? record with { Point = record.Point + _offset, Brightness = _brightness, Reflectance = _reflectance }
             : null;
 
