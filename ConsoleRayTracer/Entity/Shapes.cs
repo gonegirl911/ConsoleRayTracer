@@ -5,16 +5,16 @@ readonly record struct World(IEnumerable<IEntity> Entities) : IAnimatedEntity
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
         var closest = tMax;
-        HitRecord? hitRecord = null;
+        HitRecord? hit = null;
         foreach (var entity in Entities)
         {
             if (entity.Hit(ray, tMin, closest) is HitRecord record)
             {
                 closest = record.T;
-                hitRecord = record;
+                hit = record;
             }
         }
-        return hitRecord;
+        return hit;
     }
 
     public void Update(float timeElapsed)
@@ -48,12 +48,7 @@ readonly record struct Plane<A>(A Axis) : IEntity where A : IAxis
 {
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
-        var denom = Vector3.Dot(ray.Direction, Axis.Unit);
-        if (denom == 0f)
-        {
-            return null;
-        }
-        var t = Vector3.Dot(-ray.Origin, Axis.Unit) / denom;
+        var t = -ray.Origin.Get(Axis.Axis) / ray.Direction.Get(Axis.Axis);
         return t < tMin || t > tMax ? null : new(t, ray.PointAt(t), Axis.Unit);
     }
 }

@@ -5,9 +5,9 @@ interface IMotion<T>
     T GetValue(float interpolation);
 }
 
-readonly record struct LinearMotion(float Path) : IMotion<float>
+readonly record struct LinearMotion(float Motion) : IMotion<float>
 {
-    public float GetValue(float interpolation) => Path * interpolation;
+    public float GetValue(float interpolation) => Motion * interpolation;
 }
 
 readonly record struct LinearPath(Vector3 Path) : IMotion<Vector3>

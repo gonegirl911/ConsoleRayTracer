@@ -3,7 +3,6 @@
 class Animator
 {
     private readonly float _sensitivity;
-
     private float _speed;
     private bool _isRunning;
     private bool _acceptPause = true;
