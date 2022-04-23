@@ -2,13 +2,13 @@
 
 readonly record struct World(IEnumerable<IEntity> Entities) : IAnimatedEntity
 {
-    public HitRecord? Hit(in Ray ray)
+    public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
-        var closest = float.MaxValue;
+        var closest = tMax;
         HitRecord? hit = null;
         foreach (var entity in Entities)
         {
-            if (entity.Hit(ray) is HitRecord record && record.T < closest)
+            if (entity.Hit(ray, tMin, closest) is HitRecord record)
             {
                 closest = record.T;
                 hit = record;
@@ -33,12 +33,12 @@ readonly record struct And<L, R>(L Left, R Right) : IEntity
     where L : IEntity
     where R : IEntity
 {
-    public HitRecord? Hit(in Ray ray)
-    {
-        var left = Left.Hit(ray);
-        var right = Right.Hit(ray);
-        return (right?.T ?? float.MaxValue) < (left?.T ?? float.MaxValue) ? right : left;
-    }
+    public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
+        Left.Hit(ray, tMin, tMax) switch
+        {
+            HitRecord left => Right.Hit(ray, tMin, left.T) ?? left,
+            null => Right.Hit(ray, tMin, tMax),
+        };
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity =>
         Left.Illuminate(entity, record) + Right.Illuminate(entity, record);
@@ -46,17 +46,17 @@ readonly record struct And<L, R>(L Left, R Right) : IEntity
 
 readonly record struct Plane<A>(A Axis) : IEntity where A : IAxis
 {
-    public HitRecord? Hit(in Ray ray)
+    public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
         var t = -ray.Origin.Get(Axis.Axis) / ray.Direction.Get(Axis.Axis);
-        return t > 0.001 ? new(t, ray.PointAt(t), Axis.Unit) : null;
+        return t >= tMin && t <= tMax ? new(t, ray.PointAt(t), Axis.Unit) : null;
     }
 }
 
 readonly record struct Circle<A>(float Radius, A Axis) : IEntity where A : IAxis
 {
-    public HitRecord? Hit(in Ray ray) =>
-        new Plane<A>(Axis).Hit(ray) is HitRecord record
+    public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
+        new Plane<A>(Axis).Hit(ray, tMin, tMax) is HitRecord record
             ? Math.Sqrt(Vector3.Dot(record.Point, record.Point)) <= Radius ? record : null
             : null;
 }
@@ -66,8 +66,8 @@ readonly record struct Rect<A>(float Width, float Height, A Axis) : IEntity wher
     private readonly float _width = Width / 2f;
     private readonly float _height = Height / 2f;
 
-    public HitRecord? Hit(in Ray ray) =>
-        new Plane<A>(Axis).Hit(ray) is HitRecord record
+    public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
+        new Plane<A>(Axis).Hit(ray, tMin, tMax) is HitRecord record
             ? record.Point.Get(Axis.Main) < -_width
                 || record.Point.Get(Axis.Main) > _width
                 || record.Point.Get(Axis.Secondary) < -_height
@@ -79,7 +79,7 @@ readonly record struct Rect<A>(float Width, float Height, A Axis) : IEntity wher
 
 readonly record struct Sphere(float Radius) : IEntity
 {
-    public HitRecord? Hit(in Ray ray)
+    public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
         var a = Vector3.Dot(ray.Direction, ray.Direction);
         var b = Vector3.Dot(ray.Origin, ray.Direction);
@@ -91,10 +91,10 @@ readonly record struct Sphere(float Radius) : IEntity
         }
         
         var t = (-b - sqrtD) / a;
-        if (t < 0.001)
+        if (t < tMin || t > tMax)
         {
             t = (-b + sqrtD) / a;
-            if (t < 0.001)
+            if (t < tMin || t > tMax)
             {
                 return null;
             }
@@ -115,11 +115,12 @@ readonly record struct Cylinder(float Radius, float Height) : IEntity
         new(Radius, Height)
     );
 
-    public HitRecord? Hit(in Ray ray) => _components.Hit(ray);
+    public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
+        _components.Hit(ray, tMin, tMax);
 
     readonly record struct Lateral(float Radius, float Height) : IEntity
     {
-        public HitRecord? Hit(in Ray ray)
+        public HitRecord? Hit(in Ray ray, float tMin, float tMax)
         {
             Ray side = new(ray.Origin with { Y = 0 }, ray.Direction with { Y = 0f });
             var a = Vector3.Dot(side.Direction, side.Direction);
@@ -132,10 +133,10 @@ readonly record struct Cylinder(float Radius, float Height) : IEntity
             }
 
             var t = (-b - sqrtD) / a;
-            if (t < 0.001)
+            if (t < tMin || t > tMax)
             {
                 t = (-b + sqrtD) / a;
-                if (t < 0.001)
+                if (t < tMin || t > tMax)
                 {
                     return null;
                 }
@@ -158,13 +159,14 @@ readonly record struct Cone(float Radius, float Height) : IEntity
         new(Radius, Height)
     );
 
-    public HitRecord? Hit(in Ray ray) => _components.Hit(ray);
+    public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
+        _components.Hit(ray, tMin, tMax);
 
     readonly record struct Lateral(float Radius, float Height) : IEntity
     {
         private readonly float _ratio = Radius / Height;
 
-        public HitRecord? Hit(in Ray ray)
+        public HitRecord? Hit(in Ray ray, float tMin, float tMax)
         {
             Ray side = new(ray.Origin with { Y = 0f }, ray.Direction with { Y = 0f });
             var tan = _ratio * _ratio;
@@ -179,10 +181,10 @@ readonly record struct Cone(float Radius, float Height) : IEntity
             }
 
             var t = (-b - sqrtD) / a;
-            if (t < 0.001)
+            if (t < tMin || t > tMax)
             {
                 t = (-b + sqrtD) / a;
-                if (t < 0.001)
+                if (t < tMin || t > tMax)
                 {
                     return null;
                 }
@@ -217,5 +219,6 @@ readonly record struct RectPrism(float Width, float Height, float Depth) : IEnti
         )
     );
 
-    public HitRecord? Hit(in Ray ray) => _components.Hit(ray);
+    public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
+        _components.Hit(ray, tMin, tMax);
 }

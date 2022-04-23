@@ -96,6 +96,6 @@ class Camera : ICamera
         _u = _w * _right;
         _v = _h * _up;
 
-        return new(0);
+        return new(0f);
     }
 }

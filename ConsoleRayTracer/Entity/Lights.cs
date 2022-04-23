@@ -29,7 +29,7 @@ readonly record struct LightSource() : IEntity
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
         Ray toLight = new(record.Point, Vector3.Normalize(-record.Point));
-        return entity.Hit(toLight) is null
+        return entity.Hit(toLight, 0.001f, float.PositiveInfinity) is null
             ? Math.Max(record.Brightness * Vector3.Dot(toLight.Direction, record.Normal), 0f)
             : 0f;
     }

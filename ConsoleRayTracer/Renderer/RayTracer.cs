@@ -18,7 +18,7 @@ readonly struct RayTracer : IRenderer
         {
             return 0f;
         }
-        if (entity.Hit(ray) is HitRecord record)
+        if (entity.Hit(ray, 0.001f, float.PositiveInfinity) is HitRecord record)
         {
             var normal = ray.OppositeNormal(record.Normal);
             var reflected = ray.Direction - 2f * Vector3.Dot(ray.Direction, normal) * normal;
