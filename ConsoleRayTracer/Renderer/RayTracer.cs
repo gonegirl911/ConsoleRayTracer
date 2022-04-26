@@ -20,8 +20,8 @@ readonly struct RayTracer : IRenderer
         }
         if (entity.Hit(ray, 0.001f, float.PositiveInfinity) is HitRecord record)
         {
-            var normal = ray.OppositeNormal(record.Normal);
-            var reflected = ray.Direction - 2f * Vector3.Dot(ray.Direction, normal) * normal;
+            record = record with { Normal = ray.Opposite(record.Normal) };
+            var reflected = ray.Direction - 2f * Vector3.Dot(ray.Direction, record.Normal) * record.Normal;
             var diffused = light.Illuminate(entity, record);
             var k = record.Reflectance;
             return Math.Clamp(k * RayTrace(entity, light, new(record.Point, reflected), depth - 1) + (1f - k) * diffused, 0f, 1f);

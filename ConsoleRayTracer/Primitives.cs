@@ -4,8 +4,8 @@ readonly record struct Ray(Vector3 Origin, Vector3 Direction)
 {
     public Vector3 PointAt(float t) => Origin + Direction * t;
 
-    public Vector3 OppositeNormal(in Vector3 normal) =>
-        Vector3.Dot(Direction, normal) < 0f ? normal : -normal;
+    public Vector3 Opposite(in Vector3 vector3) =>
+        -Math.Sign(Vector3.Dot(Direction, vector3)) * vector3;
 }
 
 interface IAxis

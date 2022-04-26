@@ -4,60 +4,55 @@ class Camera : ICamera
 {
     private const float SAFE_FRAC_PI_2 = (float)Math.PI / 2f - 0.0001f;
 
-    private Vector3 _origin;
+    private readonly float _width;
+    private readonly float _height;
+    private readonly float _speed;
+    private readonly float _sensitivity;
+
     private Vector3 _forward;
     private Vector3 _right;
     private Vector3 _up;
+    private Vector3 _origin;
 
     private float _yaw;
     private float _pitch;
 
-    private readonly float _w;
-    private readonly float _h;
-    private Vector3 _u;
-    private Vector3 _v;
-
-    private readonly Vector3 _vUp;
-    private readonly float _speed;
-    private readonly float _sensitivity;
-
     public Camera(
         Vector3 lookFrom,
         Vector3 lookAt,
-        Vector3 vUp,
         float vFov,
         float aspectRatio,
         float speed,
         float sensitivity
     )
     {
+        _height = (float)Math.Tan(vFov * Math.PI / 360d);
+        _width = _height * aspectRatio;
+        _speed = speed / 1000f;
+        _sensitivity = sensitivity / 1000f;
+
         _origin = lookFrom;
         _forward = Vector3.Normalize(lookAt - lookFrom);
-        _right = Vector3.Normalize(Vector3.Cross(vUp, _forward));
+        _right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, _forward));
         _up = Vector3.Cross(_forward, _right);
 
         _yaw = (float)Math.Atan2(_forward.Z, _forward.X);
         _pitch = (float)Math.Asin(_forward.Y);
-
-        _h = (float)Math.Tan(vFov * Math.PI / 360d) * 2f;
-        _w = _h * aspectRatio;
-        _u = _w * _right;
-        _v = _h * _up;
-
-        _vUp = vUp;
-        _speed = speed / 1000f;
-        _sensitivity = sensitivity / 1000f;
     }
 
-    public Ray GetRay(float s, float t) =>
-        new(_origin, _forward + (s * 2f - 1f) * _u + (t * 2f - 1f) * _v);
+    public Ray GetRay(float s, float t)
+    {
+        var px = (2f * s - 1f) * _width;
+        var py = (2f * t - 1f) * _height;
+        return new(_origin, _right * px + _up * py + _forward);
+    }
 
     public void Move(ConsoleKey? key, float dt)
     {
         var dp = _speed * dt;
         var forward = Vector3.Normalize(_forward with { Y = 0f });
         var right = _right;
-        var up = _vUp;
+        var up = Vector3.UnitY;
 
         _origin += key switch
         {
@@ -90,11 +85,8 @@ class Camera : ICamera
         var (sinPitch, cosPitch) = Math.SinCos(_pitch);
 
         _forward = new((float)(cosYaw * cosPitch), (float)sinPitch, (float)(sinYaw * cosPitch));
-        _right = Vector3.Normalize(Vector3.Cross(_vUp, _forward));
+        _right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, _forward));
         _up = Vector3.Cross(_forward, _right);
-
-        _u = _w * _right;
-        _v = _h * _up;
 
         return new(0f);
     }

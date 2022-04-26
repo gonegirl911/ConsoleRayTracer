@@ -122,10 +122,9 @@ class Program
         });
 
         Camera camera = new(
-            lookFrom: new(-10f, 8f, -20f),
+            lookFrom: new(-12f, 9f, -21f),
             lookAt: new(0f, 3f, 0f),
-            vUp: Vector3.UnitY,
-            vFov: 25f,
+            vFov: 45f,
             aspectRatio: (float)WIDTH / HEIGHT,
             speed: 3f,
             sensitivity: 0.5f
