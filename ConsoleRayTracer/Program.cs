@@ -4,8 +4,8 @@ using System.Runtime.Versioning;
 [SupportedOSPlatform("windows")]
 class Program
 {
-    const short WIDTH = 90;
-    const short HEIGHT = 75;
+    const short WIDTH = 95;
+    const short HEIGHT = 70;
 
     static void Main()
     {
@@ -51,13 +51,13 @@ class Program
                 Brightness: 1.5f,
                 Reflectance: 0.3f
             ),
-            new Animated<Apply<Sphere>>(
+            new Animated<Apply<Sphere>, PathChain, Constant<float>, MotionChain>(
                 Entity: new(
                     Entity: new(1f),
                     Offset: new(0f, 1f, 0f),
                     Brightness: 1.5f
                 ),
-                Offset: new PathChain(new IAnimation<Vector3>[]
+                Offset: new(new IAnimation<Vector3>[]
                 {
                     new Animation<Vector3, CircularPath<AxisY>, LinearInterpolator>(
                         Motion: new(10f, new()),
@@ -85,7 +85,7 @@ class Program
                         Duration: 150f
                     ),
                 }),
-                Reflectance: new MotionChain(new IAnimation<float>[]
+                Reflectance: new(new IAnimation<float>[]
                 {
                     new Animation<float, LinearMotion, LinearInterpolator>(
                         Motion: new(1f),
@@ -108,12 +108,12 @@ class Program
 
         Light light = new(new IEntity[]
         {
-            new Animated<Apply<LightSource>>(
+            new Animated<Apply<LightSource>, Animation<Vector3, CircularPath<AxisZ>, FunctionalInterpolator>, Constant<float>, Constant<float>>(
                 Entity: new(
                     Entity: new(),
                     Brightness: 1.5f
                 ),
-                Offset: new Animation<Vector3, CircularPath<AxisZ>, FunctionalInterpolator>(
+                Offset: new(
                     Motion: new(1000f, new()),
                     Interpolator: new(input => input < 0.9f ? input * 5f / 9f : input * 5f),
                     Duration: 20_000f

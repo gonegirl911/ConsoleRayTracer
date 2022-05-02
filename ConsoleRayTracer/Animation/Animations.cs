@@ -26,6 +26,12 @@ readonly record struct Animation<T, M, I>(M Motion, I Interpolator, float Durati
         Motion.GetValue(Interpolator.GetInterpolation(timeElapsed / Duration));
 }
 
+readonly record struct Constant<T>(T Value, float Duration) : IAnimation<T>
+{
+    public T GetValue(float timeElapsed) => Value;
+    public T GetValueUnchecked(float timeElapsed) => Value;
+}
+
 readonly record struct MotionChain(IEnumerable<IAnimation<float>> Animations) : IAnimation<float>
 {
     public float Duration { get; } = Animations.Sum(a => a.Duration);

@@ -14,6 +14,11 @@ interface IAxis
     int Main { get; }
     int Secondary { get; }
     Vector3 Unit { get; }
+
+    float GetAxis(Vector3 vector3);
+    float GetMain(Vector3 vector3);
+    float GetSecondary(Vector3 vector3);
+    Vector3 Apply(Vector3 vector3);
 }
 
 readonly struct AxisX : IAxis
@@ -22,6 +27,11 @@ readonly struct AxisX : IAxis
     public int Main => 2;
     public int Secondary => 1;
     public Vector3 Unit => Vector3.UnitX;
+
+    public float GetAxis(Vector3 vector3) => vector3.X;
+    public float GetMain(Vector3 vector3) => vector3.Z;
+    public float GetSecondary(Vector3 vector3) => vector3.Y;
+    public Vector3 Apply(Vector3 vector3) => new(vector3.X, vector3.Z, vector3.Y);
 }
 
 readonly struct AxisY : IAxis
@@ -30,6 +40,11 @@ readonly struct AxisY : IAxis
     public int Main => 0;
     public int Secondary => 2;
     public Vector3 Unit => Vector3.UnitY;
+
+    public float GetAxis(Vector3 vector3) => vector3.Y;
+    public float GetMain(Vector3 vector3) => vector3.X;
+    public float GetSecondary(Vector3 vector3) => vector3.Z;
+    public Vector3 Apply(Vector3 vector3) => new(vector3.Y, vector3.X, vector3.Z);
 }
 
 readonly struct AxisZ : IAxis
@@ -38,34 +53,9 @@ readonly struct AxisZ : IAxis
     public int Main => 0;
     public int Secondary => 1;
     public Vector3 Unit => Vector3.UnitZ;
-}
 
-static class Vector3Extensions
-{
-    public static float Get(in this Vector3 vector3, int axis) =>
-        axis switch
-        {
-            0 => vector3.X,
-            1 => vector3.Y,
-            2 => vector3.Z,
-            _ => throw new IndexOutOfRangeException("axis must be between 0 and 2"),
-        };
-
-    public static void Set(ref this Vector3 vector3, int axis, float value)
-    {
-        switch (axis)
-        {
-            case 0:
-                vector3.X = value;
-                break;
-            case 1:
-                vector3.Y = value;
-                break;
-            case 2:
-                vector3.Z = value;
-                break;
-            default:
-                throw new IndexOutOfRangeException("axis must be between 0 and 2");
-        }
-    }
+    public float GetAxis(Vector3 vector3) => vector3.Z;
+    public float GetMain(Vector3 vector3) => vector3.X;
+    public float GetSecondary(Vector3 vector3) => vector3.Y;
+    public Vector3 Apply(Vector3 vector3) => new(vector3.Y, vector3.Z, vector3.X);
 }

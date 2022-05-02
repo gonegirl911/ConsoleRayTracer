@@ -2,6 +2,9 @@ namespace ConsoleRayTracer;
 
 readonly record struct Light(IEnumerable<IEntity> Sources) : IAnimatedEntity
 {
+    private readonly IEnumerable<IAnimatedEntity> _animatedSources =
+        Sources.Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
+
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
         var accum = 0f;
@@ -14,17 +17,14 @@ readonly record struct Light(IEnumerable<IEntity> Sources) : IAnimatedEntity
 
     public void Update(float timeElapsed)
     {
-        foreach (var source in Sources)
+        foreach (var source in _animatedSources)
         {
-            if (source is IAnimatedEntity e)
-            {
-                e.Update(timeElapsed);
-            }
+            source.Update(timeElapsed);
         }
     }
 }
 
-readonly record struct LightSource() : IEntity
+readonly record struct LightSource : IEntity
 {
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {

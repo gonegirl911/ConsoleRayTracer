@@ -33,7 +33,7 @@ class Camera : ICamera
 
         _origin = lookFrom;
         _forward = Vector3.Normalize(lookAt - lookFrom);
-        _right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, _forward));
+        _right = Vector3.Normalize(Vector3.Normalize(new(_forward.Z, 0f, -_forward.X)));
         _up = Vector3.Cross(_forward, _right);
 
         _yaw = (float)Math.Atan2(_forward.Z, _forward.X);
@@ -43,7 +43,7 @@ class Camera : ICamera
     public Ray GetRay(float s, float t)
     {
         var px = (2f * s - 1f) * _width;
-        var py = (2f * t - 1f) * _height;
+        var py = (1f - 2f * t) * _height;
         return new(_origin, _right * px + _up * py + _forward);
     }
 
@@ -85,7 +85,7 @@ class Camera : ICamera
         var (sinPitch, cosPitch) = Math.SinCos(_pitch);
 
         _forward = new((float)(cosYaw * cosPitch), (float)sinPitch, (float)(sinYaw * cosPitch));
-        _right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, _forward));
+        _right = Vector3.Normalize(new(_forward.Z, 0f, -_forward.X));
         _up = Vector3.Cross(_forward, _right);
 
         return new(0f);

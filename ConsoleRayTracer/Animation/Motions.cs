@@ -19,10 +19,7 @@ readonly record struct CircularPath<A>(float Radius, A Axis) : IMotion<Vector3> 
 {
     public Vector3 GetValue(float interpolation)
     {
-        var angle = Math.PI * 2f * interpolation;
-        Vector3 point = new(0f);
-        point.Set(Axis.Main, (float)Math.Cos(angle) * Radius);
-        point.Set(Axis.Secondary, (float)Math.Sin(angle) * Radius);
-        return point;
+        var (sin, cos) = Math.SinCos(Math.PI * 2f * interpolation);
+        return Axis.Apply(new(0f, (float)cos * Radius, (float)sin * Radius));
     }
 }

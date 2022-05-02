@@ -5,7 +5,7 @@ interface IInterpolator
     float GetInterpolation(float input);
 }
 
-readonly record struct LinearInterpolator() : IInterpolator
+readonly record struct LinearInterpolator : IInterpolator
 {
     public float GetInterpolation(float input) => input;
 }
@@ -20,7 +20,7 @@ readonly record struct DecelerateInterpolator(float Factor) : IInterpolator
     public float GetInterpolation(float input) => 1f - (float)Math.Pow(1f - input, 2f * Factor);
 }
 
-readonly record struct AcelerateDecelerateInterpolator() : IInterpolator
+readonly record struct AcelerateDecelerateInterpolator : IInterpolator
 {
     public float GetInterpolation(float input) => (float)Math.Cos((input + 1f) * Math.PI) * 0.5f + 0.5f;
 }

@@ -7,46 +7,45 @@ namespace ConsoleRayTracer;
 [SupportedOSPlatform("windows")]
 class WindowsTerminal : ITerminal
 {
-    public short Width { get; }
-    public short Height { get; }
+    public int Width { get; }
+    public int Height { get; }
 
     private static readonly char[] ASCII = " .:+%#@".ToCharArray();
-
     private readonly IntPtr _handle;
     private readonly CHAR_INFO[] _buf;
     private SMALL_RECT _rect;
 
     public WindowsTerminal(short width, short height)
     {
-        Width = width;
-        Height = height;
-
-        _handle = GetStdHandle(-11);
-        _buf = new CHAR_INFO[width * height];
-        _rect = new(0, 0, width, height);
-
-        Console.SetWindowSize(width, height);
-        Console.SetBufferSize(width, height);
-
-        var fontInfo = new CONSOLE_FONT_INFO_EX();
-        fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
-        GetCurrentConsoleFontEx(_handle, false, out fontInfo);
-        fontInfo.dwFontSize = new(8, 8);
         unsafe
         {
+            Width = width;
+            Height = height;
+
+            _handle = GetStdHandle(-11);
+            _buf = new CHAR_INFO[width * height];
+            _rect = new(0, 0, width, height);
+
+            Console.SetWindowSize(width, height);
+            Console.SetBufferSize(width, height);
+
+            var fontInfo = new CONSOLE_FONT_INFO_EX();
+            fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
+            GetCurrentConsoleFontEx(_handle, false, out fontInfo);
+            fontInfo.dwFontSize = new(8, 8);
             Marshal.Copy("Terminal".ToCharArray(), 0, new(fontInfo.FaceName), 8);
+            SetCurrentConsoleFontEx(_handle, false, fontInfo);
         }
-        SetCurrentConsoleFontEx(_handle, false, fontInfo);
     }
 
     public void SetPixel(int x, int y, float color) =>
-        _buf[(Height - y - 1) * Width + x] = new(ASCII[(int)(color * ASCII.Length - 1e-12)]);
+        _buf[y * Width + x] = new(ASCII[(int)(color * ASCII.Length - 1e-12)]);
 
     public void Draw() =>
         WriteConsoleOutput(
             _handle,
             _buf,
-            new(Width, Height),
+            new((short)Width, (short)Height),
             new(0, 0),
             ref _rect
         );
