@@ -36,9 +36,8 @@ class Window<T, R> where T : ITerminal where R : IRenderer
         _renderer = renderer;
     }
 
-    public void Draw<E, L, C>(E entity, L light, C camera)
+    public void Draw<E, C>(E entity, C camera)
         where E : IEntity
-        where L : IEntity
         where C : ICamera
     {
         var scaleX = 1f / _terminal.Width;
@@ -50,7 +49,7 @@ class Window<T, R> where T : ITerminal where R : IRenderer
             {
                 var s = x * scaleX;
                 var t = y * scaleY;
-                var pixelColor = _renderer.PixelColor(s, t, entity, light, camera);
+                var pixelColor = _renderer.PixelColor(s, t, entity, camera);
                 _terminal.SetPixel(x, y, pixelColor);
             });
         });

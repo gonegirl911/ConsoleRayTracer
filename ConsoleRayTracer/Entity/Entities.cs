@@ -1,9 +1,9 @@
 ﻿namespace ConsoleRayTracer;
 
-readonly record struct World(IEnumerable<IEntity> Entities) : IAnimatedEntity
+readonly record struct World(IEnumerable<IEntity> Entities, IEnumerable<IEntity> Lights) : IAnimatedEntity
 {
     private readonly IEnumerable<IAnimatedEntity> _animatedEntities =
-        Entities.Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
+        Entities.Concat(Lights).Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
 
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
@@ -20,12 +20,33 @@ readonly record struct World(IEnumerable<IEntity> Entities) : IAnimatedEntity
         return hit;
     }
 
+    public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
+    {
+        var accum = 0f;
+        foreach (var light in Lights)
+        {
+            accum += light.Illuminate(entity, record);
+        }
+        return accum;
+    }
+
     public void Update(float timeElapsed)
     {
         foreach (var entity in _animatedEntities)
         {
             entity.Update(timeElapsed);
         }
+    }
+}
+
+readonly record struct LightSource() : IEntity
+{
+    public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
+    {
+        Ray toLight = new(record.Point, Vector3.Normalize(-record.Point));
+        return entity.Hit(toLight, 0.001f, float.PositiveInfinity) is null
+            ? Math.Max(record.Brightness * Vector3.Dot(toLight.Direction, record.Normal), 0f)
+            : 0f;
     }
 }
 
@@ -47,7 +68,7 @@ readonly record struct Plane<A>(A Axis) : IEntity where A : IAxis
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
         var t = -Axis.GetAxis(ray.Origin) / Axis.GetAxis(ray.Direction);
-        return t >= tMin && t <= tMax ? new(t, ray.PointAt(t), Axis.Unit) : null;
+        return t < tMin || t > tMax ? null : new(t, ray.PointAt(t), Axis.Unit);
     }
 }
 
@@ -87,7 +108,7 @@ readonly record struct Sphere(float Radius) : IEntity
         {
             return null;
         }
-        
+
         var t = (-b - sqrtD) / a;
         if (t < tMin || t > tMax)
         {
@@ -98,8 +119,7 @@ readonly record struct Sphere(float Radius) : IEntity
             }
         }
         var point = ray.PointAt(t);
-        var normal = point / Radius;
-        return new(t, point, normal);
+        return new(t, point, point / Radius);
     }
 }
 
@@ -139,12 +159,9 @@ readonly record struct Cylinder(float Radius, float Height) : IEntity
                 }
             }
             var point = ray.PointAt(t);
-            if (point.Y < 0f || point.Y > Height)
-            {
-                return null;
-            }
-            var normal = Vector3.Normalize(point with { Y = 0f });
-            return new(t, point, normal);
+            return point.Y < 0f || point.Y > Height
+                ? null
+                : new(t, point, Vector3.Normalize(point with { Y = 0f }));
         }
     }
 }
@@ -186,12 +203,9 @@ readonly record struct Cone(float Radius, float Height) : IEntity
                 }
             }
             var point = ray.PointAt(t);
-            if (point.Y < 0f || point.Y > Height)
-            {
-                return null;
-            }
-            var normal = Vector3.Normalize(point with { Y = (float)Math.Sqrt(point.X * point.X + point.Z * point.Z) * _ratio });
-            return new(t, point, normal);
+            return point.Y < 0f || point.Y > Height
+                ? null
+                : new(t, point, Vector3.Normalize(point with { Y = (float)Math.Sqrt(point.X * point.X + point.Z * point.Z) * _ratio }));
         }
     }
 }

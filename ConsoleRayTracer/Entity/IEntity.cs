@@ -33,13 +33,6 @@ readonly record struct Apply<E>(
             : null;
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity =>
-        Entity.Illuminate(
-            new Apply<I>(entity, -Offset, 1f, 0f),
-            record with
-            {
-                Point = record.Point - Offset,
-                Brightness = Brightness,
-                Reflectance = Reflectance,
-            }
-        );
+        Entity.Illuminate(new Apply<I>(entity, -Offset), record with { Point = record.Point - Offset })
+            * Brightness;
 }

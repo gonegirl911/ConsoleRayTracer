@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-interface IAnimation<T>
+interface IAnimation<out T>
 {
     float Duration { get; }
 
@@ -8,7 +8,7 @@ interface IAnimation<T>
         (timeElapsed, timeElapsed % Duration) switch
         {
             ( > 0f, 0f) => Duration,
-            ( < 0f, 0f) => 0f,
+            ( <= 0f, 0f) => 0f,
             ( >= 0f, var elapsed) => elapsed,
             ( < 0f, var elapsed) => Duration + elapsed,
             _ => throw new ArgumentException("Invalid timeElapsed"),

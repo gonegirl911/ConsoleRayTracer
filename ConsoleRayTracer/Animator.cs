@@ -15,9 +15,7 @@ class Animator
         _isRunning = isRunning;
     }
 
-    public void Update<E, L>(ConsoleKey? key, in E entity, in L light, float dt)
-        where E : IAnimatedEntity
-        where L : IAnimatedEntity
+    public void Update<E>(E entity, ConsoleKey? key, float dt) where E : IAnimatedEntity
     {
         (_speed, _isRunning, _acceptPause, var change) = (key, _isRunning, _acceptPause) switch
         {
@@ -29,9 +27,8 @@ class Animator
             (ConsoleKey.L, false, _) => (_speed, _isRunning, true, _speed),
             _ => (_speed, _isRunning, true, 0f),
         };
-
         _timeElapsed += _isRunning ? dt * _speed : dt * change;
+
         entity.Update(_timeElapsed);
-        light.Update(_timeElapsed);
     }
 }

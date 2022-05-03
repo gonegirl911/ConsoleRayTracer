@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-interface IMotion<T>
+interface IMotion<out T>
 {
     T GetValue(float interpolation);
 }
