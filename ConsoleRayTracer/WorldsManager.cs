@@ -3,7 +3,8 @@ using System.Reflection;
 
 static class WorldsManager
 {
-    private static Dictionary<string, World> _worlds;
+    private static readonly Dictionary<string, World> _worlds;
+    private static readonly string _location = "worlds.json";
 
     static WorldsManager()
     {
@@ -14,25 +15,33 @@ static class WorldsManager
             ContractResolver = new ConstructorResolver(),
         };
 
-        if (!File.Exists("worlds.json"))
+        if (!File.Exists(_location))
         {
-            _worlds = new() { { "Default", World.Default } };
-            File.WriteAllText("worlds.json", JsonConvert.SerializeObject(_worlds));
+            File.WriteAllText(_location, JsonConvert.SerializeObject(new Dictionary<string, World>() { { "Default", World.Default } }));
         }
-        else
-        {
-            _worlds = JsonConvert.DeserializeObject<Dictionary<string, World>>(File.ReadAllText("worlds.json"))!;
-        }
+        _worlds = JsonConvert.DeserializeObject<Dictionary<string, World>>(File.ReadAllText(_location))!;
     }
 
     public static World Get(string name) => _worlds[name];
-    public static string[] Names() => _worlds.Keys.ToArray();
     public static void Start(string name) => _worlds[name].Start();
+    public static string[] Names() => _worlds.Keys.ToArray();
+    
+    public static void Add(string name, World world)
+    {
+        _worlds.Add(name, world);
+        File.WriteAllText(_location, JsonConvert.SerializeObject(_worlds));
+    }
+
+    public static void Remove(string name)
+    {
+        _worlds.Remove(name);
+        File.WriteAllText(_location, JsonConvert.SerializeObject(_worlds));
+    }
 }
 
 class ConstructorResolver : DefaultContractResolver
 {
-    private static readonly IEnumerable<Type> SYSTEM_TYPES = typeof(Assembly).Assembly.GetExportedTypes();
+    private static readonly IEnumerable<Type> _systemTypes = typeof(Assembly).Assembly.GetExportedTypes();
 
     protected override JsonObjectContract CreateObjectContract(Type objectType)
     {
@@ -41,7 +50,7 @@ class ConstructorResolver : DefaultContractResolver
             .MaxBy(ctor => ctor.GetParameters().Length);
 
         var contract = base.CreateObjectContract(objectType);
-        if (!SYSTEM_TYPES.Contains(objectType) && ctor is not null)
+        if (!_systemTypes.Contains(objectType) && ctor is not null)
         {
             contract.OverrideCreator = o => ctor.Invoke(o);
             foreach (var param in CreateConstructorParameters(ctor, contract.Properties))
