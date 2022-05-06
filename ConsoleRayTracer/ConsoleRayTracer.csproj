@@ -8,8 +8,14 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
+	<ItemGroup>
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
+
     <ItemGroup>
         <Using Include="System.Numerics" />
+		<Using Include="Newtonsoft.Json" />
+		<Using Include="Newtonsoft.Json.Serialization" />
     </ItemGroup>
 
 </Project>

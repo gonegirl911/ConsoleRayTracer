@@ -15,7 +15,7 @@ class WindowsTerminal : ITerminal
     private readonly CHAR_INFO[] _buf;
     private SMALL_RECT _rect;
 
-    public WindowsTerminal(short width, short height)
+    public WindowsTerminal(int width, int height)
     {
         unsafe
         {
@@ -24,7 +24,7 @@ class WindowsTerminal : ITerminal
 
             _handle = GetStdHandle(-11);
             _buf = new CHAR_INFO[width * height];
-            _rect = new(0, 0, width, height);
+            _rect = new(0, 0, (short)width, (short)height);
 
             Console.SetWindowSize(width, height);
             Console.SetBufferSize(width, height);

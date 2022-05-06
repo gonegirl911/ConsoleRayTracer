@@ -1,5 +1,6 @@
 namespace ConsoleRayTracer;
 
+[JsonObject(MemberSerialization.Fields)]
 class Camera : ICamera
 {
     private const float SAFE_FRAC_PI_2 = (float)Math.PI / 2f - 0.0001f;

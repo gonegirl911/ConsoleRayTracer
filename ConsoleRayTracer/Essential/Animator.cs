@@ -1,5 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
+[JsonObject(MemberSerialization.Fields)]
 class Animator
 {
     private readonly float _sensitivity;
@@ -27,7 +28,7 @@ class Animator
             (ConsoleKey.L, false, _) => (_speed, _isRunning, true, _speed),
             _ => (_speed, _isRunning, true, 0f),
         };
-        _timeElapsed += _isRunning ? dt * _speed : dt * change;
+        _timeElapsed += dt * (_isRunning ? _speed : change);
 
         entity.Update(_timeElapsed);
     }

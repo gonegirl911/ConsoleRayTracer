@@ -11,7 +11,7 @@ record Animated<E, O, B, R>(
     B Brightness = default!,
     R Reflectance = default!
 ) : IAnimatedEntity
-    where E : struct, IEntity
+    where E : IEntity
     where O : IAnimation<Vector3>
     where B : IAnimation<float>
     where R : IAnimation<float>

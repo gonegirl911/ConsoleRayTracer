@@ -43,12 +43,12 @@ readonly record struct AnticipateOvershootInterpolator(float Tension) : IInterpo
         : 0.5f * (((Tension + 1f) * (2f * input - 2f) + Tension) * (4f * input * input - 8f * input + 4f)) + 1f;
 }
 
-readonly record struct CycleInterpolator(float Cycles)
+readonly record struct CycleInterpolator(float Cycles) : IInterpolator
 {
-    public float GetIterpolation(float input) => (float)Math.Sin(2d * Math.PI * Cycles * input);
+    public float GetInterpolation(float input) => (float)Math.Sin(2d * Math.PI * Cycles * input);
 }
 
-readonly record struct FunctionalInterpolator(Func<float, float> Func) : IInterpolator
+readonly record struct LightsInterpolator : IInterpolator
 {
-    public float GetInterpolation(float input) => Func(input);
+    public float GetInterpolation(float input) => input < 0.9f ? input * 5f / 9f : input * 5f;
 }

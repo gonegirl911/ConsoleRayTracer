@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-readonly record struct World(IEnumerable<IEntity> Entities, IEnumerable<IEntity> Lights) : IAnimatedEntity
+readonly record struct Scene(IEnumerable<IEntity> Entities, IEnumerable<IEntity> Lights) : IAnimatedEntity
 {
     private readonly IEnumerable<IAnimatedEntity> _animatedEntities =
         Entities.Concat(Lights).Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
