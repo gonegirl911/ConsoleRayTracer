@@ -23,9 +23,9 @@ static class WorldsManager
         _worlds = JsonConvert.DeserializeObject<Dictionary<string, World>>(File.ReadAllText(LOCATION))!;
     }
 
+    public static string[] Names() => _worlds.Keys.ToArray();
     public static World Get(string name) => _worlds[name];
     public static void Start(string name) => _worlds[name].Start();
-    public static string[] Names() => _worlds.Keys.ToArray();
     
     public static void Add(string name, World world)
     {
