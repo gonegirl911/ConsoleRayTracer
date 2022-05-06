@@ -3,8 +3,9 @@ using System.Reflection;
 
 static class WorldsManager
 {
+    private const string LOCATION = "worlds.json";
+
     private static readonly Dictionary<string, World> _worlds;
-    private static readonly string _location = "worlds.json";
 
     static WorldsManager()
     {
@@ -15,11 +16,11 @@ static class WorldsManager
             ContractResolver = new ConstructorResolver(),
         };
 
-        if (!File.Exists(_location))
+        if (!File.Exists(LOCATION))
         {
-            File.WriteAllText(_location, JsonConvert.SerializeObject(new Dictionary<string, World>() { { "Default", World.Default } }));
+            File.WriteAllText(LOCATION, JsonConvert.SerializeObject(new Dictionary<string, World>() { { "Default", World.Default } }));
         }
-        _worlds = JsonConvert.DeserializeObject<Dictionary<string, World>>(File.ReadAllText(_location))!;
+        _worlds = JsonConvert.DeserializeObject<Dictionary<string, World>>(File.ReadAllText(LOCATION))!;
     }
 
     public static World Get(string name) => _worlds[name];
@@ -29,13 +30,13 @@ static class WorldsManager
     public static void Add(string name, World world)
     {
         _worlds.Add(name, world);
-        File.WriteAllText(_location, JsonConvert.SerializeObject(_worlds));
+        File.WriteAllText(LOCATION, JsonConvert.SerializeObject(_worlds));
     }
 
     public static void Remove(string name)
     {
         _worlds.Remove(name);
-        File.WriteAllText(_location, JsonConvert.SerializeObject(_worlds));
+        File.WriteAllText(LOCATION, JsonConvert.SerializeObject(_worlds));
     }
 }
 

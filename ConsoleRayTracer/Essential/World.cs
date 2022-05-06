@@ -2,13 +2,6 @@
 
 namespace ConsoleRayTracer;
 
-readonly record struct AppConfig(
-    Terminal Terminal,
-    Renderer Renderer,
-    int Width,
-    int Height
-);
-
 record World(AppConfig AppConfig, Scene Scene, Camera Camera, Animator Animator)
 {
     public void Start()
@@ -150,6 +143,13 @@ record World(AppConfig AppConfig, Scene Scene, Camera Camera, Animator Animator)
             Animator: new(sensitivity: 0.2f)
         );
 }
+
+readonly record struct AppConfig(
+    Terminal Terminal,
+    Renderer Renderer,
+    int Width,
+    int Height
+);
 
 enum Terminal { Windows }
 enum Renderer { RayTracer }
