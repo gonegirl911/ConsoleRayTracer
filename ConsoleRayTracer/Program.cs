@@ -1,1 +1,1 @@
-﻿WorldsManager.Start("Default");
+﻿WorldsManager.Worlds["Default"].Start();

@@ -7,10 +7,8 @@ namespace ConsoleRayTracer;
 [SupportedOSPlatform("windows")]
 class WindowsTerminal : ITerminal
 {
-    public int Width { get; }
-    public int Height { get; }
+    private const string ASCII = " .:+%#@";
 
-    private static readonly char[] ASCII = " .:+%#@".ToCharArray();
     private readonly IntPtr _handle;
     private readonly CHAR_INFO[] _buf;
     private SMALL_RECT _rect;
@@ -38,10 +36,16 @@ class WindowsTerminal : ITerminal
         }
     }
 
-    public void SetPixel(int x, int y, float color) =>
-        _buf[y * Width + x] = new(ASCII[(int)(color * ASCII.Length - 1e-12)]);
+    public int Width { get; }
+    public int Height { get; }
 
-    public void Draw() =>
+    public void SetPixel(int x, int y, float color)
+    {
+        _buf[y * Width + x] = new(ASCII[(int)(color * ASCII.Length - 1e-12)]);
+    }
+
+    public void Draw()
+    {
         WriteConsoleOutput(
             _handle,
             _buf,
@@ -49,6 +53,7 @@ class WindowsTerminal : ITerminal
             new(0, 0),
             ref _rect
         );
+    }
 
     public ConsoleKey? KeyPressed()
     {
