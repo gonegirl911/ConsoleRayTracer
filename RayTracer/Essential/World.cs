@@ -1,15 +1,15 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace ConsoleRayTracer;
+namespace RayTracer;
 
-record World(AppConfig AppConfig, Scene Scene, Camera Camera, Animator Animator)
+public record World(AppConfig AppConfig, Scene Scene, Camera Camera, Animator Animator)
 {
     public void Start()
     {
         if (AppConfig is { Terminal: Terminal.Windows, Renderer: Renderer.RayTracer } && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             App<WindowsTerminal, RayTracer> app = new(
-                terminal: new(AppConfig.Width, AppConfig.Height),
+                terminal: new(AppConfig.Width, AppConfig.Height, AppConfig.Title),
                 renderer: new()
             );
 
@@ -27,7 +27,7 @@ record World(AppConfig AppConfig, Scene Scene, Camera Camera, Animator Animator)
 
     public static World Default =>
         new(
-            AppConfig: new(Terminal.Windows, Renderer.RayTracer, 95, 70),
+            AppConfig: new(Terminal.Windows, Renderer.RayTracer, 95, 70, "Default"),
             Scene: new(
                 Entities: new IEntity[]
                 {
@@ -144,12 +144,13 @@ record World(AppConfig AppConfig, Scene Scene, Camera Camera, Animator Animator)
         );
 }
 
-readonly record struct AppConfig(
+public readonly record struct AppConfig(
     Terminal Terminal,
     Renderer Renderer,
     int Width,
-    int Height
+    int Height,
+    string Title
 );
 
-enum Terminal { Windows }
-enum Renderer { RayTracer }
+public enum Terminal { Windows }
+public enum Renderer { RayTracer }

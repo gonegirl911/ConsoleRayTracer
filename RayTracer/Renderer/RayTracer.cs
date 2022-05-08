@@ -1,4 +1,4 @@
-﻿namespace ConsoleRayTracer;
+﻿namespace RayTracer;
 
 readonly record struct RayTracer : IRenderer
 {

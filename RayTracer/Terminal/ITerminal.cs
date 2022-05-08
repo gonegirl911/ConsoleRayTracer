@@ -1,4 +1,4 @@
-﻿namespace ConsoleRayTracer;
+﻿namespace RayTracer;
 
 interface ITerminal
 {

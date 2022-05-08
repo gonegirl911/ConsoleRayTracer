@@ -1,5 +1,7 @@
-﻿using ConsoleRayTracer;
+﻿using RayTracer;
 using System.Reflection;
+
+namespace App;
 
 static class WorldsManager
 {

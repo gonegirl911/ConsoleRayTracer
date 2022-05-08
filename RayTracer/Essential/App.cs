@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace ConsoleRayTracer;
+namespace RayTracer;
 
 class App<T, R> where T : ITerminal where R : IRenderer
 {

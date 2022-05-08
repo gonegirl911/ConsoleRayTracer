@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using static ConsoleRayTracer.Win32;
+using static RayTracer.Win32;
 
-namespace ConsoleRayTracer;
+namespace RayTracer;
 
 [SupportedOSPlatform("windows")]
 class WindowsTerminal : ITerminal
@@ -13,27 +13,25 @@ class WindowsTerminal : ITerminal
     private readonly CHAR_INFO[] _buf;
     private SMALL_RECT _rect;
 
-    public WindowsTerminal(int width, int height)
+    public WindowsTerminal(int width, int height, string title)
     {
-        unsafe
-        {
-            Width = width;
-            Height = height;
+        Width = width;
+        Height = height;
 
-            _handle = GetStdHandle(-11);
-            _buf = new CHAR_INFO[width * height];
-            _rect = new(0, 0, (short)width, (short)height);
+        AllocConsole();
+        _handle = GetStdHandle(-11);
+        _buf = new CHAR_INFO[width * height];
+        _rect = new(0, 0, (short)width, (short)height);
 
-            Console.SetWindowSize(width, height);
-            Console.SetBufferSize(width, height);
+        var fontInfo = new CONSOLE_FONT_INFO_EX();
+        fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
+        fontInfo.dwFontSize = new(8, 8);
+        fontInfo.FaceName = "Terminal";
+        SetCurrentConsoleFontEx(_handle, false, fontInfo);
 
-            var fontInfo = new CONSOLE_FONT_INFO_EX();
-            fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
-            GetCurrentConsoleFontEx(_handle, false, out fontInfo);
-            fontInfo.dwFontSize = new(8, 8);
-            Marshal.Copy("Terminal".ToCharArray(), 0, new(fontInfo.FaceName), 8);
-            SetCurrentConsoleFontEx(_handle, false, fontInfo);
-        }
+        Console.Title = title;
+        Console.SetWindowSize(width, height);
+        Console.SetBufferSize(width, height);
     }
 
     public int Width { get; }

@@ -1,6 +1,6 @@
-namespace ConsoleRayTracer;
+namespace RayTracer;
 
-readonly record struct Ray(Vector3 Origin, Vector3 Direction)
+public readonly record struct Ray(Vector3 Origin, Vector3 Direction)
 {
     public Vector3 PointAt(float t) => Origin + Direction * t;
 
@@ -8,7 +8,7 @@ readonly record struct Ray(Vector3 Origin, Vector3 Direction)
         -Math.Sign(Vector3.Dot(Direction, vector3)) * vector3;
 }
 
-interface IAxis
+public interface IAxis
 {
     int Axis { get; }
     int Main { get; }
@@ -21,7 +21,7 @@ interface IAxis
     Vector3 Apply(Vector3 vector3);
 }
 
-readonly struct AxisX : IAxis
+public readonly struct AxisX : IAxis
 {
     public int Axis => 0;
     public int Main => 2;
@@ -34,7 +34,7 @@ readonly struct AxisX : IAxis
     public Vector3 Apply(Vector3 vector3) => new(vector3.X, vector3.Z, vector3.Y);
 }
 
-readonly struct AxisY : IAxis
+public readonly struct AxisY : IAxis
 {
     public int Axis => 1;
     public int Main => 0;
@@ -47,7 +47,7 @@ readonly struct AxisY : IAxis
     public Vector3 Apply(Vector3 vector3) => new(vector3.Y, vector3.X, vector3.Z);
 }
 
-readonly struct AxisZ : IAxis
+public readonly struct AxisZ : IAxis
 {
     public int Axis => 2;
     public int Main => 0;

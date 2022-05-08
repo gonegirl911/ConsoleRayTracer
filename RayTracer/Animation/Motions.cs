@@ -1,21 +1,21 @@
-﻿namespace ConsoleRayTracer;
+﻿namespace RayTracer;
 
-interface IMotion<out T>
+public interface IMotion<out T>
 {
     T GetValue(float interpolation);
 }
 
-readonly record struct LinearMotion(float Motion) : IMotion<float>
+public readonly record struct LinearMotion(float Motion) : IMotion<float>
 {
     public float GetValue(float interpolation) => Motion * interpolation;
 }
 
-readonly record struct LinearPath(Vector3 Path) : IMotion<Vector3>
+public readonly record struct LinearPath(Vector3 Path) : IMotion<Vector3>
 {
     public Vector3 GetValue(float interpolation) => Path * interpolation;
 }
 
-readonly record struct CircularPath<A>(float Radius, A Axis) : IMotion<Vector3> where A : IAxis
+public readonly record struct CircularPath<A>(float Radius, A Axis) : IMotion<Vector3> where A : IAxis
 {
     public Vector3 GetValue(float interpolation)
     {

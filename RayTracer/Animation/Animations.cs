@@ -1,6 +1,6 @@
-﻿namespace ConsoleRayTracer;
+﻿namespace RayTracer;
 
-interface IAnimation<out T>
+public interface IAnimation<out T>
 {
     float Duration { get; }
 
@@ -18,7 +18,7 @@ interface IAnimation<out T>
     T GetValueUnchecked(float timeElapsed);
 }
 
-readonly record struct Animation<T, M, I>(M Motion, I Interpolator, float Duration) : IAnimation<T>
+public readonly record struct Animation<T, M, I>(M Motion, I Interpolator, float Duration) : IAnimation<T>
     where M : IMotion<T>
     where I : IInterpolator
 {
@@ -26,13 +26,13 @@ readonly record struct Animation<T, M, I>(M Motion, I Interpolator, float Durati
         Motion.GetValue(Interpolator.GetInterpolation(timeElapsed / Duration));
 }
 
-readonly record struct Constant<T>(T Value, float Duration) : IAnimation<T>
+public readonly record struct Constant<T>(T Value, float Duration) : IAnimation<T>
 {
     public T GetValue(float timeElapsed) => Value;
     public T GetValueUnchecked(float timeElapsed) => Value;
 }
 
-readonly record struct MotionChain(IEnumerable<IAnimation<float>> Animations) : IAnimation<float>
+public readonly record struct MotionChain(IEnumerable<IAnimation<float>> Animations) : IAnimation<float>
 {
     public float Duration { get; } = Animations.Sum(a => a.Duration);
 
@@ -57,7 +57,7 @@ readonly record struct MotionChain(IEnumerable<IAnimation<float>> Animations) : 
     }
 }
 
-readonly record struct PathChain(IEnumerable<IAnimation<Vector3>> Animations) : IAnimation<Vector3>
+public readonly record struct PathChain(IEnumerable<IAnimation<Vector3>> Animations) : IAnimation<Vector3>
 {
     public float Duration { get; } = Animations.Sum(a => a.Duration);
 

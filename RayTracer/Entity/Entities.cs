@@ -1,6 +1,6 @@
-﻿namespace ConsoleRayTracer;
+﻿namespace RayTracer;
 
-readonly record struct Scene(IEnumerable<IEntity> Entities, IEnumerable<IEntity> Lights) : IAnimatedEntity
+public readonly record struct Scene(IEnumerable<IEntity> Entities, IEnumerable<IEntity> Lights) : IAnimatedEntity
 {
     private readonly IEnumerable<IAnimatedEntity> _animatedEntities =
         Entities.Concat(Lights).Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
@@ -39,7 +39,7 @@ readonly record struct Scene(IEnumerable<IEntity> Entities, IEnumerable<IEntity>
     }
 }
 
-readonly record struct LightSource() : IEntity
+public readonly record struct LightSource() : IEntity
 {
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
@@ -50,7 +50,7 @@ readonly record struct LightSource() : IEntity
     }
 }
 
-readonly record struct And<L, R>(L Left, R Right) : IEntity
+public readonly record struct And<L, R>(L Left, R Right) : IEntity
     where L : IEntity
     where R : IEntity
 {
@@ -63,7 +63,7 @@ readonly record struct And<L, R>(L Left, R Right) : IEntity
         Left.Illuminate(entity, record) + Right.Illuminate(entity, record);
 }
 
-readonly record struct Plane<A>(A Axis) : IEntity where A : IAxis
+public readonly record struct Plane<A>(A Axis) : IEntity where A : IAxis
 {
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
@@ -72,7 +72,7 @@ readonly record struct Plane<A>(A Axis) : IEntity where A : IAxis
     }
 }
 
-readonly record struct Circle<A>(float Radius, A Axis) : IEntity where A : IAxis
+public readonly record struct Circle<A>(float Radius, A Axis) : IEntity where A : IAxis
 {
     public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
         new Plane<A>(Axis).Hit(ray, tMin, tMax) is HitRecord record
@@ -80,7 +80,7 @@ readonly record struct Circle<A>(float Radius, A Axis) : IEntity where A : IAxis
             : null;
 }
 
-readonly record struct Rect<A>(float Width, float Height, A Axis) : IEntity where A : IAxis
+public readonly record struct Rect<A>(float Width, float Height, A Axis) : IEntity where A : IAxis
 {
     private readonly float _width = Width / 2f;
     private readonly float _height = Height / 2f;
@@ -96,7 +96,7 @@ readonly record struct Rect<A>(float Width, float Height, A Axis) : IEntity wher
             : null;
 }
 
-readonly record struct Sphere(float Radius) : IEntity
+public readonly record struct Sphere(float Radius) : IEntity
 {
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
@@ -123,7 +123,7 @@ readonly record struct Sphere(float Radius) : IEntity
     }
 }
 
-readonly record struct Cylinder(float Radius, float Height) : IEntity
+public readonly record struct Cylinder(float Radius, float Height) : IEntity
 {
     private readonly And<And<Apply<Circle<AxisY>>, Circle<AxisY>>, Lateral> _components = new(
         new(
@@ -166,7 +166,7 @@ readonly record struct Cylinder(float Radius, float Height) : IEntity
     }
 }
 
-readonly record struct Cone(float Radius, float Height) : IEntity
+public readonly record struct Cone(float Radius, float Height) : IEntity
 {
     private readonly And<Circle<AxisY>, Lateral> _components = new(
         new(Radius, new()),
@@ -210,7 +210,7 @@ readonly record struct Cone(float Radius, float Height) : IEntity
     }
 }
 
-readonly record struct RectPrism(float Width, float Height, float Depth) : IEntity
+public readonly record struct RectPrism(float Width, float Height, float Depth) : IEntity
 {
     private readonly And<And<And<Apply<Rect<AxisZ>>, Apply<Rect<AxisX>>>, Rect<AxisY>>, And<And<Apply<Rect<AxisZ>>, Apply<Rect<AxisX>>>, Apply<Rect<AxisY>>>> _components = new(
         new(

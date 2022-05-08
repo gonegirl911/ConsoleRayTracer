@@ -1,11 +1,11 @@
-﻿namespace ConsoleRayTracer;
+﻿namespace RayTracer;
 
-interface IAnimatedEntity : IEntity
+public interface IAnimatedEntity : IEntity
 {
     void Update(float timeElapsed);
 }
 
-record Animated<E, O, B, R>(
+public record Animated<E, O, B, R>(
     E Entity,
     O Offset = default!,
     B Brightness = default!,

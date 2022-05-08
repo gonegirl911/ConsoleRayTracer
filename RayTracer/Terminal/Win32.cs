@@ -1,11 +1,14 @@
 ﻿using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-namespace ConsoleRayTracer;
+namespace RayTracer;
 
 [SupportedOSPlatform("windows")]
 static class Win32
 {
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool AllocConsole();
+
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern IntPtr GetStdHandle(int nStdHandle);
 
@@ -65,9 +68,10 @@ static class Win32
         public uint cbSize;
         public uint nFont;
         public COORD dwFontSize;
-        public ushort FontFamily;
-        public ushort FontWeight;
-        public fixed char FaceName[32];
+        public uint FontFamily;
+        public uint FontWeight;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        public string FaceName;
     }
 
     public const int KEY_PRESSED = 0x8000;

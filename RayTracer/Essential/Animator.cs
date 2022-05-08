@@ -1,7 +1,7 @@
-﻿namespace ConsoleRayTracer;
+﻿namespace RayTracer;
 
 [JsonObject(MemberSerialization.Fields)]
-class Animator
+public class Animator
 {
     private readonly float _sensitivity;
     private float _speed;
