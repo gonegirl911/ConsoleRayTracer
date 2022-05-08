@@ -15,10 +15,6 @@ partial class Home
 
     #region Windows Form Designer generated code
 
-    /// <summary>
-    ///  Required method for Designer support - do not modify
-    ///  the contents of this method with the code editor.
-    /// </summary>
     private void InitializeComponent()
     {
             this.btnStart = new System.Windows.Forms.Button();
@@ -26,22 +22,22 @@ partial class Home
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(326, 190);
+            this.btnStart.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnStart.Location = new System.Drawing.Point(0, 0);
             this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(150, 46);
+            this.btnStart.Size = new System.Drawing.Size(724, 254);
             this.btnStart.TabIndex = 0;
             this.btnStart.Text = "Start";
             this.btnStart.UseVisualStyleBackColor = true;
-            this.btnStart.Click += new System.EventHandler(this.button1_Click);
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
             // Home
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 32F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(724, 254);
             this.Controls.Add(this.btnStart);
+            this.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.Name = "Home";
-            this.Text = "Form1";
+            this.Text = "Home";
             this.ResumeLayout(false);
 
     }
