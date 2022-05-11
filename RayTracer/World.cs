@@ -4,18 +4,17 @@ namespace RayTracer;
 
 public record World(
     string Name,
-    AppConfig AppConfig,
     Scene Scene,
     Camera Camera,
     Animator Animator
 )
 {
-    public void Start()
+    public void Start(AppConfig config)
     {
-        if (AppConfig is { Terminal: Terminal.Windows, Renderer: Renderer.RayTracer } && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (config is { Terminal: Terminal.Windows, Renderer: Renderer.RayTracer } && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             App<WindowsTerminal, RayTracer> app = new(
-                terminal: new(AppConfig.Width, AppConfig.Height, Name),
+                terminal: new(config.Width, config.Height, Name),
                 renderer: new()
             );
 
@@ -34,7 +33,6 @@ public record World(
     public static World Default =>
         new(
             Name: "Default",
-            AppConfig: new(Terminal.Windows, Renderer.RayTracer, 95, 70),
             Scene: new(
                 Entities: new IEntity[]
                 {

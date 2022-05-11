@@ -29,7 +29,7 @@ public partial class Home : Form
 
     private void btnStart_Click(object sender, EventArgs e)
     {
-        new Thread(worlds[0].Start).Start();
+        new Thread(() => worlds[0].Start(new(Terminal.Windows, Renderer.RayTracer, 95, 70))).Start();
     }
 }
 
