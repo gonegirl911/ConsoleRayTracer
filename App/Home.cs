@@ -8,6 +8,8 @@ public partial class Home : Form
     private const string LOCATION = "worlds.json";
 
     private readonly List<World> worlds;
+    private int _width = 95;
+    private int _height = 70;
 
     public Home()
     {
@@ -29,7 +31,31 @@ public partial class Home : Form
 
     private void btnStart_Click(object sender, EventArgs e)
     {
-        new Thread(() => worlds[0].Start(new(Terminal.Windows, Renderer.RayTracer, 95, 70))).Start();
+        new Thread(() => worlds[0].Start(new(Terminal.Windows, Renderer.RayTracer, _width, _height))).Start();
+    }
+
+    private void textBoxWidth_TextChanged(object sender, EventArgs e)
+    {
+        _width = _width switch
+        {
+            _ when int.TryParse(textBoxWidth.Text, out _width) => _width,
+            var prev => prev,
+        };
+    }
+
+    private void textBoxHeight_TextChanged(object sender, EventArgs e)
+    {
+        _height = _height switch
+        {
+            _ when int.TryParse(textBoxHeight.Text, out _height) => _height,
+            var prev => prev,
+        };
+    }
+
+    private void Home_Load(object sender, EventArgs e)
+    {
+        textBoxWidth.Text = _width.ToString();
+        textBoxHeight.Text = _height.ToString();
     }
 }
 

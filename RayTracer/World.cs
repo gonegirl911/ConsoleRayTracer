@@ -21,7 +21,7 @@ public record World(
             app.StartMainLoop((window, dt) =>
             {
                 var key = window.KeyPressed();
-                Camera.Move(key, dt);
+                Camera.Update(key, dt);
                 Animator.Update(Scene, key, dt);
                 window.Draw(Scene, Camera);
             });
@@ -141,7 +141,6 @@ public record World(
                 lookFrom: new(-12f, 9f, -21f),
                 lookAt: new(0f, 3f, 0f),
                 vFov: 45f,
-                aspectRatio: 95f / 70f,
                 speed: 3f,
                 sensitivity: 0.5f
             ),

@@ -40,8 +40,11 @@ class Window<T, R> where T : ITerminal where R : IRenderer
         where E : IEntity
         where C : ICamera
     {
+        _terminal.Update();
+
         var scaleX = 1f / _terminal.Width;
         var scaleY = 1f / _terminal.Height;
+        var aspectRatio = (float)_terminal.Width / _terminal.Height;
 
         Parallel.For(0, _terminal.Height, y =>
         {
@@ -49,7 +52,7 @@ class Window<T, R> where T : ITerminal where R : IRenderer
             {
                 var s = x * scaleX;
                 var t = y * scaleY;
-                var pixelColor = _renderer.PixelColor(s, t, entity, camera);
+                var pixelColor = _renderer.PixelColor(entity, camera, s, t, aspectRatio);
                 _terminal.SetPixel(x, y, pixelColor);
             });
         });

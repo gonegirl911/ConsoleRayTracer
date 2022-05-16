@@ -13,20 +13,23 @@ static class Win32
     public static extern IntPtr GetStdHandle(int nStdHandle);
 
     [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool SetConsoleScreenBufferSize(IntPtr hConsoleOutput, COORD dwSize);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
     public static extern bool GetCurrentConsoleFontEx(
-        IntPtr ConsoleOutput,
-        bool MaximumWindow,
-        out CONSOLE_FONT_INFO_EX ConsoleCurrentFont
+        IntPtr hConsoleOutput,
+        bool bMaximumWindow,
+        out CONSOLE_FONT_INFO_EX lpConsoleCurrentFont
     );
 
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern bool SetCurrentConsoleFontEx(
-        IntPtr ConsoleOutput,
-        bool MaximumWindow,
-        CONSOLE_FONT_INFO_EX ConsoleCurrentFontEx
+        IntPtr hConsoleOutput,
+        bool bMaximumWindow,
+        CONSOLE_FONT_INFO_EX lpConsoleCurrentFontEx
     );
 
-    [DllImport("USER32.dll")]
+    [DllImport("User32.dll")]
     public static extern short GetKeyState(VirtualKeyStates nVirtKey);
 
     [DllImport("kernel32.dll", SetLastError = true)]

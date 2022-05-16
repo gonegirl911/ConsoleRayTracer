@@ -10,7 +10,7 @@ class WindowsTerminal : ITerminal
     private const string ASCII = " .:+%#@";
 
     private readonly IntPtr _handle;
-    private readonly CHAR_INFO[] _buf;
+    private CHAR_INFO[] _buf;
     private SMALL_RECT _rect;
 
     public WindowsTerminal(int width, int height, string title)
@@ -23,7 +23,7 @@ class WindowsTerminal : ITerminal
         _buf = new CHAR_INFO[width * height];
         _rect = new(0, 0, (short)width, (short)height);
 
-        var fontInfo = new CONSOLE_FONT_INFO_EX();
+        CONSOLE_FONT_INFO_EX fontInfo = new();
         fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
         fontInfo.dwFontSize = new(8, 8);
         fontInfo.FaceName = "Terminal";
@@ -31,11 +31,27 @@ class WindowsTerminal : ITerminal
 
         Console.Title = title;
         Console.SetWindowSize(width, height);
-        Console.SetBufferSize(width, height);
+        SetConsoleScreenBufferSize(_handle, new((short)width, (short)height));
     }
 
-    public int Width { get; }
-    public int Height { get; }
+    public int Width { get; private set; }
+    public int Height { get; private set; }
+
+    public void Update()
+    {
+        var width = Console.WindowWidth;
+        var height = Console.WindowHeight;
+        if (width != Width || height != Height)
+        {
+            Width = width;
+            Height = height;
+
+            _buf = new CHAR_INFO[width * height];
+            _rect = new(0, 0, (short)width, (short)height);
+            
+            SetConsoleScreenBufferSize(_handle, new((short)width, (short)height));
+        }
+    }
 
     public void SetPixel(int x, int y, float color)
     {
