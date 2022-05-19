@@ -6,17 +6,16 @@ interface IWindow<R> where R : IRenderer
     int Height { get; }
     R Renderer { get; }
 
+    void Draw(int x, int y, float color);
+    void Draw(int x, int y, char ch);
     void Update();
-    void Set(int x, int y, float color);
-    void Set(int x, int y, char ch);
-    void Push();
     ConsoleKey? KeyPressed();
 
     void Draw(Func<int, int, float> pixelColor) =>
-        Parallel.For(0, Height, y => Parallel.For(0, Width, x => Set(x, y, pixelColor(x, y))));
+        Parallel.For(0, Height, y => Parallel.For(0, Width, x => Draw(x, y, pixelColor(x, y))));
 
     void Draw(Func<int, int, char> pixelChar) =>
-        Parallel.For(0, Height, y => Parallel.For(0, Width, x => Set(x, y, pixelChar(x, y))));
+        Parallel.For(0, Height, y => Parallel.For(0, Width, x => Draw(x, y, pixelChar(x, y))));
 
     void Draw<E, C>(E entity, C camera) where E : IEntity where C : ICamera
     {
@@ -44,8 +43,8 @@ interface IWindow<R> where R : IRenderer
         {
             for (var dy = 0; dy < borderWidth; dy++)
             {
-                Set(topLeftX + dx, topLeftY + dy, 1f);
-                Set(topLeftX + dx, topLeftY + height - borderWidth + dy, 1f);
+                Draw(topLeftX + dx, topLeftY + dy, 1f);
+                Draw(topLeftX + dx, topLeftY + height - borderWidth + dy, 1f);
             }
         }
 
@@ -53,23 +52,23 @@ interface IWindow<R> where R : IRenderer
         {
             for (var dx = 0; dx < borderWidth; dx++)
             {
-                Set(topLeftX + dx, topLeftY + dy, 1f);
-                Set(topLeftX + width - borderWidth + dx, topLeftY + dy, 1f);
+                Draw(topLeftX + dx, topLeftY + dy, 1f);
+                Draw(topLeftX + width - borderWidth + dx, topLeftY + dy, 1f);
             }
             for (var dx = 0; dx < padding; dx++)
             {
-                Set(topLeftX + borderWidth + dx, topLeftY + dy, 0f);
-                Set(topLeftX + width - borderWidth - padding + dx, topLeftY + dy, 0f);
+                Draw(topLeftX + borderWidth + dx, topLeftY + dy, 0f);
+                Draw(topLeftX + width - borderWidth - padding + dx, topLeftY + dy, 0f);
             }
             for (var dx = 0; dx < label.Length; dx++)
             {
                 if (dy == borderWidth + padding)
                 {
-                    Set(topLeftX + borderWidth + padding + dx, topLeftY + dy, label[dx]);
+                    Draw(topLeftX + borderWidth + padding + dx, topLeftY + dy, label[dx]);
                 }
                 else
                 {
-                    Set(topLeftX + borderWidth + padding + dx, topLeftY + dy, 0f);
+                    Draw(topLeftX + borderWidth + padding + dx, topLeftY + dy, 0f);
                 }
             }
         }

@@ -13,9 +13,8 @@ record App<W, R>(W Window) where W : IWindow<R> where R : IRenderer
             var now = stopwatch.ElapsedMilliseconds;
             var dt = now - lastFrame;
             lastFrame = now;
-            Window.Update();
             action(Window, dt);
-            Window.Push();
+            Window.Update();
         }
     }
 }

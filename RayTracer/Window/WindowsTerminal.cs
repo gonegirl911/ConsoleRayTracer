@@ -41,8 +41,17 @@ class WindowsTerminal<R> : IWindow<R> where R : IRenderer
 
     public void Update()
     {
+        WriteConsoleOutput(
+            _handle,
+            _buf,
+            new((short)Width, (short)Height),
+            new(0, 0),
+            ref _rect
+        );
+
         var width = Console.WindowWidth;
         var height = Console.WindowHeight;
+
         if (width != Width || height != Height)
         {
             Width = width;
@@ -53,22 +62,11 @@ class WindowsTerminal<R> : IWindow<R> where R : IRenderer
         }
     }
 
-    public void Set(int x, int y, float color) =>
+    public void Draw(int x, int y, float color) =>
         _buf[y * Width + x] = new(ASCII[(int)(Math.Clamp(color, 0f, 1f) * ASCII.Length - 1e-12)]);
 
-    public void Set(int x, int y, char ch) =>
+    public void Draw(int x, int y, char ch) =>
         _buf[y * Width + x] = new(ch);
-
-    public void Push()
-    {
-        WriteConsoleOutput(
-            _handle,
-            _buf,
-            new((short)Width, (short)Height),
-            new(0, 0),
-            ref _rect
-        );
-    }
 
     public ConsoleKey? KeyPressed()
     {
