@@ -11,19 +11,26 @@ public record World(
 {
     public void Start(AppConfig config)
     {
-        if (config is { Terminal: Terminal.Windows, Renderer: Renderer.RayTracer } && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        Tutorial tutorial = new();
+
+        if (config is { Window: Window.WindowsTerminal, Renderer: Renderer.RayTracer } && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            App<WindowsTerminal, RayTracer> app = new(
-                terminal: new(config.Width, config.Height, Name),
-                renderer: new()
-            );
+            App<WindowsTerminal<RayTracer>, RayTracer> app = new(new(
+                width: config.Width,
+                height: config.Height,
+                renderer: new(),
+                title: Name
+            ));
 
             app.StartMainLoop((window, dt) =>
             {
                 var key = window.KeyPressed();
+                tutorial.Update(key);
+                Camera.AspectRatio = (float)window.Width / window.Height;
                 Camera.Update(key, dt);
                 Animator.Update(Scene, key, dt);
-                window.Draw(Scene, Camera);
+                ((IWindow<RayTracer>)window).Draw(Scene, Camera);
+                ((IWindow<RayTracer>)window).Draw(tutorial.Label);
             });
         }
 
@@ -149,11 +156,11 @@ public record World(
 }
 
 public readonly record struct AppConfig(
-    Terminal Terminal,
+    Window Window,
     Renderer Renderer,
     int Width,
     int Height
 );
 
-public enum Terminal { Windows }
+public enum Window { WindowsTerminal }
 public enum Renderer { RayTracer }

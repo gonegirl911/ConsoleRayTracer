@@ -2,5 +2,5 @@
 
 public interface ICamera : IEntity
 {
-    Ray GetRay(float s, float t, float aspectRatio);
+    Ray GetRay(float s, float t);
 }

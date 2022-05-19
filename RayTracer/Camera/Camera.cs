@@ -38,12 +38,14 @@ public class Camera : ICamera
         _pitch = (float)Math.Asin(_forward.Y);
     }
 
-    public Ray GetRay(float s, float t, float aspectRatio)
+    public Ray GetRay(float s, float t)
     {
-        var px = (2f * s - 1f) * _height * aspectRatio;
+        var px = (2f * s - 1f) * _height * AspectRatio;
         var py = (1f - 2f * t) * _height;
         return new(_origin, _right * px + _up * py + _forward);
     }
+
+    public float AspectRatio { private get; set; }
 
     public void Update(ConsoleKey? key, float dt)
     {

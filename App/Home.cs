@@ -29,9 +29,9 @@ public partial class Home : Form
         InitializeComponent();
     }
 
-    private void btnStart_Click(object sender, EventArgs e)
+    private void buttonStart_Click(object sender, EventArgs e)
     {
-        new Thread(() => worlds[0].Start(new(Terminal.Windows, Renderer.RayTracer, _width, _height))).Start();
+        new Thread(() => worlds[0].Start(new(Window.WindowsTerminal, Renderer.RayTracer, _width, _height))).Start();
     }
 
     private void textBoxWidth_TextChanged(object sender, EventArgs e)

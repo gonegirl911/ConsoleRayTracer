@@ -5,7 +5,7 @@ using static RayTracer.Win32;
 namespace RayTracer;
 
 [SupportedOSPlatform("windows")]
-class WindowsTerminal : ITerminal
+class WindowsTerminal<R> : IWindow<R> where R : IRenderer
 {
     private const string ASCII = " .:+%#@";
 
@@ -13,10 +13,11 @@ class WindowsTerminal : ITerminal
     private CHAR_INFO[] _buf;
     private SMALL_RECT _rect;
 
-    public WindowsTerminal(int width, int height, string title)
+    public WindowsTerminal(int width, int height, R renderer, string title)
     {
         Width = width;
         Height = height;
+        Renderer = renderer;
 
         AllocConsole();
         _handle = GetStdHandle(-11);
@@ -36,6 +37,7 @@ class WindowsTerminal : ITerminal
 
     public int Width { get; private set; }
     public int Height { get; private set; }
+    public R Renderer { get; }
 
     public void Update()
     {
@@ -45,20 +47,19 @@ class WindowsTerminal : ITerminal
         {
             Width = width;
             Height = height;
-
             _buf = new CHAR_INFO[width * height];
             _rect = new(0, 0, (short)width, (short)height);
-            
             SetConsoleScreenBufferSize(_handle, new((short)width, (short)height));
         }
     }
 
-    public void SetPixel(int x, int y, float color)
-    {
-        _buf[y * Width + x] = new(ASCII[(int)(color * ASCII.Length - 1e-12)]);
-    }
+    public void Set(int x, int y, float color) =>
+        _buf[y * Width + x] = new(ASCII[(int)(Math.Clamp(color, 0f, 1f) * ASCII.Length - 1e-12)]);
 
-    public void Draw()
+    public void Set(int x, int y, char ch) =>
+        _buf[y * Width + x] = new(ch);
+
+    public void Push()
     {
         WriteConsoleOutput(
             _handle,
@@ -97,6 +98,10 @@ class WindowsTerminal : ITerminal
             return ConsoleKey.K;
         else if ((GetKeyState((VirtualKeyStates)0x4C) & KEY_PRESSED) != 0)
             return ConsoleKey.L;
+        else if ((GetKeyState((VirtualKeyStates)0x59) & KEY_PRESSED) != 0)
+            return ConsoleKey.Y;
+        else if ((GetKeyState((VirtualKeyStates)0x4E) & KEY_PRESSED) != 0)
+            return ConsoleKey.N;
         else
             return null;
     }

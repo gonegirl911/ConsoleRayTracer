@@ -2,11 +2,11 @@
 
 readonly record struct RayTracer : IRenderer
 {
-    public float PixelColor<E, C>(in E entity, in C camera, float s, float t, float aspectRatio)
+    public float PixelColor<E, C>(in E entity, in C camera, float s, float t)
         where E : IEntity
         where C : ICamera
     {
-        return RayTrace(entity, camera.GetRay(s, t, aspectRatio));
+        return RayTrace(entity, camera.GetRay(s, t));
     }
 
     private float RayTrace<E>(in E entity, in Ray ray, int depth = 50) where E : IEntity
