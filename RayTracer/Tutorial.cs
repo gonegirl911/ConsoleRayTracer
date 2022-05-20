@@ -11,6 +11,7 @@ class Tutorial
         "Slow down/speed up time    K,L",
         "Stop time      P",
         "Go back/forward in time    K,L",
+        "Start time     P",
         "Tutorial completed",
         "Feel free to resize the window",
         null,
@@ -35,8 +36,9 @@ class Tutorial
                 (4, ConsoleKey.K or ConsoleKey.L) => 5,
                 (5, ConsoleKey.P) => 6,
                 (6, ConsoleKey.K or ConsoleKey.L) => 7,
-                (7, _) => 8,
+                (7, ConsoleKey.P) => 8,
                 (8, _) => 9,
+                (9, _) => 10,
                 _ => _step,
             };
         }
