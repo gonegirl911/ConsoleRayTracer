@@ -66,6 +66,7 @@ partial class Home
             this.textBoxWidth.Name = "textBoxWidth";
             this.textBoxWidth.Size = new System.Drawing.Size(170, 50);
             this.textBoxWidth.TabIndex = 1;
+            this.textBoxWidth.Text = "95";
             // 
             // label1
             // 
@@ -108,6 +109,7 @@ partial class Home
             this.textBoxHeight.Name = "textBoxHeight";
             this.textBoxHeight.Size = new System.Drawing.Size(170, 50);
             this.textBoxHeight.TabIndex = 1;
+            this.textBoxHeight.Text = "70";
             // 
             // label3
             // 
@@ -129,7 +131,6 @@ partial class Home
             this.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.Name = "Home";
             this.Text = "Home";
-            this.Load += new System.EventHandler(this.Home_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.flowLayoutPanel1.ResumeLayout(false);

@@ -9,13 +9,15 @@ public record World(
     Animator Animator
 )
 {
-    public void Start<T, R>(AppConfig<T, R> appConfig) where T : ITerminal<R> where R : IRenderer
+    public void Start<T, R>(AppConfig<T, R> config) where T : ITerminal<R> where R : IRenderer
     {
         Tutorial tutorial = new();
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && appConfig is AppConfig<WindowsTerminal<RayTracer>, RayTracer> config)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && config is AppConfig<WindowsTerminal<RayTracer>, RayTracer>)
         {
-            new App<WindowsTerminal<RayTracer>, RayTracer>(new(config.Width, config.Height, new(), Name)).StartMainLoop((terminal, dt) =>
+            App<WindowsTerminal<RayTracer>, RayTracer> app = new(new(config.Width, config.Height, new(), Name));
+
+            app.StartMainLoop((terminal, dt) =>
             {
                 var key = terminal.KeyPressed();
                 Camera.Update(key, dt, (float)terminal.Width / terminal.Height);

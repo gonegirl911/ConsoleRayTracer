@@ -11,10 +11,5 @@
   <ItemGroup>
     <ProjectReference Include="..\RayTracer\RayTracer.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Using Include="Newtonsoft.Json" />
-    <Using Include="Newtonsoft.Json.Serialization" />
-  </ItemGroup>
 	
 </Project>
