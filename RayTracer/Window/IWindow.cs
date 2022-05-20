@@ -20,18 +20,18 @@ public static class TerminalExtensions
         terminal.Set(x, y, ASCII[(int)(Math.Clamp(color, 0f, 1f) * ASCII.Length - 1e-12)]);
     }
 
-    public static void Draw<T, R>(this T terminal, Func<int, int, char> pixel)
+    public static void Draw<T, R>(this T terminal, Func<int, int, char> ch)
         where T : ITerminal<R>
         where R : IRenderer
     {
-        Parallel.For(0, terminal.Height, y => Parallel.For(0, terminal.Width, x => terminal.Draw<T, R>(x, y, pixel(x, y))));
+        Parallel.For(0, terminal.Height, y => Parallel.For(0, terminal.Width, x => terminal.Draw<T, R>(x, y, ch(x, y))));
     }
 
-    public static void Draw<T, R>(this T terminal, Func<int, int, float> pixelColor)
+    public static void Draw<T, R>(this T terminal, Func<int, int, float> color)
         where T : ITerminal<R>
         where R : IRenderer
     {
-        Parallel.For(0, terminal.Height, y => Parallel.For(0, terminal.Width, x => terminal.Draw<T, R>(x, y, pixelColor(x, y))));
+        Parallel.For(0, terminal.Height, y => Parallel.For(0, terminal.Width, x => terminal.Draw<T, R>(x, y, color(x, y))));
     }
 
     public static void Draw<T, R>(this T terminal, string? label)

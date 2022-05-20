@@ -22,7 +22,7 @@ public class WorldsManager
         }
 
         _location = location;
-        _worlds = JsonConvert.DeserializeObject<List<World>>(File.ReadAllText(location))!;
+        _worlds = JsonConvert.DeserializeObject<List<World>>(File.ReadAllText(_location))!;
     }
 
     public IReadOnlyList<World> Worlds { get => _worlds; }
