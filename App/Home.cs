@@ -31,25 +31,30 @@ public partial class Home : Form
 
     private void buttonStart_Click(object sender, EventArgs e)
     {
-        new Thread(() => worlds[0].Start(new(Window.WindowsTerminal, Renderer.RayTracer, _width, _height))).Start();
+        new Thread(() => worlds[0].Start(new(
+            Terminal: typeof(WindowsTerminal<RayTracer.RayTracer>),
+            Renderer: typeof(RayTracer.RayTracer),
+            Width: _width,
+            Height: _height
+        ))).Start();
     }
 
     private void textBoxWidth_TextChanged(object sender, EventArgs e)
     {
-        _width = _width switch
+        var prev = _width;
+        if (!int.TryParse(textBoxWidth.Text, out _width))
         {
-            _ when int.TryParse(textBoxWidth.Text, out _width) => _width,
-            var prev => prev,
-        };
+            _width = prev;
+        }
     }
 
     private void textBoxHeight_TextChanged(object sender, EventArgs e)
     {
-        _height = _height switch
+        var prev = _height;
+        if (!int.TryParse(textBoxWidth.Text, out _height))
         {
-            _ when int.TryParse(textBoxHeight.Text, out _height) => _height,
-            var prev => prev,
-        };
+            _height = prev;
+        }
     }
 
     private void Home_Load(object sender, EventArgs e)

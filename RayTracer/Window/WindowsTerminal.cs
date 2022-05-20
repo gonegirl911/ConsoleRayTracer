@@ -5,10 +5,8 @@ using static RayTracer.Win32;
 namespace RayTracer;
 
 [SupportedOSPlatform("windows")]
-class WindowsTerminal<R> : IWindow<R> where R : IRenderer
+public class WindowsTerminal<R> : ITerminal<R> where R : IRenderer
 {
-    private const string ASCII = " .:+%#@";
-
     private readonly IntPtr _handle;
     private CHAR_INFO[] _buf;
     private SMALL_RECT _rect;
@@ -39,6 +37,8 @@ class WindowsTerminal<R> : IWindow<R> where R : IRenderer
     public int Height { get; private set; }
     public R Renderer { get; }
 
+    public void Set(int x, int y, char ch) => _buf[y * Width + x] = new(ch);
+
     public void Update()
     {
         WriteConsoleOutput(
@@ -61,12 +61,6 @@ class WindowsTerminal<R> : IWindow<R> where R : IRenderer
             SetConsoleScreenBufferSize(_handle, new((short)width, (short)height));
         }
     }
-
-    public void Draw(int x, int y, float color) =>
-        _buf[y * Width + x] = new(ASCII[(int)(Math.Clamp(color, 0f, 1f) * ASCII.Length - 1e-12)]);
-
-    public void Draw(int x, int y, char ch) =>
-        _buf[y * Width + x] = new(ch);
 
     public ConsoleKey? KeyPressed()
     {

@@ -5,6 +5,7 @@ public class Camera : ICamera
 {
     private const float SAFE_FRAC_PI_2 = (float)Math.PI / 2f - 0.0001f;
 
+    private float _width;
     private readonly float _height;
     private readonly float _speed;
     private readonly float _sensitivity;
@@ -26,6 +27,7 @@ public class Camera : ICamera
     )
     {
         _height = (float)Math.Tan(vFov * Math.PI / 360d);
+        _width = _height * 16f / 9f;
         _speed = speed / 1000f;
         _sensitivity = sensitivity / 1000f;
 
@@ -40,15 +42,15 @@ public class Camera : ICamera
 
     public Ray GetRay(float s, float t)
     {
-        var px = (2f * s - 1f) * _height * AspectRatio;
+        var px = (2f * s - 1f) * _width;
         var py = (1f - 2f * t) * _height;
         return new(_origin, _right * px + _up * py + _forward);
     }
 
-    public float AspectRatio { private get; set; }
-
-    public void Update(ConsoleKey? key, float dt)
+    public void Update(ConsoleKey? key, float dt, float aspectRatio)
     {
+        _width = _height * aspectRatio;
+
         var dp = _speed * dt;
         var forward = Vector3.Normalize(_forward with { Y = 0f });
         var right = _right;

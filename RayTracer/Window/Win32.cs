@@ -57,10 +57,10 @@ static class Win32
         [FieldOffset(2)]
         public ushort Attributes;
 
-        public CHAR_INFO(char c)
+        public CHAR_INFO(char ch)
         {
             UnicodeChar = '\0';
-            AsciiChar = c;
+            AsciiChar = ch;
             Attributes = 7;
         }
     }

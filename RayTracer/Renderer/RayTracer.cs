@@ -1,8 +1,8 @@
 ﻿namespace RayTracer;
 
-readonly record struct RayTracer : IRenderer
+public readonly record struct RayTracer : IRenderer
 {
-    public float PixelColor<E, C>(in E entity, in C camera, float s, float t)
+    public float Color<E, C>(in E entity, in C camera, float s, float t)
         where E : IEntity
         where C : ICamera
     {

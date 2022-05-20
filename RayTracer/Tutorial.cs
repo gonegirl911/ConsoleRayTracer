@@ -1,6 +1,6 @@
 ﻿namespace RayTracer;
 
-class Tutorial
+public class Tutorial
 {
     private static readonly string?[] _labels =
     {
