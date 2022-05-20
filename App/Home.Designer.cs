@@ -66,7 +66,7 @@ partial class Home
             this.textBoxWidth.Name = "textBoxWidth";
             this.textBoxWidth.Size = new System.Drawing.Size(170, 50);
             this.textBoxWidth.TabIndex = 1;
-            this.textBoxWidth.Text = "95";
+            this.textBoxWidth.Text = "96";
             // 
             // label1
             // 
@@ -109,7 +109,7 @@ partial class Home
             this.textBoxHeight.Name = "textBoxHeight";
             this.textBoxHeight.Size = new System.Drawing.Size(170, 50);
             this.textBoxHeight.TabIndex = 1;
-            this.textBoxHeight.Text = "70";
+            this.textBoxHeight.Text = "72";
             // 
             // label3
             // 
