@@ -31,12 +31,7 @@ public partial class Home : Form
 
     private void buttonStart_Click(object sender, EventArgs e)
     {
-        new Thread(() => worlds[0].Start(new(
-            Terminal: typeof(WindowsTerminal<RayTracer.RayTracer>),
-            Renderer: typeof(RayTracer.RayTracer),
-            Width: _width,
-            Height: _height
-        ))).Start();
+        new Thread(() => worlds[0].Start(new AppConfig<WindowsTerminal<RayTracer.RayTracer>, RayTracer.RayTracer>(_width, _height))).Start();
     }
 
     private void textBoxWidth_TextChanged(object sender, EventArgs e)
