@@ -29,7 +29,7 @@ public class Tutorial
             _step = (_step, key) switch
             {
                 (0, ConsoleKey.Y) => 1,
-                (0, ConsoleKey.N) => 9,
+                (0, ConsoleKey.N) => 10,
                 (1, ConsoleKey.W or ConsoleKey.A or ConsoleKey.S or ConsoleKey.D) => 2,
                 (2, ConsoleKey.UpArrow or ConsoleKey.LeftArrow or ConsoleKey.DownArrow or ConsoleKey.RightArrow) => 3,
                 (3, ConsoleKey.Spacebar or ConsoleKey.Z) => 4,
