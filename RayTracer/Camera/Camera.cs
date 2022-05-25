@@ -33,7 +33,7 @@ public class Camera : ICamera
 
         _origin = lookFrom;
         _forward = Vector3.Normalize(lookAt - lookFrom);
-        _right = Vector3.Normalize(Vector3.Normalize(new(_forward.Z, 0f, -_forward.X)));
+        _right = Vector3.Normalize(new(_forward.Z, 0f, -_forward.X));
         _up = Vector3.Cross(_forward, _right);
 
         _yaw = (float)Math.Atan2(_forward.Z, _forward.X);
