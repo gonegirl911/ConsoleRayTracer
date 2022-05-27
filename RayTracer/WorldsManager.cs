@@ -18,7 +18,7 @@ public class WorldsManager
 
         if (!File.Exists(location))
         {
-            File.WriteAllText(location, JsonConvert.SerializeObject(new List<World>() { { World.Default } }));
+            File.WriteAllText(location, JsonConvert.SerializeObject(new List<World>() { { World.Default } }, Formatting.Indented));
         }
 
         _location = location;
