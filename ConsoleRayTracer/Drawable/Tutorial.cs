@@ -2,8 +2,8 @@
 
 public class Tutorial : IDrawable
 {
-    const int BORDER_WIDTH = 1;
-    const int PADDING = 2;
+    private const int BORDER_WIDTH = 1;
+    private const int PADDING = 2;
 
     private static readonly Label?[] _labels =
     {
@@ -23,11 +23,13 @@ public class Tutorial : IDrawable
     private int _step = 0;
     private ConsoleKey? _lastKey = null;
 
-    public void Draw<T, R>(in T terminal) where T : ITerminal<R> where R : IRenderer
+    public void Draw<C, R>(in C canvas, in R renderer)
+        where C : ICanvas
+        where R : IRenderer
     {
         if (_labels[_step] is Label label)
         {
-            terminal.Draw<T, R, Label>(label);
+            canvas.Draw(label, renderer);
         }
     }
 

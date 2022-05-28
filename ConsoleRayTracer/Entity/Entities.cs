@@ -1,12 +1,9 @@
 ﻿namespace ConsoleRayTracer;
 
-public readonly record struct EntitySet(
-    IEnumerable<IEntity> Entities,
-    IEnumerable<IEntity> Lights
-) : IAnimatedEntity
+public readonly record struct Group(IEnumerable<IEntity> Entities) : IAnimatedEntity
 {
     private readonly IEnumerable<IAnimatedEntity> _animatedEntities =
-        Entities.Concat(Lights).Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
+        Entities.Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
 
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
@@ -23,21 +20,35 @@ public readonly record struct EntitySet(
         return hit;
     }
 
+    public void Update(float timeElapsed)
+    {
+        foreach (var animated in _animatedEntities)
+        {
+            animated.Update(timeElapsed);
+        }
+    }
+}
+
+public readonly record struct Lights(IEnumerable<IEntity> Sources) : IAnimatedEntity
+{
+    private readonly IEnumerable<IAnimatedEntity> _animatedSources =
+        Sources.Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
+
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
         var accum = 0f;
-        foreach (var light in Lights)
+        foreach (var source in Sources)
         {
-            accum += light.Illuminate(entity, record);
+            accum += source.Illuminate(entity, record);
         }
         return accum;
     }
 
     public void Update(float timeElapsed)
     {
-        foreach (var entity in _animatedEntities)
+        foreach (var animated in _animatedSources)
         {
-            entity.Update(timeElapsed);
+            animated.Update(timeElapsed);
         }
     }
 }

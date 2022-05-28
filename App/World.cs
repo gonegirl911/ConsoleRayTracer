@@ -1,10 +1,10 @@
-﻿using ConsoleRayTracer;
+﻿namespace App;
 
-WorldsManager<EntitySet, Camera> manager = new("worlds.json", () => new(
-    Name: "Default",
-    Scene: new(
-        Entity: new(
-            Entities: new IEntity[]
+record World(Scene<Group, Lights, Camera> Scene, Animator Animator) : IDrawable
+{
+    public static World Default => new(
+        Scene: new(
+            Entity: new(new IEntity[]
             {
                 new Apply<Cylinder>(
                     Entity: new(1f, 4f),
@@ -94,8 +94,8 @@ WorldsManager<EntitySet, Camera> manager = new("worlds.json", () => new(
                     Brightness: 2.1f,
                     Reflectance: 0.7f
                 ),
-            },
-            Lights: new IEntity[]
+            }),
+            Light: new(new IEntity[]
             {
                 new Animated<LightSource, Animation<Vector3, CircularPath<AxisZ>, LightsInterpolator>, Constant<float>, Constant<float>>(
                     Entity: new(),
@@ -105,17 +105,30 @@ WorldsManager<EntitySet, Camera> manager = new("worlds.json", () => new(
                         Duration: 20_000f
                     )
                 ),
-            }
+            }),
+            Camera: new(
+                lookFrom: new(-12f, 9f, -21f),
+                lookAt: new(0f, 3f, 0f),
+                vFov: 45f,
+                speed: 3f,
+                sensitivity: 0.5f
+            )
         ),
-        Camera: new(
-            lookFrom: new(-12f, 9f, -21f),
-            lookAt: new(0f, 3f, 0f),
-            vFov: 45f,
-            speed: 3f,
-            sensitivity: 0.5f
-        )
-    ),
-    Animator: new(sensitivity: 0.2f)
-));
+        Animator: new(sensitivity: 3f)
+    );
 
-manager.Worlds.First().Start(new AppConfig<WindowsTerminal<RayTracer>, RayTracer>(95, 70));
+    public void Draw<C, R>(in C canvas, in R renderer)
+        where C : ICanvas
+        where R : IRenderer
+    {
+        canvas.Draw(Scene, renderer);
+    }
+
+    public void Update(ConsoleKey? key, float dt, float aspectRatio)
+    {
+        Animator.Update(key, dt);
+        Animator.Progress(Scene.Entity);
+        Animator.Progress(Scene.Light);
+        Scene.Camera.Update(key, dt, aspectRatio);
+    }
+}

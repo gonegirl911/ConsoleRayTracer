@@ -2,7 +2,8 @@
 
 public interface IRenderer
 {
-    float Color<E, C>(in E entity, in C camera, float s, float t)
+    float Color<E, L, C>(Scene<E, L, C> scene, float s, float t)
         where E : IEntity
+        where L : IEntity
         where C : ICamera;
 }

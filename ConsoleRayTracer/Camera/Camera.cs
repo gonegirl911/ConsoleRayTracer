@@ -1,7 +1,6 @@
 namespace ConsoleRayTracer;
 
-[JsonObject(MemberSerialization.Fields)]
-public class Camera : IControllableCamera
+public class Camera : ICamera
 {
     private const float SAFE_FRAC_PI_2 = (float)Math.PI / 2f - 0.0001f;
 
@@ -45,6 +44,13 @@ public class Camera : IControllableCamera
         var px = (2f * s - 1f) * _width;
         var py = (1f - 2f * t) * _height;
         return new(_origin, _right * px + _up * py + _forward);
+    }
+
+    public void Update(ConsoleKey? key, float dt, float aspectRatio)
+    {
+        Adjust(aspectRatio);
+        Move(key, dt);
+        Rotate(key, dt);
     }
 
     public void Adjust(float aspectRatio)

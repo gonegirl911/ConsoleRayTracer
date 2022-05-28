@@ -2,5 +2,7 @@
 
 public interface IDrawable
 {
-    void Draw<T, R>(in T Terminal) where T : ITerminal<R> where R : IRenderer;
+    void Draw<C, R>(in C canvas, in R renderer)
+        where C : ICanvas
+        where R : IRenderer;
 }
