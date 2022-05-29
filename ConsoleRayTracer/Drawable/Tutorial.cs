@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public class Tutorial : IDrawable
+public sealed class Tutorial : IDrawable
 {
     private const int BORDER_WIDTH = 1;
     private const int PADDING = 2;
@@ -33,7 +33,7 @@ public class Tutorial : IDrawable
         }
     }
 
-    public void Update(ConsoleKey? key)
+    public void Progress(ConsoleKey? key)
     {
         if (key is not null && key != _lastKey)
         {

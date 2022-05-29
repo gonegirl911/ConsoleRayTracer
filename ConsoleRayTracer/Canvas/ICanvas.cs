@@ -5,6 +5,7 @@ public interface ICanvas
     int Width { get; }
     int Height { get; }
 
+    void Refresh();
     void Set(int x, int y, float color);
     void Set(int x, int y, char ch);
     void Commit();

@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public class Animator
+public sealed class Animator
 {
     private readonly float _sensitivity;
     private float _speed;
@@ -15,7 +15,7 @@ public class Animator
         _isRunning = isRunning;
     }
 
-    public void Update(ConsoleKey? key, float dt)
+    public void Progress(ConsoleKey? key, float dt)
     {
         (_speed, _isRunning, _acceptPause, var change) = (key, _isRunning, _acceptPause) switch
         {
@@ -30,5 +30,5 @@ public class Animator
         _timeElapsed += dt * (_isRunning ? _speed : change);
     }
 
-    public void Progress<E>(in E entity) where E : IAnimatedEntity => entity.Update(_timeElapsed);
+    public void MoveForward<E>(in E entity) where E : IAnimatedEntity => entity.Update(_timeElapsed);
 }

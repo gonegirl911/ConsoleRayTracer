@@ -1,6 +1,6 @@
 namespace ConsoleRayTracer;
 
-public class Camera : ICamera
+public sealed class Camera : ICamera
 {
     private const float SAFE_FRAC_PI_2 = (float)Math.PI / 2f - 0.0001f;
 
@@ -46,7 +46,7 @@ public class Camera : ICamera
         return new(_origin, _right * px + _up * py + _forward);
     }
 
-    public void Update(ConsoleKey? key, float dt, float aspectRatio)
+    public void Progress(ConsoleKey? key, float dt, float aspectRatio)
     {
         Adjust(aspectRatio);
         Move(key, dt);

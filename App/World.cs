@@ -1,6 +1,6 @@
 ﻿namespace App;
 
-record World(Scene<Group, Lights, Camera> Scene, Animator Animator) : IDrawable
+readonly record struct World(Scene<Group, Lights, Camera> Scene, Animator Animator) : IDrawable
 {
     public static World Default => new(
         Scene: new(
@@ -124,11 +124,11 @@ record World(Scene<Group, Lights, Camera> Scene, Animator Animator) : IDrawable
         canvas.Draw(Scene, renderer);
     }
 
-    public void Update(ConsoleKey? key, float dt, float aspectRatio)
+    public void Progress(ConsoleKey? key, float dt, float aspectRatio)
     {
-        Animator.Update(key, dt);
-        Animator.Progress(Scene.Entity);
-        Animator.Progress(Scene.Light);
-        Scene.Camera.Update(key, dt, aspectRatio);
+        Animator.Progress(key, dt);
+        Animator.MoveForward(Scene.Entity);
+        Animator.MoveForward(Scene.Light);
+        Scene.Camera.Progress(key, dt, aspectRatio);
     }
 }

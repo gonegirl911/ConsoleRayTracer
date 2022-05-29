@@ -5,7 +5,7 @@ public interface IAnimatedEntity : IEntity
     void Update(float timeElapsed);
 }
 
-public record Animated<E, O, B, R>(
+public sealed record Animated<E, O, B, R>(
     E Entity,
     O Offset = default!,
     B Brightness = default!,

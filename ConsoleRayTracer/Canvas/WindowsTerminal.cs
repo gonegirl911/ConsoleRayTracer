@@ -5,7 +5,7 @@ using static ConsoleRayTracer.Win32;
 namespace ConsoleRayTracer;
 
 [SupportedOSPlatform("windows")]
-public class WindowsTerminal : ICanvas
+public sealed class WindowsTerminal : ICanvas
 {
     private readonly IntPtr _handle;
     private CHAR_INFO[] _buf;

@@ -9,6 +9,9 @@ public abstract class App<C, R>
     protected abstract C Canvas { get; }
     protected abstract R Renderer { get; }
 
+    protected abstract void OnFrameUpdate(float dt);
+    protected abstract void OnFrameUpdated();
+
     public void Run()
     {
         var stopwatch = Stopwatch.StartNew();
@@ -18,17 +21,15 @@ public abstract class App<C, R>
             var now = stopwatch.ElapsedMilliseconds;
             var dt = now - lastFrame;
             lastFrame = now;
-            OnFrameUpdate(dt);
-            OnFrameUpdated();
+            RunFrame(dt);
         }
     }
 
-    public void RunOnce()
+    public void RunFrame(float dt)
     {
-        OnFrameUpdate(0f);
+        Canvas.Refresh();
+        OnFrameUpdate(dt);
         OnFrameUpdated();
+        Canvas.Commit();
     }
-
-    protected abstract void OnFrameUpdate(float dt);
-    protected abstract void OnFrameUpdated();
 }

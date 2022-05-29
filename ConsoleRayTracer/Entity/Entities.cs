@@ -1,8 +1,8 @@
 ﻿namespace ConsoleRayTracer;
 
-public readonly record struct Group(IEnumerable<IEntity> Entities) : IAnimatedEntity
+public readonly record struct Group(IReadOnlyList<IEntity> Entities) : IAnimatedEntity
 {
-    private readonly IEnumerable<IAnimatedEntity> _animatedEntities =
+    private readonly IReadOnlyList<IAnimatedEntity> _animatedEntities =
         Entities.Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
 
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
@@ -29,9 +29,9 @@ public readonly record struct Group(IEnumerable<IEntity> Entities) : IAnimatedEn
     }
 }
 
-public readonly record struct Lights(IEnumerable<IEntity> Sources) : IAnimatedEntity
+public readonly record struct Lights(IReadOnlyList<IEntity> Sources) : IAnimatedEntity
 {
-    private readonly IEnumerable<IAnimatedEntity> _animatedSources =
+    private readonly IReadOnlyList<IAnimatedEntity> _animatedSources =
         Sources.Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
