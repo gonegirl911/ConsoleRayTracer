@@ -2,9 +2,9 @@
 
 public readonly record struct Label(string Text, int BorderWidth, int Padding) : IDrawable
 {
-    public void Draw<C, R>(in C canvas, in R renderer)
-        where C : ICanvas
-        where R : IRenderer
+    public void Draw<C, R>(C canvas, R renderer)
+        where C : class, ICanvas
+        where R : class, IRenderer
     {
         var width = Text.Length + (BorderWidth + Padding) * 2;
         var height = 1 + (BorderWidth + Padding) * 2;

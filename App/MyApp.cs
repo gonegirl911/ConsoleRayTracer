@@ -3,27 +3,14 @@
 namespace App;
 
 [SupportedOSPlatform("windows")]
-sealed class MyApp : App<WindowsTerminal, RayTracer>
+sealed class MyApp : App<WindowsTerminal, RayTracer, World>
 {
-    private readonly World _world = World.Default;
-    private readonly Crosshair _crosshair = new();
-    private readonly Tutorial _tutorial = new();
-
     protected override WindowsTerminal Canvas { get; } = new(95, 70, "ConsoleRayTracer");
     protected override RayTracer Renderer { get; } = new();
+    protected override World Drawable { get; } = World.Default;
 
     protected override void OnFrameUpdate(float dt)
     {
-        var key = WindowsTerminal.KeyPressed();
-        var aspectRatio = (float)Canvas.Width / Canvas.Height;
-        _world.Progress(key, dt, aspectRatio);
-        _tutorial.Progress(key);
-    }
-
-    protected override void OnFrameUpdated()
-    {
-        Canvas.Draw(_world, Renderer);
-        Canvas.Draw(_crosshair, Renderer);
-        Canvas.Draw(_tutorial, Renderer);
+        Drawable.Progress(Win32.KeyPressed(), dt, (float)Canvas.Width / Canvas.Height);
     }
 }

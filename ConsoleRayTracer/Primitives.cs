@@ -21,7 +21,7 @@ public interface IAxis
     Vector3 Apply(Vector3 vector3);
 }
 
-public readonly struct AxisX : IAxis
+public readonly record struct AxisX : IAxis
 {
     public int Axis => 0;
     public int Main => 2;
@@ -34,7 +34,7 @@ public readonly struct AxisX : IAxis
     public Vector3 Apply(Vector3 vector3) => new(vector3.X, vector3.Z, vector3.Y);
 }
 
-public readonly struct AxisY : IAxis
+public readonly record struct AxisY : IAxis
 {
     public int Axis => 1;
     public int Main => 0;
@@ -47,7 +47,7 @@ public readonly struct AxisY : IAxis
     public Vector3 Apply(Vector3 vector3) => new(vector3.Y, vector3.X, vector3.Z);
 }
 
-public readonly struct AxisZ : IAxis
+public readonly record struct AxisZ : IAxis
 {
     public int Axis => 2;
     public int Main => 0;

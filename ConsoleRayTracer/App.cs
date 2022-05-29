@@ -2,15 +2,17 @@
 
 namespace ConsoleRayTracer;
 
-public abstract class App<C, R>
-    where C : ICanvas
-    where R : IRenderer
+public abstract class App<C, R, D>
+    where C : class, ICanvas
+    where R : class, IRenderer
+    where D : IDrawable
 {
     protected abstract C Canvas { get; }
     protected abstract R Renderer { get; }
+    protected abstract D Drawable { get; }
 
-    protected abstract void OnFrameUpdate(float dt);
-    protected abstract void OnFrameUpdated();
+    protected virtual void OnFrameUpdate(float dt) { }
+    protected virtual void OnFrameUpdated() => Canvas.Draw(Drawable, Renderer);
 
     public void Run()
     {

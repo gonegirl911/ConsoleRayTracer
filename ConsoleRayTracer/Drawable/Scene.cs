@@ -1,17 +1,16 @@
 ﻿namespace ConsoleRayTracer;
 
-public sealed record Scene<E, L, C>(E Entity, L Light, C Camera) : IDrawable
+public abstract record Scene<E, L, C>(E Entity, L Light, C Camera) : IDrawable
     where E : IEntity
     where L : IEntity
     where C : ICamera
 {
-    public void Draw<C, R>(in C canvas, in R renderer)
-        where C : ICanvas
-        where R : IRenderer
+    public virtual void Draw<C, R>(C canvas, R renderer)
+        where C : class, ICanvas
+        where R : class, IRenderer
     {
         var scaleX = 1f / canvas.Width;
         var scaleY = 1f / canvas.Height;
-        var rendererCopy = renderer;
-        canvas.Draw((x, y) => rendererCopy.Color(this, x * scaleX, y * scaleY));
+        canvas.Draw((x, y) => renderer.Color(this, x * scaleX, y * scaleY));
     }
 }

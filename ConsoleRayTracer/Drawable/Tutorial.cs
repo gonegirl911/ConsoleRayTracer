@@ -23,9 +23,9 @@ public sealed class Tutorial : IDrawable
     private int _step = 0;
     private ConsoleKey? _lastKey = null;
 
-    public void Draw<C, R>(in C canvas, in R renderer)
-        where C : ICanvas
-        where R : IRenderer
+    public void Draw<C, R>(C canvas, R renderer)
+        where C : class, ICanvas
+        where R : class, IRenderer
     {
         if (_labels[_step] is Label label)
         {

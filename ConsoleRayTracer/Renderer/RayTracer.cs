@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public readonly record struct RayTracer : IRenderer
+public sealed class RayTracer : IRenderer
 {
     public float Color<E, L, C>(Scene<E, L, C> scene, float s, float t)
         where E : IEntity
