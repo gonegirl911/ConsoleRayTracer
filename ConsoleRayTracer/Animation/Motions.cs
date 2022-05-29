@@ -15,7 +15,8 @@ public readonly record struct LinearPath(Vector3 Path) : IMotion<Vector3>
     public Vector3 GetValue(float interpolation) => Path * interpolation;
 }
 
-public readonly record struct CircularPath<A>(float Radius, A Axis) : IMotion<Vector3> where A : IAxis
+public readonly record struct CircularPath<A>(float Radius, A Axis) : IMotion<Vector3>
+    where A : IAxis
 {
     public Vector3 GetValue(float interpolation)
     {
