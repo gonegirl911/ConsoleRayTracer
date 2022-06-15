@@ -13,13 +13,8 @@ public sealed class WindowsTerminal : ICanvas
 
     public WindowsTerminal(int width, int height, string title)
     {
-        Width = width;
-        Height = height;
-
         AllocConsole();
         _handle = GetStdHandle(-11);
-        _buf = new CHAR_INFO[width * height];
-        _rect = new(0, 0, (short)width, (short)height);
 
         CONSOLE_FONT_INFO_EX fontInfo = new();
         fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
@@ -27,9 +22,25 @@ public sealed class WindowsTerminal : ICanvas
         fontInfo.FaceName = "Terminal";
         SetCurrentConsoleFontEx(_handle, false, fontInfo);
 
+        try
+        {
+            Console.SetWindowSize(width, height);
+            Console.SetBufferSize(width, height);
+        }
+        catch
+        {
+            width = Console.LargestWindowWidth;
+            height = Console.LargestWindowHeight;
+            Console.SetWindowSize(width, height);
+            Console.SetBufferSize(width, height);
+        }
+
+        Width = width;
+        Height = height;
         Console.Title = title;
-        Console.SetWindowSize(width, height);
-        SetConsoleScreenBufferSize(_handle, new((short)width, (short)height));
+
+        _buf = new CHAR_INFO[Width * Height];
+        _rect = new(0, 0, (short)Width, (short)Height);
     }
 
     public int Width { get; private set; }
@@ -67,7 +78,7 @@ public sealed class WindowsTerminal : ICanvas
             Height = height;
             _buf = new CHAR_INFO[width * height];
             _rect = new(0, 0, (short)width, (short)height);
-            SetConsoleScreenBufferSize(_handle, new((short)width, (short)height));
+            Console.SetBufferSize(width, height);
         }
     }
 }

@@ -15,9 +15,6 @@ public static class Win32
     public static extern IntPtr GetStdHandle(int nStdHandle);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern bool SetConsoleScreenBufferSize(IntPtr hConsoleOutput, COORD dwSize);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
     public static extern bool GetCurrentConsoleFontEx(
         IntPtr hConsoleOutput,
         bool bMaximumWindow,
