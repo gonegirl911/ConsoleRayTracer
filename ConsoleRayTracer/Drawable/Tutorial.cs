@@ -7,6 +7,7 @@ public sealed class Tutorial : IDrawable
 
     private static readonly Label?[] _labels =
     {
+        new("Created by Damyan Slavov, Petar Dobrev, Simeon Obretenov, 11d", BORDER_WIDTH, PADDING),
         new("Do you want to go through the tutorial?    Y/n", BORDER_WIDTH, PADDING),
         new("Move around    W,A,S,D", BORDER_WIDTH, PADDING),
         new("Look around    ArrowUp,Left,Down,Right", BORDER_WIDTH, PADDING),
@@ -23,33 +24,32 @@ public sealed class Tutorial : IDrawable
     private int _step = 0;
     private ConsoleKey? _lastKey = null;
 
-    public void Draw<C, R>(C canvas, R renderer)
-        where C : class, ICanvas
-        where R : class, IRenderer
+    public void Draw<C>(C canvas) where C : class, ICanvas
     {
         if (_labels[_step] is Label label)
         {
-            canvas.Draw(label, renderer);
+            canvas.Draw(label);
         }
     }
 
-    public void Progress(ConsoleKey? key)
+    public void Update(ConsoleKey? key)
     {
         if (key is not null && key != _lastKey)
         {
             _step = (_step, key) switch
             {
-                (0, ConsoleKey.Y) => 1,
-                (0, ConsoleKey.N) => 10,
-                (1, ConsoleKey.W or ConsoleKey.A or ConsoleKey.S or ConsoleKey.D) => 2,
-                (2, ConsoleKey.UpArrow or ConsoleKey.LeftArrow or ConsoleKey.DownArrow or ConsoleKey.RightArrow) => 3,
-                (3, ConsoleKey.Spacebar or ConsoleKey.Z) => 4,
-                (4, ConsoleKey.K or ConsoleKey.L) => 5,
-                (5, ConsoleKey.P) => 6,
-                (6, ConsoleKey.K or ConsoleKey.L) => 7,
-                (7, ConsoleKey.P) => 8,
-                (8, _) => 9,
+                (0, _) => 1,
+                (1, ConsoleKey.Y) => 2,
+                (1, ConsoleKey.N) => 11,
+                (2, ConsoleKey.W or ConsoleKey.A or ConsoleKey.S or ConsoleKey.D) => 3,
+                (3, ConsoleKey.UpArrow or ConsoleKey.LeftArrow or ConsoleKey.DownArrow or ConsoleKey.RightArrow) => 4,
+                (4, ConsoleKey.Spacebar or ConsoleKey.Z) => 5,
+                (5, ConsoleKey.K or ConsoleKey.L) => 6,
+                (6, ConsoleKey.P) => 7,
+                (7, ConsoleKey.K or ConsoleKey.L) => 8,
+                (8, ConsoleKey.P) => 9,
                 (9, _) => 10,
+                (10, _) => 11,
                 _ => _step,
             };
         }

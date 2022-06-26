@@ -2,9 +2,7 @@
 
 public readonly record struct Crosshair : IDrawable
 {
-    public void Draw<C, R>(C canvas, R renderer)
-        where C : class, ICanvas
-        where R : class, IRenderer
+    public void Draw<C>(C canvas) where C : class, ICanvas
     {
         if (canvas.Width < 3 || canvas.Height < 3)
         {

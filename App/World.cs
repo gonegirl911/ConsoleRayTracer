@@ -7,7 +7,7 @@ sealed record World(
     Animator Animator,
     Crosshair Crosshair,
     Tutorial Tutorial
-) : Scene<Group, Lights, Camera>(Entity, Light, Camera)
+) : Scene<Group, Lights, Camera, RayTracer>(Entity, Light, Camera, new())
 {
     public static World Default => new(
         Entity: new(new IEntity[]
@@ -124,19 +124,19 @@ sealed record World(
         Tutorial: new()
     );
 
-    public override void Draw<C, R>(C canvas, R renderer)
+    public override void Draw<C>(C canvas)
     {
-        base.Draw(canvas, renderer);
-        canvas.Draw(Crosshair, renderer);
-        canvas.Draw(Tutorial, renderer);
+        base.Draw(canvas);
+        canvas.Draw(Crosshair);
+        canvas.Draw(Tutorial);
     }
 
-    public void Progress(ConsoleKey? key, float dt, float aspectRatio)
+    public void Update(ConsoleKey? key, float dt, float aspectRatio)
     {
-        Animator.Progress(key, dt);
+        Animator.Update(key, dt);
         Animator.MoveForward(Entity);
         Animator.MoveForward(Light);
-        Camera.Progress(key, dt, aspectRatio);
-        Tutorial.Progress(key);
+        Camera.Update(key, dt, aspectRatio);
+        Tutorial.Update(key);
     }
 }

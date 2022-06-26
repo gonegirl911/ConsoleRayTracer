@@ -15,7 +15,7 @@ public sealed class Animator
         _isRunning = isRunning;
     }
 
-    public void Progress(ConsoleKey? key, float dt)
+    public void Update(ConsoleKey? key, float dt)
     {
         (_speed, _isRunning, _acceptPause, var change) = (key, _isRunning, _acceptPause) switch
         {

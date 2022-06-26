@@ -1,8 +1,8 @@
 ﻿namespace ConsoleRayTracer;
 
-public sealed class RayTracer : IRenderer
+public sealed class RayTracer : IRenderer<RayTracer>
 {
-    public float Color<E, L, C>(Scene<E, L, C> scene, float s, float t)
+    public float Color<E, L, C>(Scene<E, L, C, RayTracer> scene, float s, float t)
         where E : IEntity
         where L : IEntity
         where C : ICamera

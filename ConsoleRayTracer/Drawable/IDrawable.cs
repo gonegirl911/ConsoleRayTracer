@@ -2,7 +2,5 @@
 
 public interface IDrawable
 {
-    void Draw<C, R>(C canvas, R renderer)
-        where C : class, ICanvas
-        where R : class, IRenderer;
+    void Draw<C>(C canvas) where C : class, ICanvas;
 }

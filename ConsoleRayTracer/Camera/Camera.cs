@@ -46,7 +46,7 @@ public sealed class Camera : ICamera
         return new(_origin, _right * px + _up * py + _forward);
     }
 
-    public void Progress(ConsoleKey? key, float dt, float aspectRatio)
+    public void Update(ConsoleKey? key, float dt, float aspectRatio)
     {
         Adjust(aspectRatio);
         Move(key, dt);

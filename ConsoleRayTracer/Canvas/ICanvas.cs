@@ -5,7 +5,6 @@ public interface ICanvas
     int Width { get; }
     int Height { get; }
 
-    void Refresh();
     void Set(int x, int y, float color);
     void Set(int x, int y, char ch);
     void Commit();
@@ -37,11 +36,10 @@ public static class CanvasExtensions
         });
     }
 
-    public static void Draw<C, R, D>(this C canvas, in D drawable, R renderer)
+    public static void Draw<C, D>(this C canvas, in D drawable)
         where C : class, ICanvas
-        where R : class, IRenderer
         where D : IDrawable
     {
-        drawable.Draw(canvas, renderer);
+        drawable.Draw(canvas);
     }
 }
