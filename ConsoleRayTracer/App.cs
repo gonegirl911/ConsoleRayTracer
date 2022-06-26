@@ -27,6 +27,7 @@ public abstract class App<C, R, D>
 
     public void RunFrame(float dt)
     {
+        Canvas.Refresh();
         OnFrameUpdate(dt);
         OnFrameUpdated();
         Canvas.Commit();

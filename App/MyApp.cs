@@ -10,7 +10,6 @@ sealed class MyApp : App<WindowsTerminal, RayTracer, World>
 
     protected override void OnFrameUpdate(float dt)
     {
-        Canvas.Refresh();
         Drawable.Update(Win32.KeyPressed(), dt, (float)Canvas.Width / Canvas.Height);
     }
 }
