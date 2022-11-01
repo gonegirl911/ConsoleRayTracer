@@ -26,7 +26,7 @@ public sealed class Camera : ICamera, IEventHandler
         float sensitivity
     )
     {
-        _height = float.Tan(vFov * float.Pi / 360f);
+        _height = float.Tan(0.5f * vFov * float.Pi / 360f);
         _width = _height * aspect;
         _speed = speed / 1000f;
         _sensitivity = sensitivity / 1000f;
