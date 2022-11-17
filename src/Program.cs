@@ -3,7 +3,7 @@ using ConsoleRayTracer;
 
 if (OperatingSystem.IsWindows())
 {
-    App<WindowsTerminal, Game> app = new(
+    new App<WindowsTerminal, Game>(
         Canvas: new(
             width: 95,
             height: 70,
@@ -127,7 +127,7 @@ if (OperatingSystem.IsWindows())
             Crosshair: new(),
             Tutorial: new()
         )
-    );
-    app.Run();
+    )
+    .Run();
 }
 throw new InvalidOperationException("unsupported platform, expected one of \"Windows\"");
