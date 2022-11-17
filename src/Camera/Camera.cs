@@ -25,8 +25,8 @@ sealed class Camera : ICamera, IEventHandler
     {
         _origin = lookFrom;
         _forward = Vector3.Normalize(lookAt - lookFrom);
-        _right = Right;
-        _up = Up;
+        _right = Right(_forward);
+        _up = Up(_forward, _right);
         _yaw = float.Atan2(_forward.Z, _forward.X);
         _pitch = float.Asin(_forward.Y);
         _height = float.Tan(verticalFov * float.Pi / 360f * 0.5f);
@@ -47,9 +47,12 @@ sealed class Camera : ICamera, IEventHandler
         _controller.ApplyUpdates(this, dt);
     }
 
-    Vector3 Forward => new(float.Cos(_yaw) * float.Cos(_pitch), float.Sin(_pitch), float.Sin(_yaw) * float.Cos(_pitch));
-    Vector3 Right => Vector3.Normalize(Vector3.Cross(Vector3.UnitY, _forward));
-    Vector3 Up => Vector3.Cross(_forward, _right);
+    static Vector3 Forward(float yaw, float pitch) =>
+        new(float.Cos(yaw) * float.Cos(pitch), float.Sin(pitch), float.Sin(yaw) * float.Cos(pitch));
+
+    static Vector3 Right(Vector3 forward) => Vector3.Normalize(Vector3.Cross(Vector3.UnitY, forward));
+
+    static Vector3 Up(Vector3 forward, Vector3 right) => Vector3.Cross(forward, right);
 
     struct Controller(float speed, float sensitivity)
     {
@@ -130,10 +133,9 @@ sealed class Camera : ICamera, IEventHandler
 
             camera._yaw %= float.Tau;
             camera._pitch = float.Clamp(camera._pitch, -VERTICAL_BOUND, VERTICAL_BOUND);
-
-            camera._forward = camera.Forward;
-            camera._right = camera.Right;
-            camera._up = camera.Up;
+            camera._forward = Forward(camera._yaw, camera._pitch);
+            camera._right = Right(camera._forward);
+            camera._up = Up(camera._forward, camera._right);
         }
 
         readonly void ApplyMovement(Camera camera, TimeSpan dt)
