@@ -87,26 +87,28 @@ sealed class Animator : IEventHandler
 
         private void Continue(Animator animator, TimeSpan dt)
         {
+            var ds = _sensitivity * (float)dt.TotalSeconds;
             if ((_relevantKeys & Keys.L) != 0)
             {
-                _speed += _sensitivity * (float)dt.TotalSeconds;
+                _speed += ds;
             }
             else if ((_relevantKeys & Keys.K) != 0)
             {
-                _speed -= _sensitivity * (float)dt.TotalSeconds;
+                _speed -= ds;
             }
             animator._timeElapsed += (float)dt.TotalMilliseconds * _speed;
         }
 
         private void TimeTravel(Animator animator, TimeSpan dt)
         {
+            var de = (float)dt.TotalMilliseconds * _speed;
             if ((_relevantKeys & Keys.L) != 0)
             {
-                animator._timeElapsed += (float)dt.TotalMilliseconds * _speed;
+                animator._timeElapsed += de;
             }
             else if ((_relevantKeys & Keys.K) != 0)
             {
-                animator._timeElapsed -= (float)dt.TotalMilliseconds * _speed;
+                animator._timeElapsed -= de;
             }
         }
 
