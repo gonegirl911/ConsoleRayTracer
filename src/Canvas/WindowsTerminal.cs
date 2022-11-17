@@ -100,16 +100,16 @@ sealed class WindowsTerminal : ICanvas<WindowsTerminal>
         return null;
     }
 
-    private char Character(float color)
-    {
-        const string ASCII = " .:+%#@";
-
-        return ASCII[(int)float.Round(float.Clamp(color, 0f, 1f) * (ASCII.Length - 1))];
-    }
-
     private (int, int) RetrieveWindowSize()
     {
         PInvoke.GetConsoleScreenBufferInfo(_stdout, out var bufferInfo);
         return (bufferInfo.srWindow.Right + 1, bufferInfo.srWindow.Bottom + 1);
+    }
+
+    private static char Character(float color)
+    {
+        const string ASCII = " .:+%#@";
+
+        return ASCII[(int)float.Round(float.Clamp(color, 0f, 1f) * (ASCII.Length - 1))];
     }
 }

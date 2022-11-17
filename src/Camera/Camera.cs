@@ -118,7 +118,7 @@ sealed class Camera : ICamera, IEventHandler
 
         private void ApplyRotation(Camera camera, TimeSpan dt)
         {
-            const float SAFE_FRAC_PI_2 = float.Pi * 0.5f - 0.0001f;
+            const float VERTICAL_BOUND = float.Pi * 0.5f - 0.0001f;
 
             var dr = _sensitivity * (float)dt.TotalSeconds;
 
@@ -141,12 +141,8 @@ sealed class Camera : ICamera, IEventHandler
             }
 
             camera._yaw %= float.Tau;
-            camera._pitch = float.Clamp(camera._pitch, -SAFE_FRAC_PI_2, SAFE_FRAC_PI_2);
-
-            var (sinYaw, cosYaw) = float.SinCos(camera._yaw);
-            var (sinPitch, cosPitch) = float.SinCos(camera._pitch);
-
-            camera._forward = new(cosYaw * cosPitch, sinPitch, sinYaw * cosPitch);
+            camera._pitch = float.Clamp(camera._pitch, -VERTICAL_BOUND, VERTICAL_BOUND);
+            camera._forward = Forward(camera._yaw, camera._pitch);
             camera._right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, camera._forward));
             camera._up = Vector3.Cross(camera._forward, camera._right);
         }
@@ -196,7 +192,7 @@ sealed class Camera : ICamera, IEventHandler
             camera._width = camera._height * _aspectRatio;
         }
 
-        private (Keys, Keys) KeyPair(KeyEvent ev)
+        private static (Keys, Keys) KeyPair(KeyEvent ev)
         {
             return ev.Key switch
             {
@@ -213,6 +209,9 @@ sealed class Camera : ICamera, IEventHandler
                 _ => (default, default),
             };
         }
+
+        private static Vector3 Forward(float yaw, float pitch) =>
+            new(float.Cos(yaw) * float.Cos(pitch), float.Sin(pitch), float.Sin(yaw) * float.Cos(pitch));
 
         private enum Keys : ushort
         {
