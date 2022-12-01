@@ -9,7 +9,7 @@ public abstract class App<C, R, D>
     protected abstract C Canvas { get; }
     protected abstract D Drawable { get; }
 
-    protected virtual void OnFrameUpdate(float dt) { }
+    protected virtual void OnFrameUpdate(ConsoleKey? key, float dt) { }
     protected virtual void OnFrameUpdated() => Canvas.Draw(Drawable);
 
     public void Run()
@@ -28,7 +28,7 @@ public abstract class App<C, R, D>
     public void RunFrame(float dt)
     {
         Canvas.Refresh();
-        OnFrameUpdate(dt);
+        OnFrameUpdate(Canvas.KeyPressed(), dt);
         OnFrameUpdated();
         Canvas.Commit();
     }

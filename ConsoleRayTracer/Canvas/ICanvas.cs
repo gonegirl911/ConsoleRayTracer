@@ -8,6 +8,7 @@ public interface ICanvas
     void Refresh();
     void Set(int x, int y, float color);
     void Set(int x, int y, char ch);
+    ConsoleKey? KeyPressed();
     void Commit();
 }
 

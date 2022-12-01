@@ -48,6 +48,24 @@ public sealed class WindowsTerminal : ICanvas
     public int Width { get; private set; }
     public int Height { get; private set; }
 
+    public void Refresh()
+    {
+        var width = Console.WindowWidth;
+        var height = Console.WindowHeight;
+        if (width != Width || height != Height)
+        {
+            Width = width;
+            Height = height;
+            _buf = new CHAR_INFO[width * height];
+            _rect = new(0, 0, (short)width, (short)height);
+            Console.SetBufferSize(width, height);
+        }
+    }
+    public ConsoleKey? KeyPressed()
+    {
+        return Win32.KeyPressed();
+    }
+
     public void Set(int x, int y, float color)
     {
         Set(x, y, ASCII[(int)(float.Clamp(color, 0f, 1f) * ASCII.Length - 1e-12)]);
@@ -67,19 +85,5 @@ public sealed class WindowsTerminal : ICanvas
             new(0, 0),
             ref _rect
         );
-    }
-
-    public void Refresh()
-    {
-        var width = Console.WindowWidth;
-        var height = Console.WindowHeight;
-        if (width != Width || height != Height)
-        {
-            Width = width;
-            Height = height;
-            _buf = new CHAR_INFO[width * height];
-            _rect = new(0, 0, (short)width, (short)height);
-            Console.SetBufferSize(width, height);
-        }
     }
 }
