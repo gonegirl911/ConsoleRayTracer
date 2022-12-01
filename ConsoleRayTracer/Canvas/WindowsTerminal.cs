@@ -7,6 +7,8 @@ namespace ConsoleRayTracer;
 [SupportedOSPlatform("windows")]
 public sealed class WindowsTerminal : ICanvas
 {
+    private const string ASCII = " .:+%#@";
+
     private readonly IntPtr _handle;
     private CHAR_INFO[] _buf;
     private SMALL_RECT _rect;
@@ -48,8 +50,7 @@ public sealed class WindowsTerminal : ICanvas
 
     public void Set(int x, int y, float color)
     {
-        const string ASCII = " .:+%#@";
-        Set(x, y, ASCII[(int)(Math.Clamp(color, 0f, 1f) * ASCII.Length - 1e-12)]);
+        Set(x, y, ASCII[(int)(float.Clamp(color, 0f, 1f) * ASCII.Length - 1e-12)]);
     }
 
     public void Set(int x, int y, char ch)

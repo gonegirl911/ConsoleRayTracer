@@ -1,4 +1,8 @@
-﻿namespace ConsoleRayTracer;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+namespace ConsoleRayTracer;
 
 public interface IAnimation<out T>
 {
@@ -32,32 +36,7 @@ public readonly record struct Constant<T>(T Value, float Duration) : IAnimation<
     public T GetValueUnchecked(float timeElapsed) => Value;
 }
 
-public readonly record struct MotionChain(IEnumerable<IAnimation<float>> Animations) : IAnimation<float>
-{
-    public float Duration { get; } = Animations.Sum(a => a.Duration);
-
-    public float GetValueUnchecked(float timeElapsed)
-    {
-        var start = 0f;
-        var accum = 0f;
-        foreach (var animation in Animations)
-        {
-            var dt = timeElapsed - start;
-            if (dt > animation.Duration)
-            {
-                start += animation.Duration;
-                accum += animation.GetValueUnchecked(animation.Duration);
-            }
-            else
-            {
-                return accum + animation.GetValueUnchecked(dt);
-            }
-        }
-        throw new InvalidOperationException();
-    }
-}
-
-public readonly record struct PathChain(IEnumerable<IAnimation<Vector3>> Animations) : IAnimation<Vector3>
+public readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAnimation<Vector3>
 {
     public float Duration { get; } = Animations.Sum(a => a.Duration);
 
@@ -65,8 +44,10 @@ public readonly record struct PathChain(IEnumerable<IAnimation<Vector3>> Animati
     {
         var start = 0f;
         Vector3 accum = new(0f);
-        foreach (var animation in Animations)
+        ref var first = ref MemoryMarshal.GetReference(new Span<IAnimation<Vector3>>(Animations));
+        for (var i = 0; i < Animations.Length; i++)
         {
+            var animation = Unsafe.Add(ref first, i);
             var dt = timeElapsed - start;
             if (dt > animation.Duration)
             {
@@ -78,6 +59,33 @@ public readonly record struct PathChain(IEnumerable<IAnimation<Vector3>> Animati
                 return accum + animation.GetValueUnchecked(dt);
             }
         }
-        throw new InvalidOperationException();
+        throw new UnreachableException();
+    }
+}
+
+public readonly record struct MotionChain(IAnimation<float>[] Animations) : IAnimation<float>
+{
+    public float Duration { get; } = Animations.Sum(a => a.Duration);
+
+    public float GetValueUnchecked(float timeElapsed)
+    {
+        var start = 0f;
+        var accum = 0f;
+        ref var first = ref MemoryMarshal.GetReference(new Span<IAnimation<float>>(Animations));
+        for (var i = 0; i < Animations.Length; i++)
+        {
+            var animation = Unsafe.Add(ref first, i);
+            var dt = timeElapsed - start;
+            if (dt > animation.Duration)
+            {
+                start += animation.Duration;
+                accum += animation.GetValueUnchecked(animation.Duration);
+            }
+            else
+            {
+                return accum + animation.GetValueUnchecked(dt);
+            }
+        }
+        throw new UnreachableException();
     }
 }

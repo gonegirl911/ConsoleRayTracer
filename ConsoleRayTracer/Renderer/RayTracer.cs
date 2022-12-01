@@ -7,7 +7,7 @@ public sealed class RayTracer : IRenderer<RayTracer>
         where L : IEntity
         where C : ICamera
     {
-        return RayTrace(scene.Entity, scene.Light, scene.Camera.GetRay(s, t));
+        return RayTrace(scene.Entity, scene.Light, scene.Camera.CastRay(s, t));
     }
 
     private float RayTrace<E, L>(in E entity, in L light, in Ray ray, int depth = 50)
@@ -20,7 +20,7 @@ public sealed class RayTracer : IRenderer<RayTracer>
             Ray reflected = new(record.Point, Vector3.Reflect(ray.Direction, record.Normal));
             var diffused = light.Illuminate(entity, record);
             var k = record.Reflectance;
-            return Math.Clamp(k * RayTrace(entity, light, reflected, depth - 1) + (1f - k) * diffused, 0f, 1f);
+            return float.Clamp(k * RayTrace(entity, light, reflected, depth - 1) + (1f - k) * diffused, 0f, 1f);
         }
         return 0f;
     }

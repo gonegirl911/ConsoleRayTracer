@@ -1,16 +1,21 @@
-﻿namespace ConsoleRayTracer;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
-public readonly record struct Group(IReadOnlyList<IEntity> Entities) : IAnimatedEntity
+namespace ConsoleRayTracer;
+
+public readonly record struct Group(IEntity[] Entities) : IAnimatedEntity
 {
-    private readonly IReadOnlyList<IAnimatedEntity> _animatedEntities =
+    private readonly IAnimatedEntity[] _animatedEntities =
         Entities.Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
 
     public HitRecord? Hit(in Ray ray, float tMin, float tMax)
     {
         var closest = tMax;
         HitRecord? hit = null;
-        foreach (var entity in Entities)
+        ref var first = ref MemoryMarshal.GetReference(new Span<IEntity>(Entities));
+        for (var i = 0; i < Entities.Length; i++)
         {
+            var entity = Unsafe.Add(ref first, i);
             if (entity.Hit(ray, tMin, closest) is HitRecord record)
             {
                 closest = record.T;
@@ -22,23 +27,27 @@ public readonly record struct Group(IReadOnlyList<IEntity> Entities) : IAnimated
 
     public void Update(float timeElapsed)
     {
-        foreach (var animated in _animatedEntities)
+        ref var first = ref MemoryMarshal.GetReference(new Span<IAnimatedEntity>(_animatedEntities));
+        for (var i = 0; i < _animatedEntities.Length; i++)
         {
+            var animated = Unsafe.Add(ref first, i);
             animated.Update(timeElapsed);
         }
     }
 }
 
-public readonly record struct Lights(IReadOnlyList<IEntity> Sources) : IAnimatedEntity
+public readonly record struct Lights(IEntity[] Sources) : IAnimatedEntity
 {
-    private readonly IReadOnlyList<IAnimatedEntity> _animatedSources =
+    private readonly IAnimatedEntity[] _animatedSources =
         Sources.Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
         var accum = 0f;
-        foreach (var source in Sources)
+        ref var first = ref MemoryMarshal.GetReference(new Span<IEntity>(Sources));
+        for (var i = 0; i < Sources.Length; i++)
         {
+            var source = Unsafe.Add(ref first, i);
             accum += source.Illuminate(entity, record);
         }
         return accum;
@@ -46,8 +55,10 @@ public readonly record struct Lights(IReadOnlyList<IEntity> Sources) : IAnimated
 
     public void Update(float timeElapsed)
     {
-        foreach (var animated in _animatedSources)
+        ref var first = ref MemoryMarshal.GetReference(new Span<IAnimatedEntity>(_animatedSources));
+        for (var i = 0; i < _animatedSources.Length; i++)
         {
+            var animated = Unsafe.Add(ref first, i);
             animated.Update(timeElapsed);
         }
     }
@@ -59,7 +70,7 @@ public readonly record struct LightSource : IEntity
     {
         Ray toLight = new(record.Point, Vector3.Normalize(-record.Point));
         return entity.Hit(toLight, 0.001f, float.PositiveInfinity) is null
-            ? Math.Max(record.Brightness * Vector3.Dot(toLight.Direction, record.Normal), 0f)
+            ? float.Max(record.Brightness * Vector3.Dot(toLight.Direction, record.Normal), 0f)
             : 0f;
     }
 }
@@ -90,7 +101,7 @@ public readonly record struct Circle<A>(float Radius, A Axis) : IEntity where A 
 {
     public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
         new Plane<A>(Axis).Hit(ray, tMin, tMax) is HitRecord record
-            ? Math.Sqrt(Vector3.Dot(record.Point, record.Point)) <= Radius ? record : null
+            ? float.Sqrt(Vector3.Dot(record.Point, record.Point)) <= Radius ? record : null
             : null;
 }
 
@@ -117,7 +128,7 @@ public readonly record struct Sphere(float Radius) : IEntity
         var a = Vector3.Dot(ray.Direction, ray.Direction);
         var b = Vector3.Dot(ray.Origin, ray.Direction);
         var c = Vector3.Dot(ray.Origin, ray.Origin) - Radius * Radius;
-        var sqrtD = (float)Math.Sqrt(b * b - a * c);
+        var sqrtD = float.Sqrt(b * b - a * c);
         if (float.IsNaN(sqrtD))
         {
             return null;
@@ -137,19 +148,19 @@ public readonly record struct Sphere(float Radius) : IEntity
     }
 }
 
-public readonly record struct Cylinder(float Radius, float Height) : IEntity
+public readonly record struct Cylinder(float Height, float Radius) : IEntity
 {
     private readonly And<And<Apply<Circle<AxisY>>, Circle<AxisY>>, Lateral> _components = new(
         new(
             new(new(Radius, new()), new(0f, Height, 0f)),
             new(Radius, new())
         ),
-        new(Radius, Height)
+        new(Height, Radius)
     );
 
     public HitRecord? Hit(in Ray ray, float tMin, float tMax) => _components.Hit(ray, tMin, tMax);
 
-    readonly record struct Lateral(float Radius, float Height) : IEntity
+    readonly record struct Lateral(float Height, float Radius) : IEntity
     {
         public HitRecord? Hit(in Ray ray, float tMin, float tMax)
         {
@@ -157,7 +168,7 @@ public readonly record struct Cylinder(float Radius, float Height) : IEntity
             var a = Vector3.Dot(side.Direction, side.Direction);
             var b = Vector3.Dot(side.Origin, side.Direction);
             var c = Vector3.Dot(side.Origin, side.Origin) - Radius * Radius;
-            var sqrtD = (float)Math.Sqrt(b * b - a * c);
+            var sqrtD = float.Sqrt(b * b - a * c);
             if (float.IsNaN(sqrtD))
             {
                 return null;
@@ -180,16 +191,16 @@ public readonly record struct Cylinder(float Radius, float Height) : IEntity
     }
 }
 
-public readonly record struct Cone(float Radius, float Height) : IEntity
+public readonly record struct Cone(float Height, float Radius) : IEntity
 {
     private readonly And<Circle<AxisY>, Lateral> _components = new(
         new(Radius, new()),
-        new(Radius, Height)
+        new(Height, Radius)
     );
 
     public HitRecord? Hit(in Ray ray, float tMin, float tMax) => _components.Hit(ray, tMin, tMax);
 
-    readonly record struct Lateral(float Radius, float Height) : IEntity
+    readonly record struct Lateral(float Height, float Radius) : IEntity
     {
         private readonly float _ratio = Radius / Height;
 
@@ -201,7 +212,7 @@ public readonly record struct Cone(float Radius, float Height) : IEntity
             var a = Vector3.Dot(side.Direction, side.Direction) - tan * ray.Direction.Y * ray.Direction.Y;
             var b = Vector3.Dot(side.Origin, side.Direction) + tan * D * ray.Direction.Y;
             var c = Vector3.Dot(side.Origin, side.Origin) - tan * D * D;
-            var sqrtD = (float)Math.Sqrt(b * b - a * c);
+            var sqrtD = float.Sqrt(b * b - a * c);
             if (float.IsNaN(sqrtD))
             {
                 return null;
@@ -219,7 +230,7 @@ public readonly record struct Cone(float Radius, float Height) : IEntity
             var point = ray.PointAt(t);
             return point.Y < 0f || point.Y > Height
                 ? null
-                : new(t, point, Vector3.Normalize(point with { Y = (float)Math.Sqrt(point.X * point.X + point.Z * point.Z) * _ratio }));
+                : new(t, point, Vector3.Normalize(point with { Y = float.Sqrt(point.X * point.X + point.Z * point.Z) * _ratio }));
         }
     }
 }

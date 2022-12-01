@@ -2,5 +2,5 @@
 
 public interface ICamera
 {
-    Ray GetRay(float s, float t);
+    Ray CastRay(float s, float t);
 }

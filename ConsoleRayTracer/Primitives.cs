@@ -5,7 +5,7 @@ public readonly record struct Ray(Vector3 Origin, Vector3 Direction)
     public Vector3 PointAt(float t) => Origin + Direction * t;
 
     public Vector3 Opposite(in Vector3 vector3) =>
-        -Math.Sign(Vector3.Dot(Direction, vector3)) * vector3;
+        -float.Sign(Vector3.Dot(Direction, vector3)) * vector3;
 }
 
 public interface IAxis

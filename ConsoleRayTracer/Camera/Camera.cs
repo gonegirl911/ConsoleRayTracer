@@ -2,7 +2,7 @@ namespace ConsoleRayTracer;
 
 public sealed class Camera : ICamera
 {
-    private const float SAFE_FRAC_PI_2 = (float)Math.PI / 2f - 0.0001f;
+    private const float SAFE_FRAC_PI_2 = float.Pi / 2f - 0.0001f;
 
     private float _width;
     private readonly float _height;
@@ -21,12 +21,13 @@ public sealed class Camera : ICamera
         Vector3 lookFrom,
         Vector3 lookAt,
         float vFov,
+        float aspect,
         float speed,
         float sensitivity
     )
     {
-        _height = (float)Math.Tan(vFov * Math.PI / 360d);
-        _width = _height * 16f / 9f;
+        _height = float.Tan(vFov * float.Pi / 360f);
+        _width = _height * aspect;
         _speed = speed / 1000f;
         _sensitivity = sensitivity / 1000f;
 
@@ -35,27 +36,27 @@ public sealed class Camera : ICamera
         _right = Vector3.Normalize(new(_forward.Z, 0f, -_forward.X));
         _up = Vector3.Cross(_forward, _right);
 
-        _yaw = (float)Math.Atan2(_forward.Z, _forward.X);
-        _pitch = (float)Math.Asin(_forward.Y);
+        _yaw = float.Atan2(_forward.Z, _forward.X);
+        _pitch = float.Asin(_forward.Y);
     }
 
-    public Ray GetRay(float s, float t)
+    public Ray CastRay(float s, float t)
     {
         var px = (2f * s - 1f) * _width;
         var py = (1f - 2f * t) * _height;
         return new(_origin, _right * px + _up * py + _forward);
     }
 
-    public void Update(ConsoleKey? key, float dt, float aspectRatio)
+    public void Update(ConsoleKey? key, float dt, float aspect)
     {
-        Adjust(aspectRatio);
+        Adjust(aspect);
         Move(key, dt);
         Rotate(key, dt);
     }
 
-    public void Adjust(float aspectRatio)
+    public void Adjust(float aspect)
     {
-        _width = _height * aspectRatio;
+        _width = _height * aspect;
     }
 
     public void Move(ConsoleKey? key, float dt)
@@ -89,13 +90,13 @@ public sealed class Camera : ICamera
             ConsoleKey.DownArrow => (_yaw, _pitch - dr),
             _ => (_yaw, _pitch),
         };
-        _yaw %= (float)Math.PI * 2f;
-        _pitch = Math.Clamp(_pitch, -SAFE_FRAC_PI_2, SAFE_FRAC_PI_2);
+        _yaw %= float.Tau;
+        _pitch = float.Clamp(_pitch, -SAFE_FRAC_PI_2, SAFE_FRAC_PI_2);
 
-        var (sinYaw, cosYaw) = Math.SinCos(_yaw);
-        var (sinPitch, cosPitch) = Math.SinCos(_pitch);
+        var (sinYaw, cosYaw) = float.SinCos(_yaw);
+        var (sinPitch, cosPitch) = float.SinCos(_pitch);
 
-        _forward = new((float)(cosYaw * cosPitch), (float)sinPitch, (float)(sinYaw * cosPitch));
+        _forward = new(cosYaw * cosPitch, sinPitch, sinYaw * cosPitch);
         _right = Vector3.Normalize(new(_forward.Z, 0f, -_forward.X));
         _up = Vector3.Cross(_forward, _right);
     }

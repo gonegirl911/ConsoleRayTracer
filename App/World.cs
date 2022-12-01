@@ -13,18 +13,18 @@ sealed record World(
         Entity: new(new IEntity[]
         {
             new Apply<Cylinder>(
-                Entity: new(1f, 4f),
+                Entity: new(4f, 1f),
                 Offset: new(-5f, 0f, 0f),
                 Brightness: 1.5f,
                 Reflectance: 0.3f
             ),
             new Apply<Cone>(
-                Entity: new(1f, 4f),
+                Entity: new(4f, 1f),
                 Brightness: 1.5f,
                 Reflectance: 0.3f
             ),
             new Apply<Cylinder>(
-                Entity: new(1f, 4f),
+                Entity: new(4f, 1f),
                 Offset: new(5f, 0f, 0f),
                 Brightness: 1.5f,
                 Reflectance: 0.3f
@@ -116,6 +116,7 @@ sealed record World(
             lookFrom: new(-12f, 9f, -21f),
             lookAt: new(0f, 3f, 0f),
             vFov: 45f,
+            aspect: 95f / 70f,
             speed: 3f,
             sensitivity: 0.5f
         ),
