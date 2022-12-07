@@ -2,16 +2,10 @@
 
 namespace ConsoleRayTracer;
 
-public abstract class App<C, R, D>
-    where C : class, ICanvas
-    where D : IDrawable
+public sealed record App<C, D>(C Canvas, D Drawable)
+    where C : class, ICanvas<C>
+    where D : IDrawable, IEventHandler
 {
-    protected abstract C Canvas { get; }
-    protected abstract D Drawable { get; }
-
-    protected virtual void OnFrameUpdate(ConsoleKey? key, float dt) { }
-    protected virtual void OnFrameUpdated() => Canvas.Draw(Drawable);
-
     public void Run()
     {
         var stopwatch = Stopwatch.StartNew();
@@ -27,9 +21,8 @@ public abstract class App<C, R, D>
 
     public void RunFrame(float dt)
     {
-        Canvas.Refresh();
-        OnFrameUpdate(Canvas.KeyPressed(), dt);
-        OnFrameUpdated();
+        Drawable.Handle(Canvas.Refresh(), dt);
+        Canvas.Draw(Drawable);
         Canvas.Commit();
     }
 }

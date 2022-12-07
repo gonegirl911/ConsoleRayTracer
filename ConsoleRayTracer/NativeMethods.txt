@@ -1,0 +1,14 @@
+﻿GetStdHandle
+SetConsoleMode
+SetCurrentConsoleFontEx
+GetNumberOfConsoleInputEvents
+ReadConsoleInput
+WriteConsoleOutput
+SetConsoleWindowInfo
+SetConsoleScreenBufferSize
+SetConsoleTitle
+GetLargestConsoleWindowSize
+GetConsoleWindow
+SetWindowLongPtrA
+DefWindowProc
+GetConsoleScreenBufferInfo

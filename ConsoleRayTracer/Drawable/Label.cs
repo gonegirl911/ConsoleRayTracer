@@ -2,7 +2,7 @@
 
 public readonly record struct Label(string Text, int BorderWidth, int Padding) : IDrawable
 {
-    public void Draw<C>(C canvas) where C : class, ICanvas
+    public void Draw<C>(C canvas) where C : class, ICanvas<C>
     {
         var width = Text.Length + (BorderWidth + Padding) * 2;
         var height = 1 + (BorderWidth + Padding) * 2;

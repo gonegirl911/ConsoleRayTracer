@@ -1,9 +1,7 @@
 namespace ConsoleRayTracer;
 
-public sealed class Camera : ICamera
+public sealed class Camera : ICamera, IEventHandler
 {
-    private const float SAFE_FRAC_PI_2 = float.Pi / 2f - 0.0001f;
-
     private float _width;
     private readonly float _height;
     private readonly float _speed;
@@ -47,49 +45,84 @@ public sealed class Camera : ICamera
         return new(_origin, _right * px + _up * py + _forward);
     }
 
-    public void Update(ConsoleKey? key, float dt, float aspect)
+    public void Handle(in Event? ev, float dt)
     {
-        Adjust(aspect);
-        Move(key, dt);
-        Rotate(key, dt);
+        if (ev is Event current)
+        {
+            if (current.KeyEvent is KeyEvent keyEvent)
+            {
+                var _ = Move(keyEvent.PressedKey, dt) || Rotate(keyEvent.PressedKey, dt);
+            }
+            else if (current.ResizeEvent is ResizeEvent resizeEvent)
+            {
+                Adjust(resizeEvent.AspectRatio);
+            }
+        }
     }
 
-    public void Adjust(float aspect)
+    private void Adjust(float aspect)
     {
         _width = _height * aspect;
     }
 
-    public void Move(ConsoleKey? key, float dt)
+    private bool Move(ConsoleKey? key, float dt)
     {
         var dp = _speed * dt;
         var forward = Vector3.Normalize(_forward with { Y = 0f });
         var right = _right;
         var up = Vector3.UnitY;
 
-        _origin += key switch
+        switch (key)
         {
-            ConsoleKey.W => dp * forward,
-            ConsoleKey.A => -dp * right,
-            ConsoleKey.S => -dp * forward,
-            ConsoleKey.D => dp * right,
-            ConsoleKey.Spacebar => dp * up,
-            ConsoleKey.Z => -dp * up,
-            _ => new(0f),
-        };        
+            case ConsoleKey.W:
+                _origin += dp * forward;
+                break;
+            case ConsoleKey.A:
+                _origin -= dp * right;
+                break;
+            case ConsoleKey.S:
+                _origin -= dp * forward;
+                break;
+            case ConsoleKey.D:
+                _origin += dp * right;
+                break;
+            case ConsoleKey.Spacebar:
+                _origin += dp * up;
+                break;
+            case ConsoleKey.Z:
+                _origin -= dp * up;
+                break;
+            default:
+                return false;
+        }
+
+        return true;      
     }
 
-    public void Rotate(ConsoleKey? key, float dt)
+    private bool Rotate(ConsoleKey? key, float dt)
     {
+        const float SAFE_FRAC_PI_2 = float.Pi / 2f - 0.0001f;
+
         var dr = _sensitivity * dt;
 
-        (_yaw, _pitch) = key switch
+        switch (key)
         {
-            ConsoleKey.LeftArrow => (_yaw + dr, _pitch),
-            ConsoleKey.RightArrow => (_yaw - dr, _pitch),
-            ConsoleKey.UpArrow => (_yaw, _pitch + dr),
-            ConsoleKey.DownArrow => (_yaw, _pitch - dr),
-            _ => (_yaw, _pitch),
-        };
+            case ConsoleKey.UpArrow:
+                _pitch += dr;
+                break;
+            case ConsoleKey.LeftArrow:
+                _yaw += dr;
+                break;
+            case ConsoleKey.DownArrow:
+                _pitch -= dr;
+                break;
+            case ConsoleKey.RightArrow:
+                _yaw -= dr;
+                break;
+            default:
+                return false;
+        }
+
         _yaw %= float.Tau;
         _pitch = float.Clamp(_pitch, -SAFE_FRAC_PI_2, SAFE_FRAC_PI_2);
 
@@ -99,5 +132,7 @@ public sealed class Camera : ICamera
         _forward = new(cosYaw * cosPitch, sinPitch, sinYaw * cosPitch);
         _right = Vector3.Normalize(new(_forward.Z, 0f, -_forward.X));
         _up = Vector3.Cross(_forward, _right);
+
+        return true;
     }
 }

@@ -15,7 +15,7 @@ public interface IAnimation<out T>
             ( <= 0f, 0f) => 0f,
             ( >= 0f, var elapsed) => elapsed,
             ( < 0f, var elapsed) => Duration + elapsed,
-            _ => throw new ArgumentException("Invalid timeElapsed"),
+            _ => throw new ArgumentException("invalid timeElapsed"),
         }
     );
 
@@ -36,15 +36,15 @@ public readonly record struct Constant<T>(T Value, float Duration) : IAnimation<
     public T GetValueUnchecked(float timeElapsed) => Value;
 }
 
-public readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAnimation<Vector3>
+public readonly record struct MotionChain(IAnimation<float>[] Animations) : IAnimation<float>
 {
     public float Duration { get; } = Animations.Sum(a => a.Duration);
 
-    public Vector3 GetValueUnchecked(float timeElapsed)
+    public float GetValueUnchecked(float timeElapsed)
     {
         var start = 0f;
-        Vector3 accum = new(0f);
-        ref var first = ref MemoryMarshal.GetReference(new Span<IAnimation<Vector3>>(Animations));
+        var accum = 0f;
+        ref var first = ref MemoryMarshal.GetReference(Animations.AsSpan());
         for (var i = 0; i < Animations.Length; i++)
         {
             var animation = Unsafe.Add(ref first, i);
@@ -63,15 +63,15 @@ public readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAni
     }
 }
 
-public readonly record struct MotionChain(IAnimation<float>[] Animations) : IAnimation<float>
+public readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAnimation<Vector3>
 {
     public float Duration { get; } = Animations.Sum(a => a.Duration);
 
-    public float GetValueUnchecked(float timeElapsed)
+    public Vector3 GetValueUnchecked(float timeElapsed)
     {
         var start = 0f;
-        var accum = 0f;
-        ref var first = ref MemoryMarshal.GetReference(new Span<IAnimation<float>>(Animations));
+        Vector3 accum = new(0f);
+        ref var first = ref MemoryMarshal.GetReference(Animations.AsSpan());
         for (var i = 0; i < Animations.Length; i++)
         {
             var animation = Unsafe.Add(ref first, i);

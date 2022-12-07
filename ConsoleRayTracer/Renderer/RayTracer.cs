@@ -1,18 +1,17 @@
 ﻿namespace ConsoleRayTracer;
 
-public sealed class RayTracer : IRenderer<RayTracer>
+public readonly record struct RayTracer<E, L, C>(int Depth = 50)
+    : IRenderer<Scene<E, L, C, RayTracer<E, L, C>>>
+    where E : IEntity
+    where L : IEntity
+    where C : ICamera
 {
-    public float Color<E, L, C>(Scene<E, L, C, RayTracer> scene, float s, float t)
-        where E : IEntity
-        where L : IEntity
-        where C : ICamera
+    public float Trace(in Scene<E, L, C, RayTracer<E, L, C>> scene, float s, float t)
     {
-        return RayTrace(scene.Entity, scene.Light, scene.Camera.CastRay(s, t));
+        return Color(scene.Entity, scene.Light, scene.Camera.CastRay(s, t), Depth);
     }
 
-    private float RayTrace<E, L>(in E entity, in L light, in Ray ray, int depth = 50)
-        where E : IEntity
-        where L : IEntity
+    private float Color(in E entity, in L light, in Ray ray, int depth)
     {
         if (depth > 0f && entity.Hit(ray, 0.001f, float.PositiveInfinity) is HitRecord record)
         {
@@ -20,7 +19,7 @@ public sealed class RayTracer : IRenderer<RayTracer>
             Ray reflected = new(record.Point, Vector3.Reflect(ray.Direction, record.Normal));
             var diffused = light.Illuminate(entity, record);
             var k = record.Reflectance;
-            return float.Clamp(k * RayTrace(entity, light, reflected, depth - 1) + (1f - k) * diffused, 0f, 1f);
+            return float.Clamp(k * Color(entity, light, reflected, depth - 1) + (1f - k) * diffused, 0f, 1f);
         }
         return 0f;
     }

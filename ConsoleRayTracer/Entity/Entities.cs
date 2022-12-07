@@ -12,7 +12,7 @@ public readonly record struct Group(IEntity[] Entities) : IAnimatedEntity
     {
         var closest = tMax;
         HitRecord? hit = null;
-        ref var first = ref MemoryMarshal.GetReference(new Span<IEntity>(Entities));
+        ref var first = ref MemoryMarshal.GetReference(Entities.AsSpan());
         for (var i = 0; i < Entities.Length; i++)
         {
             var entity = Unsafe.Add(ref first, i);
@@ -27,7 +27,7 @@ public readonly record struct Group(IEntity[] Entities) : IAnimatedEntity
 
     public void Update(float timeElapsed)
     {
-        ref var first = ref MemoryMarshal.GetReference(new Span<IAnimatedEntity>(_animatedEntities));
+        ref var first = ref MemoryMarshal.GetReference(_animatedEntities.AsSpan());
         for (var i = 0; i < _animatedEntities.Length; i++)
         {
             var animated = Unsafe.Add(ref first, i);
@@ -44,7 +44,7 @@ public readonly record struct Lights(IEntity[] Sources) : IAnimatedEntity
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
         var accum = 0f;
-        ref var first = ref MemoryMarshal.GetReference(new Span<IEntity>(Sources));
+        ref var first = ref MemoryMarshal.GetReference(Sources.AsSpan());
         for (var i = 0; i < Sources.Length; i++)
         {
             var source = Unsafe.Add(ref first, i);
@@ -55,7 +55,7 @@ public readonly record struct Lights(IEntity[] Sources) : IAnimatedEntity
 
     public void Update(float timeElapsed)
     {
-        ref var first = ref MemoryMarshal.GetReference(new Span<IAnimatedEntity>(_animatedSources));
+        ref var first = ref MemoryMarshal.GetReference(_animatedSources.AsSpan());
         for (var i = 0; i < _animatedSources.Length; i++)
         {
             var animated = Unsafe.Add(ref first, i);

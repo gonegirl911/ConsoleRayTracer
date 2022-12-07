@@ -1,88 +1,110 @@
-﻿using System.Runtime.InteropServices;
+﻿using Microsoft.Win32.SafeHandles;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using static ConsoleRayTracer.Win32;
+using Windows.Win32;
+using Windows.Win32.System.Console;
 
 namespace ConsoleRayTracer;
 
 [SupportedOSPlatform("windows")]
-public sealed class WindowsTerminal : ICanvas
+public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
 {
-    private const string ASCII = " .:+%#@";
-
-    private readonly IntPtr _handle;
-    private CHAR_INFO[] _buf;
+    private readonly SafeFileHandle _window;
+    private readonly SafeFileHandle _stdin;
+    private readonly SafeFileHandle _stdout;
     private SMALL_RECT _rect;
+    private CHAR_INFO[] _buf;
 
-    public WindowsTerminal(int width, int height, string title)
+    public WindowsTerminal(short width, short height, string title)
     {
-        AllocConsole();
-        _handle = GetStdHandle(-11);
+        _window = new(PInvoke.GetConsoleWindow(), true);
 
-        CONSOLE_FONT_INFO_EX fontInfo = new();
-        fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
-        fontInfo.dwFontSize = new(8, 8);
-        fontInfo.FaceName = "Terminal";
-        SetCurrentConsoleFontEx(_handle, false, fontInfo);
+        _stdin = new(PInvoke.GetStdHandle(STD_HANDLE.STD_INPUT_HANDLE), true);
+        PInvoke.SetConsoleMode(_stdin, CONSOLE_MODE.ENABLE_WINDOW_INPUT);
 
-        try
+        _stdout = new(PInvoke.GetStdHandle(STD_HANDLE.STD_OUTPUT_HANDLE), true);
+        PInvoke.SetCurrentConsoleFontEx(_stdout, false, new()
         {
-            Console.SetWindowSize(width, height);
-            Console.SetBufferSize(width, height);
-        }
-        catch
-        {
-            width = Console.LargestWindowWidth;
-            height = Console.LargestWindowHeight;
-            Console.SetWindowSize(width, height);
-            Console.SetBufferSize(width, height);
-        }
+            cbSize = (uint)Marshal.SizeOf(new CONSOLE_FONT_INFOEX()),
+            dwFontSize = new() { X = 8, Y = 8 },
+            FaceName = "Terminal"
+        });
 
-        Width = width;
-        Height = height;
-        Console.Title = title;
+        var sizeLimits = PInvoke.GetLargestConsoleWindowSize(_stdout);
+        width = width == 0 || width > sizeLimits.X ? sizeLimits.X : width;
+        height = height == 0 || height > sizeLimits.Y ? sizeLimits.Y : height;
 
-        _buf = new CHAR_INFO[Width * Height];
-        _rect = new(0, 0, (short)Width, (short)Height);
+        _rect = new() { Left = 0, Top = 0, Right = (short)(width - 1), Bottom = (short)(height - 1) };
+        PInvoke.SetConsoleWindowInfo(_stdout, true, new() { Left = 0, Top = 0, Right = 1, Bottom = 1 });
+        PInvoke.SetConsoleScreenBufferSize(_stdout, new() { X = width, Y = height });
+        PInvoke.SetConsoleWindowInfo(_stdout, true, _rect);
+        _buf = new CHAR_INFO[width * height];
+
+        PInvoke.SetConsoleTitle(title);
+        PInvoke.GetNumberOfConsoleInputEvents(_stdin, out var eventsAvailable);
+        PInvoke.ReadConsoleInput(_stdin, stackalloc INPUT_RECORD[(int)eventsAvailable - 1], out var _);
     }
 
-    public int Width { get; private set; }
-    public int Height { get; private set; }
+    public int Width => _rect.Right + 1;
+    public int Height => _rect.Bottom + 1;
 
-    public void Refresh()
+    public Event? Refresh()
     {
-        var width = Console.WindowWidth;
-        var height = Console.WindowHeight;
-        if (width != Width || height != Height)
+        PInvoke.GetNumberOfConsoleInputEvents(_stdin, out var eventsAvailable);
+        if (eventsAvailable != 0)
         {
-            Width = width;
-            Height = height;
-            _buf = new CHAR_INFO[width * height];
-            _rect = new(0, 0, (short)width, (short)height);
-            Console.SetBufferSize(width, height);
+            Span<INPUT_RECORD> events = stackalloc INPUT_RECORD[1];
+            PInvoke.ReadConsoleInput(_stdin, events, out var _);
+            ref var current = ref MemoryMarshal.GetReference(events);
+
+            if (current.EventType is 0x0001)
+            {
+                return new(
+                    Variant: EventVariant.Key,
+                    Data: new(new KeyEvent(
+                        Key: (ConsoleKey)current.Event.KeyEvent.wVirtualKeyCode,
+                        State: (KeyState)(byte)current.Event.KeyEvent.bKeyDown
+                    ))
+                );
+            }
+            else if (current.EventType is 0x0004)
+            {
+                var width = current.Event.WindowBufferSizeEvent.dwSize.X;
+                var height = current.Event.WindowBufferSizeEvent.dwSize.Y;
+
+                _rect = new() { Left = 0, Top = 0, Right = (short)(width - 1), Bottom = (short)(height - 1) };
+                _buf = new CHAR_INFO[width * height];
+
+                return new(
+                    Variant: EventVariant.Resize,
+                    Data: new(new ResizeEvent(
+                        Width: width,
+                        Height: height
+                    ))
+                );
+            }
         }
-    }
-    public ConsoleKey? KeyPressed()
-    {
-        return Win32.KeyPressed();
+        return null;
     }
 
     public void Set(int x, int y, float color)
     {
-        Set(x, y, ASCII[(int)(float.Clamp(color, 0f, 1f) * ASCII.Length - 1e-12)]);
+        const string ASCII = " .:+%#@";
+        Set(x, y, ASCII[(int)float.Round(float.Clamp(color, 0f, 1f) * (ASCII.Length - 1))]);
     }
 
     public void Set(int x, int y, char ch)
     {
-        _buf[y * Width + x] = new(ch);
+        _buf[y * Width + x] = new() { Char = new() { UnicodeChar = ch }, Attributes = 7 };
     }
 
     public void Commit()
     {
-        WriteConsoleOutput(
-            _handle,
-            _buf,
-            new((short)Width, (short)Height),
-            new(0, 0),
+        PInvoke.WriteConsoleOutput(
+            _stdout,
+            MemoryMarshal.GetReference(_buf.AsSpan()),
+            new() { X = (short)Width, Y = (short)Height },
+            new() { X = 0, Y = 0 },
             ref _rect
         );
     }

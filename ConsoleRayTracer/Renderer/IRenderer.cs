@@ -1,9 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public interface IRenderer<Self> where Self : class, IRenderer<Self>
+public interface IRenderer<T>
 {
-    float Color<E, L, C>(Scene<E, L, C, Self> scene, float s, float t)
-        where E : IEntity
-        where L : IEntity
-        where C : ICamera;
+    float Trace(in T obj, float s, float t);
 }
