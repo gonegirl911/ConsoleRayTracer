@@ -9,7 +9,6 @@ namespace ConsoleRayTracer;
 [SupportedOSPlatform("windows")]
 public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
 {
-    private readonly SafeFileHandle _window;
     private readonly SafeFileHandle _stdin;
     private readonly SafeFileHandle _stdout;
     private SMALL_RECT _rect;
@@ -17,12 +16,12 @@ public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
 
     public WindowsTerminal(short width, short height, string title)
     {
-        _window = new(PInvoke.GetConsoleWindow(), true);
+        PInvoke.SetConsoleTitle(title);
 
-        _stdin = new(PInvoke.GetStdHandle(STD_HANDLE.STD_INPUT_HANDLE), true);
+        _stdin = new(PInvoke.GetStdHandle(STD_HANDLE.STD_INPUT_HANDLE), false);
         PInvoke.SetConsoleMode(_stdin, CONSOLE_MODE.ENABLE_WINDOW_INPUT);
 
-        _stdout = new(PInvoke.GetStdHandle(STD_HANDLE.STD_OUTPUT_HANDLE), true);
+        _stdout = new(PInvoke.GetStdHandle(STD_HANDLE.STD_OUTPUT_HANDLE), false);
         PInvoke.SetCurrentConsoleFontEx(_stdout, false, new()
         {
             cbSize = (uint)Marshal.SizeOf(new CONSOLE_FONT_INFOEX()),
@@ -40,7 +39,6 @@ public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
         PInvoke.SetConsoleWindowInfo(_stdout, true, _rect);
         _buf = new CHAR_INFO[width * height];
 
-        PInvoke.SetConsoleTitle(title);
         PInvoke.GetNumberOfConsoleInputEvents(_stdin, out var eventsAvailable);
         PInvoke.ReadConsoleInput(_stdin, stackalloc INPUT_RECORD[(int)eventsAvailable - 1], out var _);
     }
@@ -50,7 +48,9 @@ public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
 
     public Event? Refresh()
     {
+        UpdateBufferSize();
         PInvoke.GetNumberOfConsoleInputEvents(_stdin, out var eventsAvailable);
+
         if (eventsAvailable != 0)
         {
             Span<INPUT_RECORD> events = stackalloc INPUT_RECORD[1];
@@ -84,6 +84,7 @@ public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
                 );
             }
         }
+
         return null;
     }
 
@@ -107,5 +108,17 @@ public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
             new() { X = 0, Y = 0 },
             ref _rect
         );
+    }
+
+    private void UpdateBufferSize()
+    {
+        PInvoke.GetConsoleScreenBufferInfo(_stdout, out var bufferInfo);
+        var width = bufferInfo.srWindow.Right + 1;
+        var height = bufferInfo.srWindow.Bottom + 1;
+
+        if (width != Width || height != Height)
+        {
+            PInvoke.SetConsoleScreenBufferSize(_stdout, new() { X = (short)width, Y = (short)height });
+        }
     }
 }

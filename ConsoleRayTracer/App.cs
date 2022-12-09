@@ -21,8 +21,12 @@ public sealed record App<C, D>(C Canvas, D Drawable)
 
     public void RunFrame(float dt)
     {
-        Drawable.Handle(Canvas.Refresh(), dt);
-        Canvas.Draw(Drawable);
+        var ev = Canvas.Refresh();
+        Drawable.Handle(ev, dt);
+        if (ev?.Variant is not EventVariant.Resize)
+        {
+            Canvas.Draw(Drawable);
+        }
         Canvas.Commit();
     }
 }

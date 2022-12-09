@@ -8,7 +8,4 @@ SetConsoleWindowInfo
 SetConsoleScreenBufferSize
 SetConsoleTitle
 GetLargestConsoleWindowSize
-GetConsoleWindow
-SetWindowLongPtrA
-DefWindowProc
 GetConsoleScreenBufferInfo

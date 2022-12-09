@@ -44,6 +44,7 @@ public readonly record struct MotionChain(IAnimation<float>[] Animations) : IAni
     {
         var start = 0f;
         var accum = 0f;
+
         ref var first = ref MemoryMarshal.GetReference(Animations.AsSpan());
         for (var i = 0; i < Animations.Length; i++)
         {
@@ -59,6 +60,7 @@ public readonly record struct MotionChain(IAnimation<float>[] Animations) : IAni
                 return accum + animation.GetValueUnchecked(dt);
             }
         }
+
         throw new UnreachableException();
     }
 }
@@ -70,7 +72,8 @@ public readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAni
     public Vector3 GetValueUnchecked(float timeElapsed)
     {
         var start = 0f;
-        Vector3 accum = new(0f);
+        var accum = Vector3.Zero;
+
         ref var first = ref MemoryMarshal.GetReference(Animations.AsSpan());
         for (var i = 0; i < Animations.Length; i++)
         {
@@ -86,6 +89,7 @@ public readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAni
                 return accum + animation.GetValueUnchecked(dt);
             }
         }
+        
         throw new UnreachableException();
     }
 }
