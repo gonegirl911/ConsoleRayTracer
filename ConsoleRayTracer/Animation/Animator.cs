@@ -45,30 +45,12 @@ public sealed class Animator : IEventHandler
 
         public void Handle(in Event? ev)
         {
-            var (key, keyState, opp) = ev?.KeyEvent switch
+            if (ev.HasValue)
             {
-                { Key: ConsoleKey.P, State: KeyState.Pressed } when (_keyHistory & Keys.P) == 0 => (Keys.P, KeyState.Pressed, (Keys)0),
-                { Key: ConsoleKey.P, State: KeyState.Released } => (Keys.P, KeyState.Released, (Keys)0),
-                { Key: ConsoleKey.K, State: var state } => (Keys.K, state, Keys.L),
-                { Key: ConsoleKey.L, State: var state } => (Keys.L, state, Keys.K),
-                _ => ((Keys)0, KeyState.Pressed, (Keys)0),
-            };
-
-            switch (keyState)
-            {
-                case KeyState.Pressed:
-                    _relevantKeys |= key;
-                    _relevantKeys &= ~opp;
-                    _keyHistory |= key;
-                    break;
-                case KeyState.Released:
-                    _relevantKeys &= ~key;
-                    if ((_keyHistory & opp) != 0)
-                    {
-                        _relevantKeys |= opp;
-                    }
-                    _keyHistory &= ~key;
-                    break;
+                if (ev.Value.Variant is EventVariant.Key)
+                {
+                    OnKeyEvent(ev.Value.Data.KeyEvent);
+                }
             }
         }
 
@@ -77,6 +59,7 @@ public sealed class Animator : IEventHandler
             if ((_relevantKeys & Keys.P) != 0)
             {
                 animator._isRunning = !animator._isRunning;
+
                 _relevantKeys &= ~Keys.P;
             }
 
@@ -90,7 +73,7 @@ public sealed class Animator : IEventHandler
                 {
                     animator._speed += dt * animator._sensitivity;
                 }
-
+                
                 animator._timeElapsed += dt * animator._speed;
             }
             else
@@ -103,6 +86,34 @@ public sealed class Animator : IEventHandler
                 {
                     animator._timeElapsed += dt * animator._speed;
                 }
+            }
+        }
+
+        private void OnKeyEvent(in KeyEvent keyEvent)
+        {
+            var (key, opp) = keyEvent switch
+            {
+                { Key: ConsoleKey.P, State: KeyState.Pressed } when (_keyHistory & Keys.P) == 0 => (Keys.P, (Keys)0),
+                { Key: ConsoleKey.P, State: KeyState.Released } => (Keys.P, (Keys)0),
+                { Key: ConsoleKey.K, State: _ } => (Keys.K, Keys.L),
+                { Key: ConsoleKey.L, State: _ } => (Keys.L, Keys.K),
+                _ => ((Keys)0, (Keys)0),
+            };
+
+            if (keyEvent.State is KeyState.Pressed)
+            {
+                _relevantKeys |= key;
+                _relevantKeys &= ~opp;
+                _keyHistory |= key;
+            }
+            else if (keyEvent.State is KeyState.Released)
+            {
+                _relevantKeys &= ~key;
+                if ((_keyHistory & opp) != 0)
+                {
+                    _relevantKeys |= opp;
+                }
+                _keyHistory &= ~key;
             }
         }
 

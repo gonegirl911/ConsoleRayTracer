@@ -70,56 +70,65 @@ public sealed class Camera : ICamera, IEventHandler
 
         public void Handle(in Event? ev)
         {
-            switch (ev)
+            if (ev.HasValue)
             {
-                case { Variant: EventVariant.Key, Data: var data }:
-                    OnKeyEvent(data.KeyEvent);
-                    break;
-                case { Variant: EventVariant.Resize, Data: var data }:
-                    OnResizeEvent(data.ResizeEvent);
-                    break;
+                if (ev.Value.Variant is EventVariant.Key)
+                {
+                    OnKeyEvent(ev.Value.Data.KeyEvent);
+                }
+                if (ev.Value.Variant is EventVariant.Resize)
+                {
+                    OnResizeEvent(ev.Value.Data.ResizeEvent);
+                }
             }
         }
 
         public void Update(Camera camera, float dt)
         {
-            Resize(camera);
-            Rotate(camera, dt);
-            Move(camera, dt);
+            if (_aspectRatio != 0.0f)
+            {
+                Resize(camera);
+                _aspectRatio = 0.0f;
+            }
+
+            if (_relevantKeys != 0)
+            {
+                Rotate(camera, dt);
+                Move(camera, dt);
+            }
         }
 
         private void OnKeyEvent(in KeyEvent keyEvent)
         {
-            var (key, keyState, opp) = keyEvent switch
+            var (key, opp) = keyEvent.Key switch
             {
-                { Key: ConsoleKey.W, State: var state } => (Keys.W, state, Keys.S),
-                { Key: ConsoleKey.A, State: var state } => (Keys.A, state, Keys.D),
-                { Key: ConsoleKey.S, State: var state } => (Keys.S, state, Keys.W),
-                { Key: ConsoleKey.D, State: var state } => (Keys.D, state, Keys.A),
-                { Key: ConsoleKey.Z, State: var state } => (Keys.Z, state, Keys.Spacebar),
-                { Key: ConsoleKey.Spacebar, State: var state } => (Keys.Spacebar, state, Keys.Z),
-                { Key: ConsoleKey.UpArrow, State: var state } => (Keys.UpArrow, state, Keys.DownArrow),
-                { Key: ConsoleKey.LeftArrow, State: var state } => (Keys.LeftArrow, state, Keys.RightArrow),
-                { Key: ConsoleKey.DownArrow, State: var state } => (Keys.DownArrow, state, Keys.UpArrow),
-                { Key: ConsoleKey.RightArrow, State: var state } => (Keys.RightArrow, state, Keys.LeftArrow),
-                _ => ((Keys)0, KeyState.Pressed, (Keys)0),
+                ConsoleKey.W => (Keys.W, Keys.S),
+                ConsoleKey.A => (Keys.A, Keys.D),
+                ConsoleKey.S => (Keys.S, Keys.W),
+                ConsoleKey.D => (Keys.D, Keys.A),
+                ConsoleKey.Z => (Keys.Z, Keys.Spacebar),
+                ConsoleKey.Spacebar => (Keys.Spacebar, Keys.Z),
+                ConsoleKey.UpArrow => (Keys.UpArrow, Keys.DownArrow),
+                ConsoleKey.LeftArrow => (Keys.LeftArrow, Keys.RightArrow),
+                ConsoleKey.DownArrow => (Keys.DownArrow, Keys.UpArrow),
+                ConsoleKey.RightArrow => (Keys.RightArrow, Keys.LeftArrow),
+                _ => ((Keys)0, (Keys)0),
             };
 
-            switch (keyState)
+            if (keyEvent.State is KeyState.Pressed)
             {
-                case KeyState.Pressed:
-                    _relevantKeys |= key;
-                    _relevantKeys &= ~opp;
-                    _keyHistory |= key;
-                    break;
-                case KeyState.Released:
-                    _relevantKeys &= ~key;
-                    if ((_keyHistory & opp) != 0)
-                    {
-                        _relevantKeys |= opp;
-                    }
-                    _keyHistory &= ~key;
-                    break;
+                _relevantKeys |= key;
+                _relevantKeys &= ~opp;
+                _keyHistory |= key;
+            }
+            else if (keyEvent.State is KeyState.Released)
+            {
+                _relevantKeys &= ~key;
+                if ((_keyHistory & opp) != 0)
+                {
+                    _relevantKeys |= opp;
+                }
+                _keyHistory &= ~key;
             }
         }
 
