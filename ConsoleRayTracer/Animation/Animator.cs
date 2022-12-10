@@ -6,7 +6,6 @@ public sealed class Animator : IEventHandler
     private readonly float _sensitivity;
     private bool _isRunning;
     private float _timeElapsed;
-    
     private readonly Controller _controller;
 
     public Animator(float sensitivity, float speed = 1f, bool isRunning = true)
@@ -15,7 +14,6 @@ public sealed class Animator : IEventHandler
         _sensitivity = sensitivity / 1000f;
         _isRunning = isRunning;
         _timeElapsed = 0f;
-        
         _controller = new();
     }
 
@@ -56,34 +54,17 @@ public sealed class Animator : IEventHandler
         {
             if ((_relevantKeys & Keys.P) != 0)
             {
-                animator._isRunning = !animator._isRunning;
-
+                ToggleIsRunning(animator);
                 _relevantKeys &= ~Keys.P;
             }
 
             if (animator._isRunning)
             {
-                if ((_relevantKeys & Keys.K) != 0)
-                {
-                    animator._speed -= dt * animator._sensitivity;
-                }
-                else if ((_relevantKeys & Keys.L) != 0)
-                {
-                    animator._speed += dt * animator._sensitivity;
-                }
-                
-                animator._timeElapsed += dt * animator._speed;
+                ChangeTimeSpeed(animator, dt);
             }
             else
             {
-                if ((_relevantKeys & Keys.K) != 0)
-                {
-                    animator._timeElapsed -= dt * animator._speed;
-                }
-                else if ((_relevantKeys & Keys.L) != 0)
-                {
-                    animator._timeElapsed += dt * animator._speed;
-                }
+                TimeTravel(animator, dt);
             }
         }
 
@@ -112,6 +93,36 @@ public sealed class Animator : IEventHandler
                     _relevantKeys |= opp;
                 }
                 _keyHistory &= ~key;
+            }
+        }
+
+        private void ToggleIsRunning(Animator animator)
+        {
+            animator._isRunning = !animator._isRunning;
+        }
+
+        private void ChangeTimeSpeed(Animator animator, float dt)
+        {
+            if ((_relevantKeys & Keys.K) != 0)
+            {
+                animator._speed -= dt * animator._sensitivity;
+            }
+            else if ((_relevantKeys & Keys.L) != 0)
+            {
+                animator._speed += dt * animator._sensitivity;
+            }
+            animator._timeElapsed += dt * animator._speed;
+        }
+
+        private void TimeTravel(Animator animator, float dt)
+        {
+            if ((_relevantKeys & Keys.K) != 0)
+            {
+                animator._timeElapsed -= dt * animator._speed;
+            }
+            else if ((_relevantKeys & Keys.L) != 0)
+            {
+                animator._timeElapsed += dt * animator._speed;
             }
         }
 

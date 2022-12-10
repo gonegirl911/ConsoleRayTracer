@@ -12,7 +12,6 @@ public readonly record struct Group(IEntity[] Entities) : IAnimatedEntity
     {
         var closest = tMax;
         HitRecord? hit = null;
-
         ref var first = ref MemoryMarshal.GetReference(Entities.AsSpan());
         for (var i = 0; i < Entities.Length; i++)
         {
@@ -23,7 +22,6 @@ public readonly record struct Group(IEntity[] Entities) : IAnimatedEntity
                 hit = record;
             }
         }
-
         return hit;
     }
 
@@ -46,14 +44,12 @@ public readonly record struct Lights(IEntity[] Sources) : IAnimatedEntity
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
         var accum = 0f;
-
         ref var first = ref MemoryMarshal.GetReference(Sources.AsSpan());
         for (var i = 0; i < Sources.Length; i++)
         {
             var source = Unsafe.Add(ref first, i);
             accum += source.Illuminate(entity, record);
         }
-
         return accum;
     }
 

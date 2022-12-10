@@ -19,7 +19,6 @@ sealed record World(
         Scene.Camera.Handle(ev, dt);
         Animator.Handle(ev, dt);
         Tutorial.Handle(ev, dt);
-
         Animator.MoveForward(Scene.Entity);
         Animator.MoveForward(Scene.Light);
     }
