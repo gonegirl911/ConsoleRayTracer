@@ -50,7 +50,6 @@ public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
     {
         RefreshBufferSize();
         PInvoke.GetNumberOfConsoleInputEvents(_stdin, out var eventsAvailable);
-
         if (eventsAvailable != 0)
         {
             Span<INPUT_RECORD> events = stackalloc INPUT_RECORD[1];
@@ -75,7 +74,6 @@ public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
                 return new(new ResizeEvent(width, height));
             }
         }
-
         return null;
     }
 
@@ -104,10 +102,8 @@ public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
     private void RefreshBufferSize()
     {
         PInvoke.GetConsoleScreenBufferInfo(_stdout, out var bufferInfo);
-
         var width = bufferInfo.srWindow.Right + 1;
         var height = bufferInfo.srWindow.Bottom + 1;
-
         if (width != Width || height != Height)
         {
             PInvoke.SetConsoleScreenBufferSize(_stdout, new() { X = (short)width, Y = (short)height });

@@ -127,6 +127,7 @@ if (OperatingSystem.IsWindows())
             Tutorial: new()
         )
     );
+
     app.Run();
 }
 
