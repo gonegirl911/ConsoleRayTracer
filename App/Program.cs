@@ -127,8 +127,6 @@ if (OperatingSystem.IsWindows())
             Tutorial: new()
         )
     );
-
     app.Run();
 }
-
 throw new InvalidOperationException("app only supported on Windows");
