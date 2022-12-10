@@ -10,6 +10,6 @@ public sealed record Scene<E, L, C, R>(E Entity, L Light, C Camera, R Renderer) 
     {
         var scaleX = 1f / canvas.Width;
         var scaleY = 1f / canvas.Height;
-        canvas.Draw((x, y) => Renderer.Trace(this, x * scaleX, y * scaleY));
+        canvas.Draw((x, y) => Renderer.Render(this, x * scaleX, y * scaleY));
     }
 }

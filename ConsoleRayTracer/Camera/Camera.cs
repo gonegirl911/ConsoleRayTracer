@@ -15,6 +15,8 @@ public sealed class Camera : ICamera, IEventHandler
     private float _yaw;
     private float _pitch;
 
+    private readonly Controller _controller;
+
     public Camera(
         Vector3 lookFrom,
         Vector3 lookAt,
@@ -36,6 +38,8 @@ public sealed class Camera : ICamera, IEventHandler
 
         _yaw = float.Atan2(_forward.Z, _forward.X);
         _pitch = float.Asin(_forward.Y);
+
+        _controller = new();
     }
 
     public Ray CastRay(float s, float t)
@@ -47,92 +51,170 @@ public sealed class Camera : ICamera, IEventHandler
 
     public void Handle(in Event? ev, float dt)
     {
-        if (ev is Event current)
+        _controller.Handle(ev);
+        _controller.Update(this, dt);
+    }
+
+    private sealed class Controller
+    {
+        private Keys _relevantKeys;
+        private Keys _keyHistory;
+        private float _aspectRatio;
+
+        public Controller()
         {
-            if (current.KeyEvent is KeyEvent keyEvent)
+            _relevantKeys = 0;
+            _keyHistory = 0;
+            _aspectRatio = 0f;
+        }
+
+        public void Handle(in Event? ev)
+        {
+            switch (ev)
             {
-                var _ = Move(keyEvent.PressedKey, dt) || Rotate(keyEvent.PressedKey, dt);
+                case { Variant: EventVariant.Key, Data: var data }:
+                    OnKeyEvent(data.KeyEvent);
+                    break;
+                case { Variant: EventVariant.Resize, Data: var data }:
+                    OnResizeEvent(data.ResizeEvent);
+                    break;
             }
-            else if (current.ResizeEvent is ResizeEvent resizeEvent)
+        }
+
+        public void Update(Camera camera, float dt)
+        {
+            Resize(camera);
+            Rotate(camera, dt);
+            Move(camera, dt);
+        }
+
+        private void OnKeyEvent(in KeyEvent keyEvent)
+        {
+            var (key, keyState, opp) = keyEvent switch
             {
-                Adjust(resizeEvent.AspectRatio);
+                { Key: ConsoleKey.W, State: var state } => (Keys.W, state, Keys.S),
+                { Key: ConsoleKey.A, State: var state } => (Keys.A, state, Keys.D),
+                { Key: ConsoleKey.S, State: var state } => (Keys.S, state, Keys.W),
+                { Key: ConsoleKey.D, State: var state } => (Keys.D, state, Keys.A),
+                { Key: ConsoleKey.Z, State: var state } => (Keys.Z, state, Keys.Spacebar),
+                { Key: ConsoleKey.Spacebar, State: var state } => (Keys.Spacebar, state, Keys.Z),
+                { Key: ConsoleKey.UpArrow, State: var state } => (Keys.UpArrow, state, Keys.DownArrow),
+                { Key: ConsoleKey.LeftArrow, State: var state } => (Keys.LeftArrow, state, Keys.RightArrow),
+                { Key: ConsoleKey.DownArrow, State: var state } => (Keys.DownArrow, state, Keys.UpArrow),
+                { Key: ConsoleKey.RightArrow, State: var state } => (Keys.RightArrow, state, Keys.LeftArrow),
+                _ => ((Keys)0, KeyState.Pressed, (Keys)0),
+            };
+
+            switch (keyState)
+            {
+                case KeyState.Pressed:
+                    _relevantKeys |= key;
+                    _relevantKeys &= ~opp;
+                    _keyHistory |= key;
+                    break;
+                case KeyState.Released:
+                    _relevantKeys &= ~key;
+                    if ((_keyHistory & opp) != 0)
+                    {
+                        _relevantKeys |= opp;
+                    }
+                    _keyHistory &= ~key;
+                    break;
             }
         }
-    }
 
-    private void Adjust(float aspect)
-    {
-        _width = _height * aspect;
-    }
-
-    private bool Move(ConsoleKey? key, float dt)
-    {
-        var dp = _speed * dt;
-        var forward = Vector3.Normalize(_forward with { Y = 0f });
-        var right = _right;
-        var up = Vector3.UnitY;
-
-        switch (key)
+        private void OnResizeEvent(in ResizeEvent resizeEvent)
         {
-            case ConsoleKey.W:
-                _origin += dp * forward;
-                break;
-            case ConsoleKey.A:
-                _origin -= dp * right;
-                break;
-            case ConsoleKey.S:
-                _origin -= dp * forward;
-                break;
-            case ConsoleKey.D:
-                _origin += dp * right;
-                break;
-            case ConsoleKey.Spacebar:
-                _origin += dp * up;
-                break;
-            case ConsoleKey.Z:
-                _origin -= dp * up;
-                break;
-            default:
-                return false;
+            _aspectRatio = resizeEvent.AspectRatio;
         }
 
-        return true;      
-    }
-
-    private bool Rotate(ConsoleKey? key, float dt)
-    {
-        const float SAFE_FRAC_PI_2 = float.Pi / 2f - 0.0001f;
-
-        var dr = _sensitivity * dt;
-
-        switch (key)
+        private void Resize(Camera camera)
         {
-            case ConsoleKey.UpArrow:
-                _pitch += dr;
-                break;
-            case ConsoleKey.LeftArrow:
-                _yaw += dr;
-                break;
-            case ConsoleKey.DownArrow:
-                _pitch -= dr;
-                break;
-            case ConsoleKey.RightArrow:
-                _yaw -= dr;
-                break;
-            default:
-                return false;
+            camera._width = camera._height * _aspectRatio;
         }
 
-        _yaw %= float.Tau;
-        _pitch = float.Clamp(_pitch, -SAFE_FRAC_PI_2, SAFE_FRAC_PI_2);
+        private void Rotate(Camera camera, float dt)
+        {
+            const float SAFE_FRAC_PI_2 = float.Pi / 2f - 0.0001f;
 
-        var (sinYaw, cosYaw) = float.SinCos(_yaw);
-        var (sinPitch, cosPitch) = float.SinCos(_pitch);
+            var dr = camera._sensitivity * dt;
 
-        _forward = new(cosYaw * cosPitch, sinPitch, sinYaw * cosPitch);
-        _right = Vector3.Normalize(new(_forward.Z, 0f, -_forward.X));
-        _up = Vector3.Cross(_forward, _right);
+            if ((_relevantKeys & Keys.UpArrow) != 0)
+            {
+                camera._pitch += dr;
+            }
+            else if ((_relevantKeys & Keys.DownArrow) != 0)
+            {
+                camera._pitch -= dr;
+            }
 
-        return true;
+            if ((_relevantKeys & Keys.LeftArrow) != 0)
+            {
+                camera._yaw += dr;
+            }
+            else if ((_relevantKeys & Keys.RightArrow) != 0)
+            {
+                camera._yaw -= dr;
+            }
+
+            camera._yaw %= float.Tau;
+            camera._pitch = float.Clamp(camera._pitch, -SAFE_FRAC_PI_2, SAFE_FRAC_PI_2);
+
+            var (sinYaw, cosYaw) = float.SinCos(camera._yaw);
+            var (sinPitch, cosPitch) = float.SinCos(camera._pitch);
+
+            camera._forward = new(cosYaw * cosPitch, sinPitch, sinYaw * cosPitch);
+            camera._right = Vector3.Normalize(new(camera._forward.Z, 0f, -camera._forward.X));
+            camera._up = Vector3.Cross(camera._forward, camera._right);
+        }
+
+        private void Move(Camera camera, float dt)
+        {
+            var dp = camera._speed * dt;
+            var forward = Vector3.Normalize(camera._forward with { Y = 0f });
+            var right = camera._right;
+            var up = Vector3.UnitY;
+
+            if ((_relevantKeys & Keys.W) != 0)
+            {
+                camera._origin += forward * dp;
+            }
+            else if ((_relevantKeys & Keys.S) != 0)
+            {
+                camera._origin -= forward * dp;
+            }
+
+            if ((_relevantKeys & Keys.A) != 0)
+            {
+                camera._origin -= right * dp;
+            }
+            else if ((_relevantKeys & Keys.D) != 0)
+            {
+                camera._origin += right * dp;
+            }
+
+            if ((_relevantKeys & Keys.Z) != 0)
+            {
+                camera._origin -= up * dp;
+            }
+            else if ((_relevantKeys & Keys.Spacebar) != 0)
+            {
+                camera._origin += up * dp;
+            }
+        }
+
+        private enum Keys : ushort
+        {
+            W = 1 << 0,
+            A = 1 << 1,
+            S = 1 << 2,
+            D = 1 << 3,
+            Z = 1 << 4,
+            Spacebar = 1 << 5,
+            UpArrow = 1 << 6,
+            LeftArrow = 1 << 7,
+            DownArrow = 1 << 8,
+            RightArrow = 1 << 9,
+        }
     }
 }

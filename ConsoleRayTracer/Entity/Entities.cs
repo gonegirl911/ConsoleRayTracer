@@ -156,6 +156,16 @@ public readonly record struct Sphere(float Radius) : IEntity
 
 public readonly record struct Cylinder(float Height, float Radius) : IEntity
 {
+    private readonly And<And<Apply<Circle<AxisY>>, Circle<AxisY>>, Lateral> _components = new(
+        new(
+            new(new(Radius, new()), new(0f, Height, 0f)),
+            new(Radius, new())
+        ),
+        new(Height, Radius)
+    );
+
+    public HitRecord? Hit(in Ray ray, float tMin, float tMax) => _components.Hit(ray, tMin, tMax);
+
     private readonly record struct Lateral(float Height, float Radius) : IEntity
     {
         public HitRecord? Hit(in Ray ray, float tMin, float tMax)
@@ -181,27 +191,24 @@ public readonly record struct Cylinder(float Height, float Radius) : IEntity
                     return null;
                 }
             }
-            
+
             var point = ray.PointAt(t);
             return point.Y >= 0f && point.Y < Height
                 ? new(t, point, Vector3.Normalize(point with { Y = 0f }))
                 : null;
         }
     }
-
-    private readonly And<And<Apply<Circle<AxisY>>, Circle<AxisY>>, Lateral> _components = new(
-        new(
-            new(new(Radius, new()), new(0f, Height, 0f)),
-            new(Radius, new())
-        ),
-        new(Height, Radius)
-    );
-
-    public HitRecord? Hit(in Ray ray, float tMin, float tMax) => _components.Hit(ray, tMin, tMax);
 }
 
 public readonly record struct Cone(float Height, float Radius) : IEntity
 {
+    private readonly And<Circle<AxisY>, Lateral> _components = new(
+        new(Radius, new()),
+        new(Height, Radius)
+    );
+
+    public HitRecord? Hit(in Ray ray, float tMin, float tMax) => _components.Hit(ray, tMin, tMax);
+
     private readonly record struct Lateral(float Height, float Radius) : IEntity
     {
         private readonly float _ratio = Radius / Height;
@@ -238,13 +245,6 @@ public readonly record struct Cone(float Height, float Radius) : IEntity
                 : null;
         }
     }
-
-    private readonly And<Circle<AxisY>, Lateral> _components = new(
-        new(Radius, new()),
-        new(Height, Radius)
-    );
-
-    public HitRecord? Hit(in Ray ray, float tMin, float tMax) => _components.Hit(ray, tMin, tMax);
 }
 
 public readonly record struct RectPrism(float Width, float Height, float Depth) : IEntity

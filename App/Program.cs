@@ -120,7 +120,7 @@ if (OperatingSystem.IsWindows())
                     speed: 3f,
                     sensitivity: 0.5f
                 ),
-                Renderer: new()
+                Renderer: new(Depth: 50)
             ),
             Animator: new(sensitivity: 3f),
             Crosshair: new(),

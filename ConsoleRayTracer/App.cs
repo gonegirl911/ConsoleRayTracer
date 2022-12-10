@@ -10,6 +10,7 @@ public sealed record App<C, D>(C Canvas, D Drawable)
     {
         var stopwatch = Stopwatch.StartNew();
         var lastFrame = 0L;
+
         while (true)
         {
             var now = stopwatch.ElapsedMilliseconds;
@@ -22,6 +23,7 @@ public sealed record App<C, D>(C Canvas, D Drawable)
     public void RunFrame(float dt)
     {
         var ev = Canvas.Refresh();
+
         Drawable.Handle(ev, dt);
         if (ev?.Variant is not EventVariant.Resize)
         {
