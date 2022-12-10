@@ -76,7 +76,7 @@ public sealed class Camera : ICamera, IEventHandler
                 {
                     OnKeyEvent(ev.Value.Data.KeyEvent);
                 }
-                if (ev.Value.Variant is EventVariant.Resize)
+                else if (ev.Value.Variant is EventVariant.Resize)
                 {
                     OnResizeEvent(ev.Value.Data.ResizeEvent);
                 }

@@ -19,13 +19,11 @@ public sealed class Tutorial : IDrawable, IEventHandler
     };
 
     private int _step;
-
     private ConsoleKey? _lastKey;
 
     public Tutorial()
     {
         _step = 0;
-
         _lastKey = null;
     }
 
@@ -59,7 +57,6 @@ public sealed class Tutorial : IDrawable, IEventHandler
                     (10, _) => 11,
                     _ => _step,
                 };
-
                 _lastKey = keyEvent.Key;
             }
             else if (keyEvent.State is KeyState.Released && keyEvent.Key == _lastKey)

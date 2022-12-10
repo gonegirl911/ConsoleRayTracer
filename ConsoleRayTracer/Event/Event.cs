@@ -6,9 +6,12 @@ public readonly record struct Event(EventVariant Variant, EventData Data)
 {
     public readonly KeyEvent? KeyEvent = Variant is EventVariant.Key ? Data.KeyEvent : null;
     public readonly ResizeEvent? ResizeEvent = Variant is EventVariant.Resize ? Data.ResizeEvent : null;
+
+    public Event(KeyEvent keyEvent) : this(EventVariant.Key, new(keyEvent)) { }
+    public Event(ResizeEvent resizeEvent) : this(EventVariant.Resize, new(resizeEvent)) { }
 }
 
-public enum EventVariant : byte { Key, Resize }
+public enum EventVariant : byte { Key, Mouse, Resize }
 
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct EventData

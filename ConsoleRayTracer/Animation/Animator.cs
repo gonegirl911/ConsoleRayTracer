@@ -4,7 +4,6 @@ public sealed class Animator : IEventHandler
 {
     private float _speed;
     private readonly float _sensitivity;
-
     private bool _isRunning;
     private float _timeElapsed;
     
@@ -14,7 +13,6 @@ public sealed class Animator : IEventHandler
     {
         _speed = speed;
         _sensitivity = sensitivity / 1000f;
-    
         _isRunning = isRunning;
         _timeElapsed = 0f;
         

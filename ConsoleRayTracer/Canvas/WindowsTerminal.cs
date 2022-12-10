@@ -59,13 +59,10 @@ public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
 
             if (current.EventType is 0x0001)
             {
-                return new(
-                    Variant: EventVariant.Key,
-                    Data: new(new KeyEvent(
-                        Key: (ConsoleKey)current.Event.KeyEvent.wVirtualKeyCode,
-                        State: (KeyState)(byte)current.Event.KeyEvent.bKeyDown
-                    ))
-                );
+                return new(new KeyEvent(
+                    Key: (ConsoleKey)current.Event.KeyEvent.wVirtualKeyCode,
+                    State: (KeyState)(byte)current.Event.KeyEvent.bKeyDown
+                ));
             }
             else if (current.EventType is 0x0004)
             {
@@ -75,13 +72,7 @@ public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
                 _rect = new() { Left = 0, Top = 0, Right = (short)(width - 1), Bottom = (short)(height - 1) };
                 _buf = new CHAR_INFO[width * height];
 
-                return new(
-                    Variant: EventVariant.Resize,
-                    Data: new(new ResizeEvent(
-                        Width: width,
-                        Height: height
-                    ))
-                );
+                return new(new ResizeEvent(width, height));
             }
         }
 
