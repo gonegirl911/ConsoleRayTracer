@@ -8,14 +8,13 @@ public sealed record App<C, D>(C Canvas, D Drawable)
 {
     public void Run()
     {
-        var stopwatch = Stopwatch.StartNew();
-        var lastFrame = 0L;
+        var lastFrame = Stopwatch.GetTimestamp();
         while (true)
         {
-            var now = stopwatch.ElapsedMilliseconds;
-            var dt = now - lastFrame;
+            var now = Stopwatch.GetTimestamp();
+            var dt = Stopwatch.GetElapsedTime(lastFrame, now);
             lastFrame = now;
-            RunFrame(dt);
+            RunFrame((float)dt.TotalMilliseconds);
         }
     }
 
