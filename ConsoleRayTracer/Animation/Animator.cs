@@ -20,7 +20,7 @@ public sealed class Animator : IEventHandler
     public void Handle(in Event? ev, float dt)
     {
         _controller.Handle(ev);
-        _controller.Update(this, dt);
+        _controller.ApplyUpdates(this, dt);
     }
 
     public void MoveForward<E>(in E animatedEntity) where E : IAnimatedEntity
@@ -50,7 +50,7 @@ public sealed class Animator : IEventHandler
             }
         }
 
-        public void Update(Animator animator, float dt)
+        public void ApplyUpdates(Animator animator, float dt)
         {
             if ((_relevantKeys & Keys.P) != 0)
             {

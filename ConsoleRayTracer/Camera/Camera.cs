@@ -52,7 +52,7 @@ public sealed class Camera : ICamera, IEventHandler
     public void Handle(in Event? ev, float dt)
     {
         _controller.Handle(ev);
-        _controller.Update(this, dt);
+        _controller.ApplyUpdates(this, dt);
     }
 
     private sealed class Controller
@@ -83,18 +83,18 @@ public sealed class Camera : ICamera, IEventHandler
             }
         }
 
-        public void Update(Camera camera, float dt)
+        public void ApplyUpdates(Camera camera, float dt)
         {
             if (_aspectRatio != 0.0f)
             {
-                Resize(camera);
+                ApplyResize(camera);
                 _aspectRatio = 0.0f;
             }
 
             if (_relevantKeys != 0)
             {
-                Rotate(camera, dt);
-                Move(camera, dt);
+                ApplyRotation(camera, dt);
+                ApplyMovement(camera, dt);
             }
         }
 
@@ -137,12 +137,12 @@ public sealed class Camera : ICamera, IEventHandler
             _aspectRatio = resizeEvent.AspectRatio;
         }
 
-        private void Resize(Camera camera)
+        private void ApplyResize(Camera camera)
         {
             camera._width = camera._height * _aspectRatio;
         }
 
-        private void Rotate(Camera camera, float dt)
+        private void ApplyRotation(Camera camera, float dt)
         {
             const float SAFE_FRAC_PI_2 = float.Pi / 2f - 0.0001f;
 
@@ -177,7 +177,7 @@ public sealed class Camera : ICamera, IEventHandler
             camera._up = Vector3.Cross(camera._forward, camera._right);
         }
 
-        private void Move(Camera camera, float dt)
+        private void ApplyMovement(Camera camera, float dt)
         {
             var dp = camera._speed * dt;
             var forward = Vector3.Normalize(camera._forward with { Y = 0f });
