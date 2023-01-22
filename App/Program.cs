@@ -115,7 +115,7 @@ if (OperatingSystem.IsWindows())
                 Camera: new(
                     lookFrom: new(-12f, 9f, -21f),
                     lookAt: new(0f, 3f, 0f),
-                    vFov: 45f,
+                    vFov: 90f,
                     aspect: 95f / 70f,
                     speed: 3f,
                     sensitivity: 0.5f
