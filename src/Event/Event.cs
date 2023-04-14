@@ -4,8 +4,8 @@ namespace ConsoleRayTracer;
 
 readonly record struct Event(Variant Variant, Data Data)
 {
-    public readonly KeyEvent? KeyEvent = Variant is Variant.Key ? Data.KeyEvent : null;
-    public readonly ResizeEvent? ResizeEvent = Variant is Variant.Resize ? Data.ResizeEvent : null;
+    public readonly KeyEvent? KeyEvent = Variant == Variant.Key ? Data.KeyEvent : null;
+    public readonly ResizeEvent? ResizeEvent = Variant == Variant.Resize ? Data.ResizeEvent : null;
 
     public Event(KeyEvent keyEvent) : this(Variant.Key, new(keyEvent)) { }
     public Event(ResizeEvent resizeEvent) : this(Variant.Resize, new(resizeEvent)) { }
@@ -39,8 +39,8 @@ readonly struct Data
 
 readonly record struct KeyEvent(ConsoleKey Key, KeyState State)
 {
-    public readonly ConsoleKey? PressedKey = State is KeyState.Pressed ? Key : null;
-    public readonly ConsoleKey? ReleasedKey = State is KeyState.Released ? Key : null;
+    public readonly ConsoleKey? PressedKey = State == KeyState.Pressed ? Key : null;
+    public readonly ConsoleKey? ReleasedKey = State == KeyState.Released ? Key : null;
 }
 
 enum KeyState : byte

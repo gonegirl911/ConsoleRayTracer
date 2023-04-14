@@ -22,6 +22,7 @@ sealed class WindowsTerminal : ICanvas<WindowsTerminal>
         PInvoke.SetConsoleTitle(title);
         PInvoke.SetConsoleMode(_stdin, CONSOLE_MODE.ENABLE_WINDOW_INPUT);
         PInvoke.SetCurrentConsoleFontEx(_stdout, false, new() { cbSize = (uint)Marshal.SizeOf(new CONSOLE_FONT_INFOEX()), dwFontSize = new() { X = 8, Y = 8 }, FaceName = "Terminal" });
+        PInvoke.SetConsoleCursorInfo(_stdout, new() { dwSize = 100, bVisible = false });
 
         var sizeLimits = PInvoke.GetLargestConsoleWindowSize(_stdout);
 
@@ -55,7 +56,7 @@ sealed class WindowsTerminal : ICanvas<WindowsTerminal>
 
             ref var ev = ref MemoryMarshal.GetReference(events);
 
-            if (ev.EventType is 0x0001)
+            if (ev.EventType == 0x0001)
             {
                 return new(
                     new KeyEvent(
@@ -64,7 +65,7 @@ sealed class WindowsTerminal : ICanvas<WindowsTerminal>
                     )
                 );
             }
-            else if (ev.EventType is 0x0004)
+            else if (ev.EventType == 0x0004)
             {
                 var width = ev.Event.WindowBufferSizeEvent.dwSize.X;
                 var height = ev.Event.WindowBufferSizeEvent.dwSize.Y;

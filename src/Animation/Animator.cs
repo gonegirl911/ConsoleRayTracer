@@ -76,13 +76,13 @@ sealed class Animator : IEventHandler
                 _ => (default, default),
             };
 
-            if (keyEvent.State is KeyState.Pressed)
+            if (keyEvent.State == KeyState.Pressed)
             {
                 _relevantKeys |= key;
                 _relevantKeys &= ~opposite;
                 _keyHistory |= key;
             }
-            else if (keyEvent.State is KeyState.Released)
+            else if (keyEvent.State == KeyState.Released)
             {
                 _relevantKeys &= ~key;
 

@@ -9,3 +9,4 @@ SetConsoleScreenBufferSize
 SetConsoleTitle
 GetLargestConsoleWindowSize
 GetConsoleScreenBufferInfo
+SetConsoleCursorInfo
