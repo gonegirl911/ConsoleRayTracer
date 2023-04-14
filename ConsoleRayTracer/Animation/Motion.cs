@@ -1,4 +1,6 @@
-﻿namespace ConsoleRayTracer;
+﻿using System.Numerics;
+
+namespace ConsoleRayTracer;
 
 public interface IMotion<out T>
 {
@@ -15,12 +17,12 @@ public readonly record struct LinearPath(Vector3 Path) : IMotion<Vector3>
     public Vector3 GetValue(float interpolation) => Path * interpolation;
 }
 
-public readonly record struct CircularPath<A>(float Radius, A Axis) : IMotion<Vector3>
+public readonly record struct CircularPath<A>(A Axis, float Radius) : IMotion<Vector3>
     where A : IAxis
 {
     public Vector3 GetValue(float interpolation)
     {
-        var (sin, cos) = float.SinCos(float.Tau * interpolation);
-        return Axis.Apply(new(0f, cos, sin)) * Radius;
+        var theta = float.Tau * interpolation;
+        return Axis.Apply(new(0f, float.Cos(theta), float.Sin(theta))) * Radius;
     }
 }

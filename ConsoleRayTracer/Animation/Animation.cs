@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -42,23 +43,24 @@ public readonly record struct MotionChain(IAnimation<float>[] Animations) : IAni
 
     public float GetValueUnchecked(float timeElapsed)
     {
-        var start = 0f;
         var accum = 0f;
-        ref var first = ref MemoryMarshal.GetReference(Animations.AsSpan());
-        for (var i = 0; i < Animations.Length; i++)
+        var elapsed = 0f;
+
+        foreach (var animation in Animations.AsSpan())
         {
-            var animation = Unsafe.Add(ref first, i);
-            var dt = timeElapsed - start;
+            var dt = timeElapsed - elapsed;
+
             if (dt > animation.Duration)
             {
-                start += animation.Duration;
                 accum += animation.GetValueUnchecked(animation.Duration);
+                elapsed += animation.Duration;
             }
             else
             {
                 return accum + animation.GetValueUnchecked(dt);
             }
         }
+
         throw new UnreachableException();
     }
 }
@@ -69,23 +71,24 @@ public readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAni
 
     public Vector3 GetValueUnchecked(float timeElapsed)
     {
-        var start = 0f;
         var accum = Vector3.Zero;
-        ref var first = ref MemoryMarshal.GetReference(Animations.AsSpan());
-        for (var i = 0; i < Animations.Length; i++)
+        var elapsed = 0f;
+
+        foreach (var animation in Animations.AsSpan())
         {
-            var animation = Unsafe.Add(ref first, i);
-            var dt = timeElapsed - start;
+            var dt = timeElapsed - elapsed;
+
             if (dt > animation.Duration)
             {
-                start += animation.Duration;
                 accum += animation.GetValueUnchecked(animation.Duration);
+                elapsed += animation.Duration;
             }
             else
             {
                 return accum + animation.GetValueUnchecked(dt);
             }
         }
+
         throw new UnreachableException();
     }
 }

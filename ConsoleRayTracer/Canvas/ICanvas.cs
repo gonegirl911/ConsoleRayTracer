@@ -1,6 +1,7 @@
 ﻿namespace ConsoleRayTracer;
 
-public interface ICanvas<TSelf> where TSelf : class, ICanvas<TSelf>
+public interface ICanvas<TSelf>
+    where TSelf : class, ICanvas<TSelf>
 {
     int Width { get; }
     int Height { get; }
@@ -13,34 +14,9 @@ public interface ICanvas<TSelf> where TSelf : class, ICanvas<TSelf>
 
 public static class CanvasExtensions
 {
-    public static void Draw<C>(this C canvas, Func<int, int, float> color)
+    public static void Set<C>(this C canvas, Func<int, int, float> color)
         where C : class, ICanvas<C>
     {
-        Parallel.For(0, canvas.Height, y =>
-        {
-            Parallel.For(0, canvas.Width, x =>
-            {
-                canvas.Set(x, y, color(x, y));
-            });
-        });
-    }
-
-    public static void Draw<C>(this C canvas, Func<int, int, char> ch)
-        where C : class, ICanvas<C>
-    {
-        Parallel.For(0, canvas.Height, y =>
-        {
-            Parallel.For(0, canvas.Width, x =>
-            {
-                canvas.Set(x, y, ch(x, y));
-            });
-        });
-    }
-
-    public static void Draw<C, D>(this C canvas, in D drawable)
-        where C : class, ICanvas<C>
-        where D : IDrawable
-    {
-        drawable.Draw(canvas);
+        Parallel.For(0, canvas.Height, y => Parallel.For(0, canvas.Width, x => canvas.Set(x, y, color(x, y))));
     }
 }

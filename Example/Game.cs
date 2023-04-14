@@ -1,6 +1,8 @@
-﻿namespace App;
+using ConsoleRayTracer;
 
-sealed record World(
+namespace Example;
+
+public sealed record Game(
     Scene<Group, Lights, Camera, RayTracer<Group, Lights, Camera>> Scene,
     Animator Animator,
     Crosshair Crosshair,
@@ -9,12 +11,12 @@ sealed record World(
 {
     public void Draw<C>(C canvas) where C : class, ICanvas<C>
     {
-        canvas.Draw(Scene);
-        canvas.Draw(Crosshair);
-        canvas.Draw(Tutorial);
+        Scene.Draw(canvas);
+        Crosshair.Draw(canvas);
+        Tutorial.Draw(canvas);
     }
 
-    public void Handle(in Event? ev, float dt)
+    public void Handle(Event? ev, TimeSpan dt)
     {
         Scene.Camera.Handle(ev, dt);
         Animator.Handle(ev, dt);

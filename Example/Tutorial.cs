@@ -1,47 +1,49 @@
-﻿namespace ConsoleRayTracer;
+﻿using ConsoleRayTracer;
+
+namespace Example;
 
 public sealed class Tutorial : IDrawable, IEventHandler
 {
     private static readonly Label?[] LABELS =
     {
-        new("Created by Damyan Slavov, Petar Dobrev, Simeon Obretenov, 11d", 1, 2),
-        new("Do you want to go through the tutorial?    Y/n", 1, 2),
-        new("Move around    W,A,S,D", 1, 2),
-        new("Look around    ArrowUp,Left,Down,Right", 1, 2),
-        new("Go up/down     Space,Z", 1, 2),
-        new("Slow down/speed up time    K,L", 1, 2),
-        new("Stop time      P", 1, 2),
-        new("Go back/forward in time    K,L", 1, 2),
-        new("Start time     P", 1, 2),
-        new("Tutorial completed", 1, 2),
-        new("Feel free to resize the window", 1, 2),
+        new("Created by Damyan Slavov, Petar Dobrev, Simeon Obretenov, 11d"),
+        new("Do you want to go through the tutorial?    Y/n"),
+        new("Move around    W,A,S,D"),
+        new("Look around    ArrowUp,Left,Down,Right"),
+        new("Go up/down     Space,Z"),
+        new("Slow down/speed up time    K,L"),
+        new("Stop time      P"),
+        new("Go back/forward in time    K,L"),
+        new("Start time     P"),
+        new("Tutorial completed"),
+        new("Feel free to resize the window"),
         null,
     };
 
-    private int _step;
+    private int _stage;
     private ConsoleKey? _lastKey;
 
     public Tutorial()
     {
-        _step = 0;
+        _stage = 0;
         _lastKey = null;
     }
 
     public void Draw<C>(C canvas) where C : class, ICanvas<C>
     {
-        if (LABELS[_step] is Label label)
+        if (LABELS[_stage] is Label label)
         {
-            canvas.Draw(label);
+            label.Draw(canvas);
         }
     }
 
-    public void Handle(in Event? ev, float dt)
+    public void Handle(Event? ev, TimeSpan dt)
     {
         if (ev?.KeyEvent is KeyEvent keyEvent)
         {
-            if (keyEvent.State is KeyState.Pressed && keyEvent.Key != _lastKey)
+            if (keyEvent.PressedKey is ConsoleKey key && key != _lastKey)
             {
-                _step = (_step, keyEvent.Key) switch
+                _stage = (_stage, key) switch
                 {
                     (0, _) => 1,
                     (1, ConsoleKey.Y) => 2,
@@ -55,11 +57,11 @@ public sealed class Tutorial : IDrawable, IEventHandler
                     (8, ConsoleKey.P) => 9,
                     (9, _) => 10,
                     (10, _) => 11,
-                    _ => _step,
+                    _ => _stage,
                 };
-                _lastKey = keyEvent.Key;
+                _lastKey = key;
             }
-            else if (keyEvent.State is KeyState.Released && keyEvent.Key == _lastKey)
+            else
             {
                 _lastKey = null;
             }

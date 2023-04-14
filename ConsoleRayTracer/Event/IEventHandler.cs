@@ -2,5 +2,5 @@
 
 public interface IEventHandler
 {
-    void Handle(in Event? ev, float dt);
+    void Handle(Event? ev, TimeSpan dt);
 }

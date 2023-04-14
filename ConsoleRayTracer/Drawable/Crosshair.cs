@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public readonly record struct Crosshair : IDrawable
+public readonly struct Crosshair : IDrawable
 {
     public void Draw<C>(C canvas) where C : class, ICanvas<C>
     {
@@ -14,8 +14,8 @@ public readonly record struct Crosshair : IDrawable
 
         canvas.Set(centerX - 1, centerY, 1f);
         canvas.Set(centerX, centerY - 1, 1f);
-        canvas.Set(centerX + 1, centerY, 1f);
-        canvas.Set(centerX, centerY + 1, 1f);
         canvas.Set(centerX, centerY, 1f);
+        canvas.Set(centerX, centerY + 1, 1f);
+        canvas.Set(centerX + 1, centerY, 1f);
     }
 }

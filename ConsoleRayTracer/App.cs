@@ -9,23 +9,21 @@ public sealed record App<C, D>(C Canvas, D Drawable)
     public void Run()
     {
         var lastFrame = Stopwatch.GetTimestamp();
+
         while (true)
         {
             var now = Stopwatch.GetTimestamp();
-            var dt = Stopwatch.GetElapsedTime(lastFrame, now);
+
+            RunFrame(Stopwatch.GetElapsedTime(lastFrame, now));
+
             lastFrame = now;
-            RunFrame((float)dt.TotalMilliseconds);
         }
     }
 
-    public void RunFrame(float dt)
+    public void RunFrame(TimeSpan dt)
     {
-        var ev = Canvas.Refresh();
-        Drawable.Handle(ev, dt);
-        if (ev?.Variant is not EventVariant.Resize)
-        {
-            Canvas.Draw(Drawable);
-        }
+        Drawable.Handle(Canvas.Refresh(), dt);
+        Drawable.Draw(Canvas);
         Canvas.Commit();
     }
 }

@@ -1,4 +1,4 @@
-﻿GetStdHandle
+GetStdHandle
 SetConsoleMode
 SetCurrentConsoleFontEx
 GetNumberOfConsoleInputEvents

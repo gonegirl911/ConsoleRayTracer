@@ -1,8 +1,10 @@
-﻿namespace ConsoleRayTracer;
+﻿using System.Numerics;
+
+namespace ConsoleRayTracer;
 
 public interface IEntity
 {
-    HitRecord? Hit(in Ray ray, float tMin, float tMax) => null;
+    HitRecord? Hit(Ray ray, float tMin, float tMax) => null;
     float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity => 0f;
 }
 
@@ -22,7 +24,7 @@ public readonly record struct Apply<E>(
 ) : IEntity
     where E : IEntity
 {
-    public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
+    public HitRecord? Hit(Ray ray, float tMin, float tMax) =>
         Entity.Hit(ray with { Origin = ray.Origin - Offset }, tMin, tMax) is HitRecord record
             ? record with
             {

@@ -1,4 +1,6 @@
-﻿namespace ConsoleRayTracer;
+﻿using System.Numerics;
+
+namespace ConsoleRayTracer;
 
 public interface IAnimatedEntity : IEntity
 {
@@ -20,7 +22,7 @@ public sealed record Animated<E, O, B, R>(
     private float _brightness = 1f + Brightness.GetValue(0f);
     private float _reflectance = Reflectance.GetValue(0f);
 
-    public HitRecord? Hit(in Ray ray, float tMin, float tMax) =>
+    public HitRecord? Hit(Ray ray, float tMin, float tMax) =>
         Entity.Hit(ray with { Origin = ray.Origin - _offset }, tMin, tMax) is HitRecord record
             ? record with
             {

@@ -2,22 +2,16 @@
 
 public sealed class Animator : IEventHandler
 {
-    private float _speed;
-    private readonly float _sensitivity;
-    private bool _isRunning;
     private float _timeElapsed;
     private readonly Controller _controller;
 
-    public Animator(float sensitivity, float speed = 1f, bool isRunning = true)
+    public Animator(float speed, float sensitivity, bool isRunning = true)
     {
-        _speed = speed;
-        _sensitivity = sensitivity / 1000f;
-        _isRunning = isRunning;
         _timeElapsed = 0f;
-        _controller = new();
+        _controller = new(speed, sensitivity, isRunning);
     }
 
-    public void Handle(in Event? ev, float dt)
+    public void Handle(Event? ev, TimeSpan dt)
     {
         _controller.Handle(ev);
         _controller.ApplyUpdates(this, dt);
@@ -32,35 +26,38 @@ public sealed class Animator : IEventHandler
     {
         private Keys _relevantKeys;
         private Keys _keyHistory;
+        private bool _isRunning;
+        private float _speed;
+        private readonly float _sensitivity;
 
-        public Controller()
+        public Controller(float speed, float sensitivity, bool isRunning)
         {
             _relevantKeys = 0;
             _keyHistory = 0;
+            _isRunning = isRunning;
+            _speed = speed;
+            _sensitivity = sensitivity;
         }
 
-        public void Handle(in Event? ev)
+        public void Handle(Event? ev)
         {
-            if (ev.HasValue)
+            if (ev?.KeyEvent is KeyEvent keyEvent)
             {
-                if (ev.Value.Variant is EventVariant.Key)
-                {
-                    OnKeyEvent(ev.Value.Data.KeyEvent);
-                }
+                OnKeyEvent(keyEvent);
             }
         }
 
-        public void ApplyUpdates(Animator animator, float dt)
+        public void ApplyUpdates(Animator animator, TimeSpan dt)
         {
             if ((_relevantKeys & Keys.P) != 0)
             {
-                ToggleIsRunning(animator);
+                _isRunning = !_isRunning;
                 _relevantKeys &= ~Keys.P;
             }
 
-            if (animator._isRunning)
+            if (_isRunning)
             {
-                ChangeTimeSpeed(animator, dt);
+                Continue(animator, dt);
             }
             else
             {
@@ -68,69 +65,72 @@ public sealed class Animator : IEventHandler
             }
         }
 
-        private void OnKeyEvent(in KeyEvent keyEvent)
+        private void OnKeyEvent(KeyEvent keyEvent)
         {
-            var (key, opp) = keyEvent switch
+            var (key, opposite) = keyEvent switch
             {
-                { Key: ConsoleKey.P, State: KeyState.Pressed } when (_keyHistory & Keys.P) == 0 => (Keys.P, (Keys)0),
-                { Key: ConsoleKey.P, State: KeyState.Released } => (Keys.P, (Keys)0),
-                { Key: ConsoleKey.K, State: _ } => (Keys.K, Keys.L),
+                { Key: ConsoleKey.P, State: KeyState.Pressed } when (_keyHistory & Keys.P) == 0 => (Keys.P, default),
+                { Key: ConsoleKey.P, State: KeyState.Released } => (Keys.P, default),
                 { Key: ConsoleKey.L, State: _ } => (Keys.L, Keys.K),
-                _ => ((Keys)0, (Keys)0),
+                { Key: ConsoleKey.K, State: _ } => (Keys.K, Keys.L),
+                _ => (default, default),
             };
 
             if (keyEvent.State is KeyState.Pressed)
             {
                 _relevantKeys |= key;
-                _relevantKeys &= ~opp;
+                _relevantKeys &= ~opposite;
                 _keyHistory |= key;
             }
             else if (keyEvent.State is KeyState.Released)
             {
                 _relevantKeys &= ~key;
-                if ((_keyHistory & opp) != 0)
+
+                if ((_keyHistory & opposite) != 0)
                 {
-                    _relevantKeys |= opp;
+                    _relevantKeys |= opposite;
                 }
+
                 _keyHistory &= ~key;
             }
         }
 
-        private void ToggleIsRunning(Animator animator)
+        private void Continue(Animator animator, TimeSpan dt)
         {
-            animator._isRunning = !animator._isRunning;
+            var ds = _sensitivity * (float)dt.TotalSeconds;
+            var de = (float)dt.TotalMilliseconds * _speed;
+
+            if ((_relevantKeys & Keys.L) != 0)
+            {
+                _speed += ds;
+            }
+            else if ((_relevantKeys & Keys.K) != 0)
+            {
+                _speed -= ds;
+            }
+
+            animator._timeElapsed += de;
         }
 
-        private void ChangeTimeSpeed(Animator animator, float dt)
+        private void TimeTravel(Animator animator, TimeSpan dt)
         {
-            if ((_relevantKeys & Keys.K) != 0)
-            {
-                animator._speed -= dt * animator._sensitivity;
-            }
-            else if ((_relevantKeys & Keys.L) != 0)
-            {
-                animator._speed += dt * animator._sensitivity;
-            }
-            animator._timeElapsed += dt * animator._speed;
-        }
+            var de = (float)dt.TotalMilliseconds * _speed;
 
-        private void TimeTravel(Animator animator, float dt)
-        {
-            if ((_relevantKeys & Keys.K) != 0)
+            if ((_relevantKeys & Keys.L) != 0)
             {
-                animator._timeElapsed -= dt * animator._speed;
+                animator._timeElapsed += de;
             }
-            else if ((_relevantKeys & Keys.L) != 0)
+            else if ((_relevantKeys & Keys.K) != 0)
             {
-                animator._timeElapsed += dt * animator._speed;
+                animator._timeElapsed -= de;
             }
         }
 
         private enum Keys : byte
         {
             P = 1 << 0,
-            K = 1 << 1,
             L = 1 << 2,
+            K = 1 << 1,
         }
     }
 }

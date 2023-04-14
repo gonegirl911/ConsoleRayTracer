@@ -1,55 +1,47 @@
+using System.Numerics;
+
 namespace ConsoleRayTracer;
 
 public sealed class Camera : ICamera, IEventHandler
 {
-    private float _width;
-    private readonly float _height;
-    private readonly float _speed;
-    private readonly float _sensitivity;
-
+    private Vector3 _origin;
     private Vector3 _forward;
     private Vector3 _right;
     private Vector3 _up;
-    private Vector3 _origin;
-
     private float _yaw;
     private float _pitch;
-
+    private float _width;
+    private readonly float _height;
     private readonly Controller _controller;
 
     public Camera(
         Vector3 lookFrom,
         Vector3 lookAt,
-        float vFov,
-        float aspect,
+        float verticalFov,
+        float aspectRatio,
         float speed,
         float sensitivity
     )
     {
-        _height = float.Tan(vFov * float.Pi / 360f * 0.5f);
-        _width = _height * aspect;
-        _speed = speed / 1000f;
-        _sensitivity = sensitivity / 1000f;
-
         _origin = lookFrom;
         _forward = Vector3.Normalize(lookAt - lookFrom);
-        _right = Vector3.Normalize(new(_forward.Z, 0f, -_forward.X));
+        _right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, _forward));
         _up = Vector3.Cross(_forward, _right);
-
         _yaw = float.Atan2(_forward.Z, _forward.X);
         _pitch = float.Asin(_forward.Y);
-
-        _controller = new();
+        _height = float.Tan(verticalFov * float.Pi / 360f * 0.5f);
+        _width = _height * aspectRatio;
+        _controller = new(speed, sensitivity);
     }
 
     public Ray CastRay(float s, float t)
     {
-        var px = (2f * s - 1f) * _width;
-        var py = (1f - 2f * t) * _height;
-        return new(_origin, _right * px + _up * py + _forward);
+        var sx = (-1f + s * 2f) * _width;
+        var sy = (1f - t * 2f) * _height;
+        return new(_origin, _forward + _right * sx + _up * sy);
     }
 
-    public void Handle(in Event? ev, float dt)
+    public void Handle(Event? ev, TimeSpan dt)
     {
         _controller.Handle(ev);
         _controller.ApplyUpdates(this, dt);
@@ -60,93 +52,91 @@ public sealed class Camera : ICamera, IEventHandler
         private Keys _relevantKeys;
         private Keys _keyHistory;
         private float _aspectRatio;
+        private readonly float _speed;
+        private readonly float _sensitivity;
 
-        public Controller()
+        public Controller(float speed, float sensitivity)
         {
             _relevantKeys = 0;
             _keyHistory = 0;
             _aspectRatio = 0f;
+            _speed = speed;
+            _sensitivity = sensitivity;
         }
 
-        public void Handle(in Event? ev)
+        public void Handle(Event? ev)
         {
-            if (ev.HasValue)
+            if (ev?.KeyEvent is KeyEvent keyEvent)
             {
-                if (ev.Value.Variant is EventVariant.Key)
-                {
-                    OnKeyEvent(ev.Value.Data.KeyEvent);
-                }
-                else if (ev.Value.Variant is EventVariant.Resize)
-                {
-                    OnResizeEvent(ev.Value.Data.ResizeEvent);
-                }
+                OnKeyEvent(keyEvent);
+            }
+            else if (ev?.ResizeEvent is ResizeEvent resizeEvent)
+            {
+                OnResizeEvent(resizeEvent);
             }
         }
 
-        public void ApplyUpdates(Camera camera, float dt)
+        public void ApplyUpdates(Camera camera, TimeSpan dt)
         {
-            if (_aspectRatio != 0.0f)
-            {
-                ApplyResize(camera);
-                _aspectRatio = 0.0f;
-            }
-
             if (_relevantKeys != 0)
             {
                 ApplyRotation(camera, dt);
                 ApplyMovement(camera, dt);
             }
+
+            if (_aspectRatio != 0.0f)
+            {
+                ApplyResize(camera);
+                _aspectRatio = 0.0f;
+            }
         }
 
-        private void OnKeyEvent(in KeyEvent keyEvent)
+        private void OnKeyEvent(KeyEvent keyEvent)
         {
-            var (key, opp) = keyEvent.Key switch
+            var (key, opposite) = keyEvent.Key switch
             {
                 ConsoleKey.W => (Keys.W, Keys.S),
                 ConsoleKey.A => (Keys.A, Keys.D),
                 ConsoleKey.S => (Keys.S, Keys.W),
                 ConsoleKey.D => (Keys.D, Keys.A),
-                ConsoleKey.Z => (Keys.Z, Keys.Spacebar),
                 ConsoleKey.Spacebar => (Keys.Spacebar, Keys.Z),
+                ConsoleKey.Z => (Keys.Z, Keys.Spacebar),
                 ConsoleKey.UpArrow => (Keys.UpArrow, Keys.DownArrow),
                 ConsoleKey.LeftArrow => (Keys.LeftArrow, Keys.RightArrow),
                 ConsoleKey.DownArrow => (Keys.DownArrow, Keys.UpArrow),
                 ConsoleKey.RightArrow => (Keys.RightArrow, Keys.LeftArrow),
-                _ => ((Keys)0, (Keys)0),
+                _ => (default, default),
             };
 
             if (keyEvent.State is KeyState.Pressed)
             {
                 _relevantKeys |= key;
-                _relevantKeys &= ~opp;
+                _relevantKeys &= ~opposite;
                 _keyHistory |= key;
             }
             else if (keyEvent.State is KeyState.Released)
             {
                 _relevantKeys &= ~key;
-                if ((_keyHistory & opp) != 0)
+
+                if ((_keyHistory & opposite) != 0)
                 {
-                    _relevantKeys |= opp;
+                    _relevantKeys |= opposite;
                 }
+
                 _keyHistory &= ~key;
             }
         }
 
-        private void OnResizeEvent(in ResizeEvent resizeEvent)
+        private void OnResizeEvent(ResizeEvent resizeEvent)
         {
             _aspectRatio = resizeEvent.AspectRatio;
         }
 
-        private void ApplyResize(Camera camera)
+        private void ApplyRotation(Camera camera, TimeSpan dt)
         {
-            camera._width = camera._height * _aspectRatio;
-        }
+            const float SAFE_FRAC_PI_2 = float.Pi * 0.5f - 0.0001f;
 
-        private void ApplyRotation(Camera camera, float dt)
-        {
-            const float SAFE_FRAC_PI_2 = float.Pi / 2f - 0.0001f;
-
-            var dr = camera._sensitivity * dt;
+            var dr = _sensitivity * (float)dt.TotalSeconds;
 
             if ((_relevantKeys & Keys.UpArrow) != 0)
             {
@@ -173,43 +163,55 @@ public sealed class Camera : ICamera, IEventHandler
             var (sinPitch, cosPitch) = float.SinCos(camera._pitch);
 
             camera._forward = new(cosYaw * cosPitch, sinPitch, sinYaw * cosPitch);
-            camera._right = Vector3.Normalize(new(camera._forward.Z, 0f, -camera._forward.X));
+            camera._right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, camera._forward));
             camera._up = Vector3.Cross(camera._forward, camera._right);
         }
 
-        private void ApplyMovement(Camera camera, float dt)
+        private void ApplyMovement(Camera camera, TimeSpan dt)
         {
-            var dp = camera._speed * dt;
-            var forward = Vector3.Normalize(camera._forward with { Y = 0f });
+            var dp = _speed * (float)dt.TotalSeconds;
             var right = camera._right;
             var up = Vector3.UnitY;
+            var forward = Vector3.Cross(right, up);
+
+            var direction = Vector3.Zero;
 
             if ((_relevantKeys & Keys.W) != 0)
             {
-                camera._origin += forward * dp;
+                direction += forward;
             }
             else if ((_relevantKeys & Keys.S) != 0)
             {
-                camera._origin -= forward * dp;
+                direction -= forward;
             }
 
             if ((_relevantKeys & Keys.A) != 0)
             {
-                camera._origin -= right * dp;
+                direction -= right;
             }
             else if ((_relevantKeys & Keys.D) != 0)
             {
-                camera._origin += right * dp;
+                direction += right;
             }
 
-            if ((_relevantKeys & Keys.Z) != 0)
+            if ((_relevantKeys & Keys.Spacebar) != 0)
             {
-                camera._origin -= up * dp;
+                direction += up;
             }
-            else if ((_relevantKeys & Keys.Spacebar) != 0)
+            else if ((_relevantKeys & Keys.Z) != 0)
             {
-                camera._origin += up * dp;
+                direction -= up;
             }
+
+            if (direction != Vector3.Zero)
+            {
+                camera._origin += Vector3.Normalize(direction) * dp;
+            }
+        }
+
+        private void ApplyResize(Camera camera)
+        {
+            camera._width = camera._height * _aspectRatio;
         }
 
         private enum Keys : ushort
@@ -218,8 +220,8 @@ public sealed class Camera : ICamera, IEventHandler
             A = 1 << 1,
             S = 1 << 2,
             D = 1 << 3,
-            Z = 1 << 4,
-            Spacebar = 1 << 5,
+            Spacebar = 1 << 4,
+            Z = 1 << 5,
             UpArrow = 1 << 6,
             LeftArrow = 1 << 7,
             DownArrow = 1 << 8,

@@ -1,11 +1,11 @@
+using System.Numerics;
+
 namespace ConsoleRayTracer;
 
 public readonly record struct Ray(Vector3 Origin, Vector3 Direction)
 {
     public Vector3 PointAt(float t) => Origin + Direction * t;
-
-    public Vector3 Opposite(in Vector3 vector3) =>
-        -float.Sign(Vector3.Dot(Direction, vector3)) * vector3;
+    public Vector3 Opposite(Vector3 vector) => -float.Sign(Vector3.Dot(vector, Direction)) * vector;
 }
 
 public interface IAxis
@@ -15,10 +15,10 @@ public interface IAxis
     int Secondary { get; }
     Vector3 Unit { get; }
 
-    float GetAxis(Vector3 vector3);
-    float GetMain(Vector3 vector3);
-    float GetSecondary(Vector3 vector3);
-    Vector3 Apply(Vector3 vector3);
+    float GetAxis(Vector3 vector);
+    float GetMain(Vector3 vector);
+    float GetSecondary(Vector3 vector);
+    Vector3 Apply(Vector3 vector);
 }
 
 public readonly record struct AxisX : IAxis
@@ -28,10 +28,10 @@ public readonly record struct AxisX : IAxis
     public int Secondary => 1;
     public Vector3 Unit => Vector3.UnitX;
 
-    public float GetAxis(Vector3 vector3) => vector3.X;
-    public float GetMain(Vector3 vector3) => vector3.Z;
-    public float GetSecondary(Vector3 vector3) => vector3.Y;
-    public Vector3 Apply(Vector3 vector3) => new(vector3.X, vector3.Z, vector3.Y);
+    public float GetAxis(Vector3 vector) => vector.X;
+    public float GetMain(Vector3 vector) => vector.Z;
+    public float GetSecondary(Vector3 vector) => vector.Y;
+    public Vector3 Apply(Vector3 vector) => new(vector.X, vector.Z, vector.Y);
 }
 
 public readonly record struct AxisY : IAxis
@@ -41,10 +41,10 @@ public readonly record struct AxisY : IAxis
     public int Secondary => 2;
     public Vector3 Unit => Vector3.UnitY;
 
-    public float GetAxis(Vector3 vector3) => vector3.Y;
-    public float GetMain(Vector3 vector3) => vector3.X;
-    public float GetSecondary(Vector3 vector3) => vector3.Z;
-    public Vector3 Apply(Vector3 vector3) => new(vector3.Y, vector3.X, vector3.Z);
+    public float GetAxis(Vector3 vector) => vector.Y;
+    public float GetMain(Vector3 vector) => vector.X;
+    public float GetSecondary(Vector3 vector) => vector.Z;
+    public Vector3 Apply(Vector3 vector) => new(vector.Y, vector.X, vector.Z);
 }
 
 public readonly record struct AxisZ : IAxis
@@ -54,8 +54,8 @@ public readonly record struct AxisZ : IAxis
     public int Secondary => 1;
     public Vector3 Unit => Vector3.UnitZ;
 
-    public float GetAxis(Vector3 vector3) => vector3.Z;
-    public float GetMain(Vector3 vector3) => vector3.X;
-    public float GetSecondary(Vector3 vector3) => vector3.Y;
-    public Vector3 Apply(Vector3 vector3) => new(vector3.Y, vector3.Z, vector3.X);
+    public float GetAxis(Vector3 vector) => vector.Z;
+    public float GetMain(Vector3 vector) => vector.X;
+    public float GetSecondary(Vector3 vector) => vector.Y;
+    public Vector3 Apply(Vector3 vector) => new(vector.Y, vector.Z, vector.X);
 }
