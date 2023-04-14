@@ -26,6 +26,7 @@ readonly record struct Label(string Text) : IDrawable
                 canvas.Set(topLeftX + dx, topLeftY + height - OUTLINE + dy, 1f);
             }
         }
+
         for (var dy = OUTLINE; dy < height - OUTLINE; dy++)
         {
             for (var dx = 0; dx < PADDING; dx++)
@@ -33,11 +34,13 @@ readonly record struct Label(string Text) : IDrawable
                 canvas.Set(topLeftX + OUTLINE + dx, topLeftY + dy, 0f);
                 canvas.Set(topLeftX + width - PADDING - OUTLINE + dx, topLeftY + dy, 0f);
             }
+
             for (var dx = 0; dx < OUTLINE; dx++)
             {
                 canvas.Set(topLeftX + dx, topLeftY + dy, 1f);
                 canvas.Set(topLeftX + width - OUTLINE + dx, topLeftY + dy, 1f);
             }
+
             for (var dx = 0; dx < Text.Length; dx++)
             {
                 if (dy == PADDING + OUTLINE)
