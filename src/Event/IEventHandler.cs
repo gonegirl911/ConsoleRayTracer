@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public interface IEventHandler
+interface IEventHandler
 {
     void Handle(Event? ev, TimeSpan dt);
 }

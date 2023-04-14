@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace ConsoleRayTracer;
 
-public sealed class Camera : ICamera, IEventHandler
+sealed class Camera : ICamera, IEventHandler
 {
     private Vector3 _origin;
     private Vector3 _forward;

@@ -2,7 +2,7 @@
 
 namespace ConsoleRayTracer;
 
-public sealed record App<C, D>(C Canvas, D Drawable)
+sealed record App<C, D>(C Canvas, D Drawable)
     where C : class, ICanvas<C>
     where D : IDrawable, IEventHandler
 {

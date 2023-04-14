@@ -2,7 +2,7 @@
 
 namespace ConsoleRayTracer;
 
-public readonly record struct RayTracer<E, L, C>(int Depth) : IRenderer<Scene<E, L, C, RayTracer<E, L, C>>>
+readonly record struct RayTracer<E, L, C>(int Depth) : IRenderer<Scene<E, L, C, RayTracer<E, L, C>>>
     where E : IEntity
     where L : IEntity
     where C : ICamera

@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public sealed class Tutorial : IDrawable, IEventHandler
+sealed class Tutorial : IDrawable, IEventHandler
 {
     private static readonly Label?[] LABELS =
     {

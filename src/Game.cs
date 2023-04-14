@@ -1,6 +1,6 @@
 namespace ConsoleRayTracer;
 
-public sealed record Game(
+sealed record Game(
     Scene<Group, Lights, Camera, RayTracer<Group, Lights, Camera>> Scene,
     Animator Animator,
     Crosshair Crosshair,

@@ -7,7 +7,7 @@ using Windows.Win32.System.Console;
 namespace ConsoleRayTracer;
 
 [SupportedOSPlatform("windows")]
-public sealed class WindowsTerminal : ICanvas<WindowsTerminal>
+sealed class WindowsTerminal : ICanvas<WindowsTerminal>
 {
     private readonly SafeFileHandle _stdin;
     private readonly SafeFileHandle _stdout;

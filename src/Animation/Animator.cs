@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public sealed class Animator : IEventHandler
+sealed class Animator : IEventHandler
 {
     private float _timeElapsed;
     private readonly Controller _controller;

@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public readonly struct Crosshair : IDrawable
+readonly struct Crosshair : IDrawable
 {
     public void Draw<C>(C canvas) where C : class, ICanvas<C>
     {

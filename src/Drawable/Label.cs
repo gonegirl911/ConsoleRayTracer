@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public readonly record struct Label(string Text) : IDrawable
+readonly record struct Label(string Text) : IDrawable
 {
     const int PADDING = 2;
     const int OUTLINE = 1;

@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public interface ICanvas<TSelf>
+interface ICanvas<TSelf>
     where TSelf : class, ICanvas<TSelf>
 {
     int Width { get; }
@@ -12,7 +12,7 @@ public interface ICanvas<TSelf>
     void Commit();
 }
 
-public static class CanvasExtensions
+static class CanvasExtensions
 {
     public static void Set<C>(this C canvas, Func<int, int, float> color)
         where C : class, ICanvas<C>

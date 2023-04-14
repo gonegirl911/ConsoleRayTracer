@@ -2,12 +2,12 @@
 
 namespace ConsoleRayTracer;
 
-public interface IAnimatedEntity : IEntity
+interface IAnimatedEntity : IEntity
 {
     void Update(float timeElapsed);
 }
 
-public sealed record Animated<E, O, B, R>(
+sealed record Animated<E, O, B, R>(
     E Entity,
     O Offset = default!,
     B Brightness = default!,

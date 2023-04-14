@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public sealed record Scene<E, L, C, R>(E Entity, L Light, C Camera, R Renderer) : IDrawable
+sealed record Scene<E, L, C, R>(E Entity, L Light, C Camera, R Renderer) : IDrawable
     where E : IEntity
     where L : IEntity
     where C : ICamera

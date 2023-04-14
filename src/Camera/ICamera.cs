@@ -1,6 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-public interface ICamera
+interface ICamera
 {
     Ray CastRay(float s, float t);
 }

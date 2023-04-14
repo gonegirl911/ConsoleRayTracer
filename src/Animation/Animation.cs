@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace ConsoleRayTracer;
 
-public interface IAnimation<out T>
+interface IAnimation<out T>
 {
     float Duration { get; }
 
@@ -23,7 +23,7 @@ public interface IAnimation<out T>
     T GetValueUnchecked(float timeElapsed);
 }
 
-public readonly record struct Animation<T, M, I>(M Motion, I Interpolator, float Duration) : IAnimation<T>
+readonly record struct Animation<T, M, I>(M Motion, I Interpolator, float Duration) : IAnimation<T>
     where M : IMotion<T>
     where I : IInterpolator
 {
@@ -31,13 +31,13 @@ public readonly record struct Animation<T, M, I>(M Motion, I Interpolator, float
         Motion.GetValue(Interpolator.GetInterpolation(timeElapsed / Duration));
 }
 
-public readonly record struct Constant<T>(T Value, float Duration) : IAnimation<T>
+readonly record struct Constant<T>(T Value, float Duration) : IAnimation<T>
 {
     public T GetValue(float timeElapsed) => Value;
     public T GetValueUnchecked(float timeElapsed) => Value;
 }
 
-public readonly record struct MotionChain(IAnimation<float>[] Animations) : IAnimation<float>
+readonly record struct MotionChain(IAnimation<float>[] Animations) : IAnimation<float>
 {
     public float Duration { get; } = Animations.Sum(a => a.Duration);
 
@@ -65,7 +65,7 @@ public readonly record struct MotionChain(IAnimation<float>[] Animations) : IAni
     }
 }
 
-public readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAnimation<Vector3>
+readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAnimation<Vector3>
 {
     public float Duration { get; } = Animations.Sum(a => a.Duration);
 

@@ -2,7 +2,7 @@
 
 namespace ConsoleRayTracer;
 
-public readonly record struct Event(Variant Variant, Data Data)
+readonly record struct Event(Variant Variant, Data Data)
 {
     public readonly KeyEvent? KeyEvent = Variant is Variant.Key ? Data.KeyEvent : null;
     public readonly ResizeEvent? ResizeEvent = Variant is Variant.Resize ? Data.ResizeEvent : null;
@@ -11,14 +11,14 @@ public readonly record struct Event(Variant Variant, Data Data)
     public Event(ResizeEvent resizeEvent) : this(Variant.Resize, new(resizeEvent)) { }
 }
 
-public enum Variant : byte
+enum Variant : byte
 {
     Key,
     Resize,
 }
 
 [StructLayout(LayoutKind.Explicit)]
-public readonly struct Data
+readonly struct Data
 {
     [FieldOffset(0)]
     public readonly KeyEvent KeyEvent;
@@ -37,19 +37,19 @@ public readonly struct Data
     }
 }
 
-public readonly record struct KeyEvent(ConsoleKey Key, KeyState State)
+readonly record struct KeyEvent(ConsoleKey Key, KeyState State)
 {
     public readonly ConsoleKey? PressedKey = State is KeyState.Pressed ? Key : null;
     public readonly ConsoleKey? ReleasedKey = State is KeyState.Released ? Key : null;
 }
 
-public enum KeyState : byte
+enum KeyState : byte
 {
     Pressed = 1,
     Released = 0,
 }
 
-public readonly record struct ResizeEvent(int Width, int Height)
+readonly record struct ResizeEvent(int Width, int Height)
 {
     public readonly float AspectRatio = (float)Width / Height;
 }

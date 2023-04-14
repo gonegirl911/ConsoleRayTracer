@@ -2,13 +2,13 @@ using System.Numerics;
 
 namespace ConsoleRayTracer;
 
-public readonly record struct Ray(Vector3 Origin, Vector3 Direction)
+readonly record struct Ray(Vector3 Origin, Vector3 Direction)
 {
     public Vector3 PointAt(float t) => Origin + Direction * t;
     public Vector3 Opposite(Vector3 vector) => -float.Sign(Vector3.Dot(vector, Direction)) * vector;
 }
 
-public interface IAxis
+interface IAxis
 {
     int Axis { get; }
     int Main { get; }
@@ -21,7 +21,7 @@ public interface IAxis
     Vector3 Apply(Vector3 vector);
 }
 
-public readonly record struct AxisX : IAxis
+readonly record struct AxisX : IAxis
 {
     public int Axis => 0;
     public int Main => 2;
@@ -34,7 +34,7 @@ public readonly record struct AxisX : IAxis
     public Vector3 Apply(Vector3 vector) => new(vector.X, vector.Z, vector.Y);
 }
 
-public readonly record struct AxisY : IAxis
+readonly record struct AxisY : IAxis
 {
     public int Axis => 1;
     public int Main => 0;
@@ -47,7 +47,7 @@ public readonly record struct AxisY : IAxis
     public Vector3 Apply(Vector3 vector) => new(vector.Y, vector.X, vector.Z);
 }
 
-public readonly record struct AxisZ : IAxis
+readonly record struct AxisZ : IAxis
 {
     public int Axis => 2;
     public int Main => 0;
