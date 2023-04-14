@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using Example;
 using ConsoleRayTracer;
 
 if (OperatingSystem.IsWindows())

@@ -1,6 +1,4 @@
-﻿using ConsoleRayTracer;
-
-namespace Example;
+﻿namespace ConsoleRayTracer;
 
 public sealed class Tutorial : IDrawable, IEventHandler
 {

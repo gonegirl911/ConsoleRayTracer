@@ -1,6 +1,4 @@
-using ConsoleRayTracer;
-
-namespace Example;
+namespace ConsoleRayTracer;
 
 public sealed record Game(
     Scene<Group, Lights, Camera, RayTracer<Group, Lights, Camera>> Scene,
