@@ -128,8 +128,6 @@ if (OperatingSystem.IsWindows())
             Tutorial: new()
         )
     );
-
     app.Run();
 }
-
 throw new InvalidOperationException("WindowsTerminal is only supported on Windows");

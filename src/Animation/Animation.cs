@@ -45,11 +45,9 @@ readonly record struct MotionChain(IAnimation<float>[] Animations) : IAnimation<
     {
         var accum = 0f;
         var elapsed = 0f;
-
         foreach (var animation in Animations.AsSpan())
         {
             var dt = timeElapsed - elapsed;
-
             if (dt > animation.Duration)
             {
                 accum += animation.GetValueUnchecked(animation.Duration);
@@ -60,7 +58,6 @@ readonly record struct MotionChain(IAnimation<float>[] Animations) : IAnimation<
                 return accum + animation.GetValueUnchecked(dt);
             }
         }
-
         throw new UnreachableException();
     }
 }
@@ -73,11 +70,9 @@ readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAnimation<
     {
         var accum = Vector3.Zero;
         var elapsed = 0f;
-
         foreach (var animation in Animations.AsSpan())
         {
             var dt = timeElapsed - elapsed;
-
             if (dt > animation.Duration)
             {
                 accum += animation.GetValueUnchecked(animation.Duration);
@@ -88,7 +83,6 @@ readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAnimation<
                 return accum + animation.GetValueUnchecked(dt);
             }
         }
-
         throw new UnreachableException();
     }
 }

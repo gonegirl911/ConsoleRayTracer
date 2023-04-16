@@ -91,45 +91,29 @@ sealed class Camera : ICamera, IEventHandler
             }
         }
 
-        private void OnKeyEvent(KeyEvent keyEvent)
+        private void OnKeyEvent(KeyEvent ev)
         {
-            var (key, opposite) = keyEvent.Key switch
-            {
-                ConsoleKey.W => (Keys.W, Keys.S),
-                ConsoleKey.A => (Keys.A, Keys.D),
-                ConsoleKey.S => (Keys.S, Keys.W),
-                ConsoleKey.D => (Keys.D, Keys.A),
-                ConsoleKey.Spacebar => (Keys.Spacebar, Keys.Z),
-                ConsoleKey.Z => (Keys.Z, Keys.Spacebar),
-                ConsoleKey.UpArrow => (Keys.UpArrow, Keys.DownArrow),
-                ConsoleKey.LeftArrow => (Keys.LeftArrow, Keys.RightArrow),
-                ConsoleKey.DownArrow => (Keys.DownArrow, Keys.UpArrow),
-                ConsoleKey.RightArrow => (Keys.RightArrow, Keys.LeftArrow),
-                _ => (default, default),
-            };
-
-            if (keyEvent.State == KeyState.Pressed)
+            var (key, oppositeKey) = KeyPair(ev);
+            if (ev.State == KeyState.Pressed)
             {
                 _relevantKeys |= key;
-                _relevantKeys &= ~opposite;
+                _relevantKeys &= ~oppositeKey;
                 _keyHistory |= key;
             }
-            else if (keyEvent.State == KeyState.Released)
+            else if (ev.State == KeyState.Released)
             {
                 _relevantKeys &= ~key;
-
-                if ((_keyHistory & opposite) != 0)
+                if ((_keyHistory & oppositeKey) != 0)
                 {
-                    _relevantKeys |= opposite;
+                    _relevantKeys |= oppositeKey;
                 }
-
                 _keyHistory &= ~key;
             }
         }
 
-        private void OnResizeEvent(ResizeEvent resizeEvent)
+        private void OnResizeEvent(ResizeEvent ev)
         {
-            _aspectRatio = resizeEvent.AspectRatio;
+            _aspectRatio = ev.AspectRatio;
         }
 
         private void ApplyRotation(Camera camera, TimeSpan dt)
@@ -169,12 +153,10 @@ sealed class Camera : ICamera, IEventHandler
 
         private void ApplyMovement(Camera camera, TimeSpan dt)
         {
-            var dp = _speed * (float)dt.TotalSeconds;
+            var direction = Vector3.Zero;
             var right = camera._right;
             var up = Vector3.UnitY;
             var forward = Vector3.Cross(right, up);
-
-            var direction = Vector3.Zero;
 
             if ((_relevantKeys & Keys.W) != 0)
             {
@@ -205,13 +187,31 @@ sealed class Camera : ICamera, IEventHandler
 
             if (direction != Vector3.Zero)
             {
-                camera._origin += Vector3.Normalize(direction) * dp;
+                camera._origin += Vector3.Normalize(direction) * _speed * (float)dt.TotalSeconds;
             }
         }
 
         private void ApplyResize(Camera camera)
         {
             camera._width = camera._height * _aspectRatio;
+        }
+
+        private (Keys, Keys) KeyPair(KeyEvent ev)
+        {
+            return ev.Key switch
+            {
+                ConsoleKey.W => (Keys.W, Keys.S),
+                ConsoleKey.A => (Keys.A, Keys.D),
+                ConsoleKey.S => (Keys.S, Keys.W),
+                ConsoleKey.D => (Keys.D, Keys.A),
+                ConsoleKey.Spacebar => (Keys.Spacebar, Keys.Z),
+                ConsoleKey.Z => (Keys.Z, Keys.Spacebar),
+                ConsoleKey.UpArrow => (Keys.UpArrow, Keys.DownArrow),
+                ConsoleKey.LeftArrow => (Keys.LeftArrow, Keys.RightArrow),
+                ConsoleKey.DownArrow => (Keys.DownArrow, Keys.UpArrow),
+                ConsoleKey.RightArrow => (Keys.RightArrow, Keys.LeftArrow),
+                _ => (default, default),
+            };
         }
 
         private enum Keys : ushort

@@ -11,7 +11,6 @@ readonly struct Crosshair : IDrawable
 
         var centerX = canvas.Width / 2;
         var centerY = canvas.Height / 2;
-
         canvas.Set(centerX - 1, centerY, 1f);
         canvas.Set(centerX, centerY - 1, 1f);
         canvas.Set(centerX, centerY, 1f);

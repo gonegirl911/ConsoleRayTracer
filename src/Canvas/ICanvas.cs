@@ -1,7 +1,6 @@
 ﻿namespace ConsoleRayTracer;
 
-interface ICanvas<TSelf>
-    where TSelf : class, ICanvas<TSelf>
+interface ICanvas<TSelf> where TSelf : class, ICanvas<TSelf>
 {
     int Width { get; }
     int Height { get; }

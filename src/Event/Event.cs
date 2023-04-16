@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Windows.Win32.System.Console;
 
 namespace ConsoleRayTracer;
 
@@ -22,7 +23,6 @@ readonly struct Data
 {
     [FieldOffset(0)]
     public readonly KeyEvent KeyEvent;
-
     [FieldOffset(0)]
     public readonly ResizeEvent ResizeEvent;
 
@@ -41,6 +41,10 @@ readonly record struct KeyEvent(ConsoleKey Key, KeyState State)
 {
     public readonly ConsoleKey? PressedKey = State == KeyState.Pressed ? Key : null;
     public readonly ConsoleKey? ReleasedKey = State == KeyState.Released ? Key : null;
+
+    public KeyEvent(in INPUT_RECORD record)
+        : this((ConsoleKey)record.Event.KeyEvent.wVirtualKeyCode, (KeyState)(byte)record.Event.KeyEvent.bKeyDown)
+    { }
 }
 
 enum KeyState : byte
@@ -52,4 +56,8 @@ enum KeyState : byte
 readonly record struct ResizeEvent(int Width, int Height)
 {
     public readonly float AspectRatio = (float)Width / Height;
+
+    public ResizeEvent(in INPUT_RECORD record)
+        : this(record.Event.WindowBufferSizeEvent.dwSize.X, record.Event.WindowBufferSizeEvent.dwSize.Y)
+    { }
 }

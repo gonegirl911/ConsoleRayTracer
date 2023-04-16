@@ -9,13 +9,10 @@ sealed record App<C, D>(C Canvas, D Drawable)
     public void Run()
     {
         var lastFrame = Stopwatch.GetTimestamp();
-
         while (true)
         {
             var now = Stopwatch.GetTimestamp();
-
             RunFrame(Stopwatch.GetElapsedTime(lastFrame, now));
-
             lastFrame = now;
         }
     }

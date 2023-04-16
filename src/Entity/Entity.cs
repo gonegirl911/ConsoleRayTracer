@@ -11,7 +11,6 @@ readonly record struct Group(IEntity[] Entities) : IAnimatedEntity
     {
         HitRecord? hitRecord = null;
         var closest = tMax;
-
         foreach (var entity in Entities.AsSpan())
         {
             if (entity.Hit(ray, tMin, closest) is HitRecord record)
@@ -20,7 +19,6 @@ readonly record struct Group(IEntity[] Entities) : IAnimatedEntity
                 closest = record.T;
             }
         }
-
         return hitRecord;
     }
 
@@ -41,12 +39,10 @@ readonly record struct Lights(IEntity[] Sources) : IAnimatedEntity
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
         var accum = 0f;
-
         foreach (var source in Sources.AsSpan())
         {
             accum += source.Illuminate(entity, record);
         }
-
         return accum;
     }
 
@@ -102,8 +98,8 @@ readonly record struct Circle<A>(float Radius, A Axis) : IEntity where A : IAxis
 
 readonly record struct Rect<A>(float Width, float Height, A Axis) : IEntity where A : IAxis
 {
-    private readonly float _width = Width / 2f;
-    private readonly float _height = Height / 2f;
+    private readonly float _width = Width * 0.5f;
+    private readonly float _height = Height * 0.5f;
 
     public HitRecord? Hit(Ray ray, float tMin, float tMax) =>
         new Plane<A>(Axis).Hit(ray, tMin, tMax) is HitRecord record
@@ -124,18 +120,15 @@ readonly record struct Sphere(float Radius) : IEntity
         var b = Vector3.Dot(ray.Origin, ray.Direction);
         var c = Vector3.Dot(ray.Origin, ray.Origin) - Radius * Radius;
         var sqrtD = float.Sqrt(b * b - a * c);
-
         if (float.IsNaN(sqrtD))
         {
             return null;
         }
 
         var t = (-b - sqrtD) / a;
-
         if (t < tMin || t > tMax)
         {
             t = (-b + sqrtD) / a;
-
             if (t < tMin || t > tMax)
             {
                 return null;
@@ -143,7 +136,6 @@ readonly record struct Sphere(float Radius) : IEntity
         }
 
         var point = ray.PointAt(t);
-
         return new(t, point, point / Radius);
     }
 }
@@ -169,18 +161,15 @@ readonly record struct Cylinder(float Height, float Radius) : IEntity
             var b = Vector3.Dot(sideRay.Origin, sideRay.Direction);
             var c = Vector3.Dot(sideRay.Origin, sideRay.Origin) - Radius * Radius;
             var sqrtD = float.Sqrt(b * b - a * c);
-
             if (float.IsNaN(sqrtD))
             {
                 return null;
             }
 
             var t = (-b - sqrtD) / a;
-
             if (t < tMin || t > tMax)
             {
                 t = (-b + sqrtD) / a;
-
                 if (t < tMin || t > tMax)
                 {
                     return null;
@@ -188,7 +177,6 @@ readonly record struct Cylinder(float Height, float Radius) : IEntity
             }
 
             var point = ray.PointAt(t);
-
             return point.Y >= 0f && point.Y < Height
                 ? new(t, point, Vector3.Normalize(point with { Y = 0f }))
                 : null;
@@ -218,18 +206,15 @@ readonly record struct Cone(float Height, float Radius) : IEntity
             var b = Vector3.Dot(sideRay.Origin, sideRay.Direction) + tan * D * ray.Direction.Y;
             var c = Vector3.Dot(sideRay.Origin, sideRay.Origin) - tan * D * D;
             var sqrtD = float.Sqrt(b * b - a * c);
-
             if (float.IsNaN(sqrtD))
             {
                 return null;
             }
 
             var t = (-b - sqrtD) / a;
-
             if (t < tMin || t > tMax)
             {
                 t = (-b + sqrtD) / a;
-
                 if (t < tMin || t > tMax)
                 {
                     return null;
@@ -237,7 +222,6 @@ readonly record struct Cone(float Height, float Radius) : IEntity
             }
 
             var point = ray.PointAt(t);
-
             return point.Y >= 0f && point.Y < Height
                 ? new(t, point, Vector3.Normalize(point with { Y = float.Sqrt(point.X * point.X + point.Z * point.Z) * _ratio }))
                 : null;
