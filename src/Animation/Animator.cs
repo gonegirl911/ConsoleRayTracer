@@ -87,33 +87,31 @@ sealed class Animator : IEventHandler
 
         private void Continue(Animator animator, TimeSpan dt)
         {
-            var ds = _sensitivity * (float)dt.TotalSeconds;
             if ((_relevantKeys & Keys.L) != 0)
             {
-                _speed += ds;
+                _speed += _sensitivity * (float)dt.TotalSeconds;
             }
             else if ((_relevantKeys & Keys.K) != 0)
             {
-                _speed -= ds;
+                _speed -= _sensitivity * (float)dt.TotalSeconds;
             }
             animator._timeElapsed += (float)dt.TotalMilliseconds * _speed;
         }
 
         private void TimeTravel(Animator animator, TimeSpan dt)
         {
-            var de = (float)dt.TotalMilliseconds * _speed;
             if ((_relevantKeys & Keys.L) != 0)
             {
-                animator._timeElapsed += de;
+                animator._timeElapsed += (float)dt.TotalMilliseconds * _speed;
             }
             else if ((_relevantKeys & Keys.K) != 0)
             {
-                animator._timeElapsed -= de;
+                animator._timeElapsed -= (float)dt.TotalMilliseconds * _speed;
             }
         }
 
-        private (Keys, Keys) KeyPair(KeyEvent ev)
-            => ev switch
+        private (Keys, Keys) KeyPair(KeyEvent ev) =>
+            ev switch
             {
                 { Key: ConsoleKey.P, State: KeyState.Pressed } when (_keyHistory & Keys.P) == 0 => (Keys.P, default),
                 { Key: ConsoleKey.P, State: KeyState.Released } => (Keys.P, default),

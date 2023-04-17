@@ -192,8 +192,8 @@ sealed class Camera : ICamera, IEventHandler
             camera._width = camera._height * _aspectRatio;
         }
 
-        private static (Keys, Keys) KeyPair(KeyEvent ev)
-            => ev.Key switch
+        private static (Keys, Keys) KeyPair(KeyEvent ev) =>
+            ev.Key switch
             {
                 ConsoleKey.W => (Keys.W, Keys.S),
                 ConsoleKey.A => (Keys.A, Keys.D),
