@@ -87,32 +87,33 @@ sealed class Animator : IEventHandler
 
         private void Continue(Animator animator, TimeSpan dt)
         {
+            var ds = _sensitivity * (float)dt.TotalSeconds;
             if ((_relevantKeys & Keys.L) != 0)
             {
-                _speed += _sensitivity * (float)dt.TotalSeconds;
+                _speed += ds;
             }
             else if ((_relevantKeys & Keys.K) != 0)
             {
-                _speed -= _sensitivity * (float)dt.TotalSeconds;
+                _speed -= ds;
             }
             animator._timeElapsed += (float)dt.TotalMilliseconds * _speed;
         }
 
         private void TimeTravel(Animator animator, TimeSpan dt)
         {
+            var de = (float)dt.TotalMilliseconds * _speed;
             if ((_relevantKeys & Keys.L) != 0)
             {
-                animator._timeElapsed += (float)dt.TotalMilliseconds * _speed;
+                animator._timeElapsed += de;
             }
             else if ((_relevantKeys & Keys.K) != 0)
             {
-                animator._timeElapsed -= (float)dt.TotalMilliseconds * _speed;
+                animator._timeElapsed -= de;
             }
         }
 
         private (Keys, Keys) KeyPair(KeyEvent ev)
-        {
-            return ev switch
+            => ev switch
             {
                 { Key: ConsoleKey.P, State: KeyState.Pressed } when (_keyHistory & Keys.P) == 0 => (Keys.P, default),
                 { Key: ConsoleKey.P, State: KeyState.Released } => (Keys.P, default),
@@ -120,7 +121,6 @@ sealed class Animator : IEventHandler
                 { Key: ConsoleKey.K, State: _ } => (Keys.K, Keys.L),
                 _ => (default, default),
             };
-        }
 
         private enum Keys : byte
         {

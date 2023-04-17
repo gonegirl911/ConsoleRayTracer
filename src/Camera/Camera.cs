@@ -193,8 +193,7 @@ sealed class Camera : ICamera, IEventHandler
         }
 
         private static (Keys, Keys) KeyPair(KeyEvent ev)
-        {
-            return ev.Key switch
+            => ev.Key switch
             {
                 ConsoleKey.W => (Keys.W, Keys.S),
                 ConsoleKey.A => (Keys.A, Keys.D),
@@ -208,7 +207,6 @@ sealed class Camera : ICamera, IEventHandler
                 ConsoleKey.RightArrow => (Keys.RightArrow, Keys.LeftArrow),
                 _ => (default, default),
             };
-        }
 
         private static Vector3 Forward(float yaw, float pitch) =>
             new(float.Cos(yaw) * float.Cos(pitch), float.Sin(pitch), float.Sin(yaw) * float.Cos(pitch));

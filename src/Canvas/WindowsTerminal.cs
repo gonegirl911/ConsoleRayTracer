@@ -24,9 +24,9 @@ sealed class WindowsTerminal : ICanvas<WindowsTerminal>
         PInvoke.SetCurrentConsoleFontEx(_stdout, false, new() { cbSize = (uint)Marshal.SizeOf(new CONSOLE_FONT_INFOEX()), dwFontSize = new() { X = 8, Y = 8 }, FaceName = "Terminal" });
         PInvoke.SetConsoleCursorInfo(_stdout, new() { dwSize = 100, bVisible = false });
 
-        var sizeLimits = PInvoke.GetLargestConsoleWindowSize(_stdout);
-        width = width == 0 || width > sizeLimits.X ? sizeLimits.X : width;
-        height = height == 0 || height > sizeLimits.Y ? sizeLimits.Y : height;
+        var sizeBounds = PInvoke.GetLargestConsoleWindowSize(_stdout);
+        width = width == 0 || width > sizeBounds.X ? sizeBounds.X : width;
+        height = height == 0 || height > sizeBounds.Y ? sizeBounds.Y : height;
         _rect = new() { Left = 0, Top = 0, Right = (short)(width - 1), Bottom = (short)(height - 1) };
         _buf = new CHAR_INFO[width * height];
         PInvoke.SetConsoleWindowInfo(_stdout, true, new() { Left = 0, Top = 0, Right = 1, Bottom = 1 });
@@ -95,7 +95,7 @@ sealed class WindowsTerminal : ICanvas<WindowsTerminal>
         {
             Span<INPUT_RECORD> events = stackalloc INPUT_RECORD[1];
             PInvoke.ReadConsoleInput(_stdin, events, out var _);
-            return events[0];
+            return MemoryMarshal.GetReference(events);
         }
         return null;
     }
