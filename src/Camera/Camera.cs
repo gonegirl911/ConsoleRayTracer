@@ -142,6 +142,7 @@ sealed class Camera : ICamera, IEventHandler
 
             camera._yaw %= float.Tau;
             camera._pitch = float.Clamp(camera._pitch, -VERTICAL_BOUND, VERTICAL_BOUND);
+
             camera._forward = Forward(camera._yaw, camera._pitch);
             camera._right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, camera._forward));
             camera._up = Vector3.Cross(camera._forward, camera._right);
