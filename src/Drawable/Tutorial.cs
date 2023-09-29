@@ -18,8 +18,8 @@ sealed class Tutorial : IDrawable, IEventHandler
         null,
     };
 
-    private int _stage;
-    private ConsoleKey? _lastKey;
+    int _stage;
+    ConsoleKey? _lastKey;
 
     public Tutorial()
     {

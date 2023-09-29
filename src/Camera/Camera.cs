@@ -4,15 +4,15 @@ namespace ConsoleRayTracer;
 
 sealed class Camera : ICamera, IEventHandler
 {
-    private Vector3 _origin;
-    private Vector3 _forward;
-    private Vector3 _right;
-    private Vector3 _up;
-    private float _yaw;
-    private float _pitch;
-    private float _width;
-    private readonly float _height;
-    private readonly Controller _controller;
+    Vector3 _origin;
+    Vector3 _forward;
+    Vector3 _right;
+    Vector3 _up;
+    float _yaw;
+    float _pitch;
+    float _width;
+    readonly float _height;
+    readonly Controller _controller;
 
     public Camera(
         Vector3 lookFrom,
@@ -47,13 +47,13 @@ sealed class Camera : ICamera, IEventHandler
         _controller.ApplyUpdates(this, dt);
     }
 
-    private sealed class Controller
+    sealed class Controller
     {
-        private Keys _relevantKeys;
-        private Keys _keyHistory;
-        private float _aspectRatio;
-        private readonly float _speed;
-        private readonly float _sensitivity;
+        Keys _relevantKeys;
+        Keys _keyHistory;
+        float _aspectRatio;
+        readonly float _speed;
+        readonly float _sensitivity;
 
         public Controller(float speed, float sensitivity)
         {
@@ -91,7 +91,7 @@ sealed class Camera : ICamera, IEventHandler
             }
         }
 
-        private void OnKeyEvent(KeyEvent ev)
+        void OnKeyEvent(KeyEvent ev)
         {
             var (key, oppositeKey) = KeyPair(ev);
             if (ev.State == KeyState.Pressed)
@@ -111,12 +111,12 @@ sealed class Camera : ICamera, IEventHandler
             }
         }
 
-        private void OnResizeEvent(ResizeEvent ev)
+        void OnResizeEvent(ResizeEvent ev)
         {
             _aspectRatio = ev.AspectRatio;
         }
 
-        private void ApplyRotation(Camera camera, TimeSpan dt)
+        void ApplyRotation(Camera camera, TimeSpan dt)
         {
             const float VERTICAL_BOUND = float.Pi * 0.5f - 0.0001f;
 
@@ -148,7 +148,7 @@ sealed class Camera : ICamera, IEventHandler
             camera._up = Vector3.Cross(camera._forward, camera._right);
         }
 
-        private void ApplyMovement(Camera camera, TimeSpan dt)
+        void ApplyMovement(Camera camera, TimeSpan dt)
         {
             var direction = Vector3.Zero;
             var right = camera._right;
@@ -188,12 +188,12 @@ sealed class Camera : ICamera, IEventHandler
             }
         }
 
-        private void ApplyResize(Camera camera)
+        void ApplyResize(Camera camera)
         {
             camera._width = camera._height * _aspectRatio;
         }
 
-        private static (Keys, Keys) KeyPair(KeyEvent ev) =>
+        static (Keys, Keys) KeyPair(KeyEvent ev) =>
             ev.Key switch
             {
                 ConsoleKey.W => (Keys.W, Keys.S),
@@ -209,10 +209,10 @@ sealed class Camera : ICamera, IEventHandler
                 _ => (default, default),
             };
 
-        private static Vector3 Forward(float yaw, float pitch) =>
+        static Vector3 Forward(float yaw, float pitch) =>
             new(float.Cos(yaw) * float.Cos(pitch), float.Sin(pitch), float.Sin(yaw) * float.Cos(pitch));
 
-        private enum Keys : ushort
+        enum Keys : ushort
         {
             W = 1 << 0,
             A = 1 << 1,

@@ -2,8 +2,8 @@
 
 sealed class Animator : IEventHandler
 {
-    private float _timeElapsed;
-    private readonly Controller _controller;
+    float _timeElapsed;
+    readonly Controller _controller;
 
     public Animator(float speed, float sensitivity, bool isRunning = true)
     {
@@ -22,13 +22,13 @@ sealed class Animator : IEventHandler
         animatedEntity.Update(_timeElapsed);
     }
 
-    private sealed class Controller
+    sealed class Controller
     {
-        private Keys _relevantKeys;
-        private Keys _keyHistory;
-        private bool _isRunning;
-        private float _speed;
-        private readonly float _sensitivity;
+        Keys _relevantKeys;
+        Keys _keyHistory;
+        bool _isRunning;
+        float _speed;
+        readonly float _sensitivity;
 
         public Controller(float speed, float sensitivity, bool isRunning)
         {
@@ -65,7 +65,7 @@ sealed class Animator : IEventHandler
             }
         }
 
-        private void OnKeyEvent(KeyEvent ev)
+        void OnKeyEvent(KeyEvent ev)
         {
             var (key, oppositeKey) = KeyPair(ev);
             if (ev.State == KeyState.Pressed)
@@ -85,7 +85,7 @@ sealed class Animator : IEventHandler
             }
         }
 
-        private void Continue(Animator animator, TimeSpan dt)
+        void Continue(Animator animator, TimeSpan dt)
         {
             var ds = _sensitivity * (float)dt.TotalSeconds;
             if ((_relevantKeys & Keys.L) != 0)
@@ -99,7 +99,7 @@ sealed class Animator : IEventHandler
             animator._timeElapsed += (float)dt.TotalMilliseconds * _speed;
         }
 
-        private void TimeTravel(Animator animator, TimeSpan dt)
+        void TimeTravel(Animator animator, TimeSpan dt)
         {
             var de = (float)dt.TotalMilliseconds * _speed;
             if ((_relevantKeys & Keys.L) != 0)
@@ -112,7 +112,7 @@ sealed class Animator : IEventHandler
             }
         }
 
-        private (Keys, Keys) KeyPair(KeyEvent ev) =>
+        (Keys, Keys) KeyPair(KeyEvent ev) =>
             ev switch
             {
                 { Key: ConsoleKey.P, State: KeyState.Pressed } when (_keyHistory & Keys.P) == 0 => (Keys.P, default),
@@ -122,7 +122,7 @@ sealed class Animator : IEventHandler
                 _ => (default, default),
             };
 
-        private enum Keys : byte
+        enum Keys : byte
         {
             P = 1 << 0,
             L = 1 << 2,

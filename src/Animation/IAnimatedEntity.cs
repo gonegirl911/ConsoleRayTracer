@@ -18,9 +18,9 @@ sealed record Animated<E, O, B, R>(
     where B : IAnimation<float>
     where R : IAnimation<float>
 {
-    private Vector3 _offset = Offset.GetValue(0f);
-    private float _brightness = 1f + Brightness.GetValue(0f);
-    private float _reflectance = Reflectance.GetValue(0f);
+    Vector3 _offset = Offset.GetValue(0f);
+    float _brightness = 1f + Brightness.GetValue(0f);
+    float _reflectance = Reflectance.GetValue(0f);
 
     public HitRecord? Hit(Ray ray, float tMin, float tMax) =>
         Entity.Hit(ray with { Origin = ray.Origin - _offset }, tMin, tMax) is HitRecord record

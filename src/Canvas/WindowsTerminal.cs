@@ -9,10 +9,10 @@ namespace ConsoleRayTracer;
 [SupportedOSPlatform("windows")]
 sealed class WindowsTerminal : ICanvas<WindowsTerminal>
 {
-    private readonly SafeFileHandle _stdin;
-    private readonly SafeFileHandle _stdout;
-    private SMALL_RECT _rect;
-    private CHAR_INFO[] _buf;
+    readonly SafeFileHandle _stdin;
+    readonly SafeFileHandle _stdout;
+    SMALL_RECT _rect;
+    CHAR_INFO[] _buf;
 
     public WindowsTerminal(short width, short height, string title)
     {
@@ -77,7 +77,7 @@ sealed class WindowsTerminal : ICanvas<WindowsTerminal>
         );
     }
 
-    private void RefreshBufferSize()
+    void RefreshBufferSize()
     {
         var (width, height) = RetrieveWindowSize();
         if (Width != width || Height != height)
@@ -88,7 +88,7 @@ sealed class WindowsTerminal : ICanvas<WindowsTerminal>
         }
     }
 
-    private INPUT_RECORD? ReadEvent()
+    INPUT_RECORD? ReadEvent()
     {
         PInvoke.GetNumberOfConsoleInputEvents(_stdin, out var eventsAvailable);
         if (eventsAvailable != 0)
@@ -100,13 +100,13 @@ sealed class WindowsTerminal : ICanvas<WindowsTerminal>
         return null;
     }
 
-    private (int, int) RetrieveWindowSize()
+    (int, int) RetrieveWindowSize()
     {
         PInvoke.GetConsoleScreenBufferInfo(_stdout, out var bufferInfo);
         return (bufferInfo.srWindow.Right + 1, bufferInfo.srWindow.Bottom + 1);
     }
 
-    private static char Character(float color)
+    static char Character(float color)
     {
         const string ASCII = " .:+%#@";
 
