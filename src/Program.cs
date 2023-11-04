@@ -130,4 +130,4 @@ if (OperatingSystem.IsWindows())
     );
     app.Run();
 }
-throw new InvalidOperationException("WindowsTerminal is only supported on Windows");
+throw new InvalidOperationException("ConsoleRayTracer is only available on Windows");
