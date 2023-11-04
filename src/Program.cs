@@ -130,4 +130,4 @@ if (OperatingSystem.IsWindows())
     );
     app.Run();
 }
-throw new InvalidOperationException("ConsoleRayTracer is only available on Windows");
+throw new InvalidOperationException("unsupported platform, expected one of \"Windows\"");
