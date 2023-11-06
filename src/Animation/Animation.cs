@@ -13,7 +13,7 @@ interface IAnimation<out T>
             ( > 0f, 0f) => Duration,
             ( <= 0f, 0f) => 0f,
             ( >= 0f, var elapsed) => elapsed,
-            ( < 0f, var elapsed) => Duration + elapsed,
+            ( < 0f, var elapsed) => elapsed + Duration,
             _ => throw new ArgumentException("invalid timeElapsed"),
         }
     );
@@ -31,7 +31,6 @@ readonly record struct Animation<T, M, I>(M Motion, I Interpolator, float Durati
 
 readonly record struct Constant<T>(T Value, float Duration) : IAnimation<T>
 {
-    public T GetValue(float timeElapsed) => Value;
     public T GetValueUnchecked(float timeElapsed) => Value;
 }
 
