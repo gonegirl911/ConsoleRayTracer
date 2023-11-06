@@ -29,10 +29,7 @@ sealed class Tutorial : IDrawable, IEventHandler
 
     public void Draw(ICanvas canvas)
     {
-        if (LABELS[_stage] is Label label)
-        {
-            label.Draw(canvas);
-        }
+        LABELS[_stage]?.Draw(canvas);
     }
 
     public void Handle(Event? ev, TimeSpan dt)
