@@ -65,16 +65,16 @@ sealed class Animator : IEventHandler
             }
         }
 
-        void OnKeyEvent(KeyEvent ev)
+        void OnKeyEvent(KeyEvent keyEvent)
         {
-            var (key, oppositeKey) = KeyPair(ev);
-            if (ev.State == KeyState.Pressed)
+            var (key, oppositeKey) = KeyPair(keyEvent);
+            if (keyEvent.State == KeyState.Pressed)
             {
                 _relevantKeys |= key;
                 _relevantKeys &= ~oppositeKey;
                 _keyHistory |= key;
             }
-            else if (ev.State == KeyState.Released)
+            else
             {
                 _relevantKeys &= ~key;
                 if ((_keyHistory & oppositeKey) != 0)
@@ -112,8 +112,8 @@ sealed class Animator : IEventHandler
             }
         }
 
-        readonly (Keys, Keys) KeyPair(KeyEvent ev) =>
-            ev switch
+        readonly (Keys, Keys) KeyPair(KeyEvent keyEvent) =>
+            keyEvent switch
             {
                 { Key: ConsoleKey.P, State: KeyState.Pressed } when (_keyHistory & Keys.P) == 0 => (Keys.P, default),
                 { Key: ConsoleKey.P, State: KeyState.Released } => (Keys.P, default),

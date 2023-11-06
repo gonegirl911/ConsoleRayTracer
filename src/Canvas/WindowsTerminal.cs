@@ -44,16 +44,14 @@ sealed class WindowsTerminal : ICanvas
     {
         RefreshBufferSize();
 
-        if (ReadEvent() is INPUT_RECORD record)
-        {
-            return record.EventType switch
+        return ReadEvent() is INPUT_RECORD record
+            ? record.EventType switch
             {
                 0x1 => new(new KeyEvent(record)),
                 0x4 => new(new ResizeEvent(record)),
                 _ => null,
-            };
-        }
-        return null;
+            }
+            : null;
     }
 
     public void Set(int x, int y, char ch)

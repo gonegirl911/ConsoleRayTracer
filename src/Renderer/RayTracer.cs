@@ -12,7 +12,7 @@ readonly record struct RayTracer<E, L, C>(int Depth) : IRenderer<Scene<E, L, C, 
 
     float Trace(in E entity, in L light, Ray ray, int depth)
     {
-        if (depth > 0f && entity.Hit(ray, 0.001f, float.PositiveInfinity) is HitRecord record)
+        if (depth > 0f && entity.Hit(ray, 0.001f, float.MaxValue) is HitRecord record)
         {
             record = record with { Normal = ray.Opposite(record.Normal) };
             var diffused = light.Illuminate(entity, record);

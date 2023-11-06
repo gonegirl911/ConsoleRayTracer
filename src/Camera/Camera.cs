@@ -91,16 +91,16 @@ sealed class Camera : ICamera, IEventHandler
             }
         }
 
-        void OnKeyEvent(KeyEvent ev)
+        void OnKeyEvent(KeyEvent keyEvent)
         {
-            var (key, oppositeKey) = KeyPair(ev);
-            if (ev.State == KeyState.Pressed)
+            var (key, oppositeKey) = KeyPair(keyEvent);
+            if (keyEvent.State == KeyState.Pressed)
             {
                 _relevantKeys |= key;
                 _relevantKeys &= ~oppositeKey;
                 _keyHistory |= key;
             }
-            else if (ev.State == KeyState.Released)
+            else
             {
                 _relevantKeys &= ~key;
                 if ((_keyHistory & oppositeKey) != 0)
@@ -111,9 +111,9 @@ sealed class Camera : ICamera, IEventHandler
             }
         }
 
-        void OnResizeEvent(ResizeEvent ev)
+        void OnResizeEvent(ResizeEvent resizeEvent)
         {
-            _aspectRatio = ev.AspectRatio;
+            _aspectRatio = resizeEvent.AspectRatio;
         }
 
         readonly void ApplyRotation(Camera camera, TimeSpan dt)
@@ -193,8 +193,8 @@ sealed class Camera : ICamera, IEventHandler
             camera._width = camera._height * _aspectRatio;
         }
 
-        static (Keys, Keys) KeyPair(KeyEvent ev) =>
-            ev.Key switch
+        static (Keys, Keys) KeyPair(KeyEvent keyEvent) =>
+            keyEvent.Key switch
             {
                 ConsoleKey.W => (Keys.W, Keys.S),
                 ConsoleKey.A => (Keys.A, Keys.D),
