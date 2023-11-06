@@ -7,7 +7,7 @@ sealed record Game(
     Tutorial Tutorial
 ) : IDrawable, IEventHandler
 {
-    public void Draw<C>(C canvas) where C : class, ICanvas<C>
+    public void Draw(ICanvas canvas)
     {
         Scene.Draw(canvas);
         Crosshair.Draw(canvas);

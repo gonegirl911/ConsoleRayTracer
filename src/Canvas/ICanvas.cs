@@ -1,21 +1,23 @@
 ﻿namespace ConsoleRayTracer;
 
-interface ICanvas<TSelf> where TSelf : class, ICanvas<TSelf>
+interface ICanvas
 {
     int Width { get; }
     int Height { get; }
 
     Event? Refresh();
-    void Set(int x, int y, float color);
     void Set(int x, int y, char ch);
     void Commit();
-}
 
-static class CanvasExtensions
-{
-    public static void Set<C>(this C canvas, Func<int, int, float> color)
-        where C : class, ICanvas<C>
+    void Set(int x, int y, float color)
     {
-        Parallel.For(0, canvas.Height, y => Parallel.For(0, canvas.Width, x => canvas.Set(x, y, color(x, y))));
+        const string ASCII = " .:+%#@";
+
+        Set(x, y, ASCII[(int)float.Round(float.Clamp(color, 0f, 1f) * (ASCII.Length - 1))]);
+    }
+
+    void Set(Func<int, int, float> color)
+    {
+        Parallel.For(0, Height, y => Parallel.For(0, Width, x => Set(x, y, color(x, y))));
     }
 }

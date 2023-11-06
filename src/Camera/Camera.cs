@@ -36,9 +36,9 @@ sealed class Camera : ICamera, IEventHandler
 
     public Ray CastRay(float s, float t)
     {
-        var sx = (-1f + s * 2f) * _width;
-        var sy = (1f - t * 2f) * _height;
-        return new(_origin, _forward + _right * sx + _up * sy);
+        var screenX = (-1f + s * 2f) * _width;
+        var screenY = (1f - t * 2f) * _height;
+        return new(_origin, _forward + _right * screenX + _up * screenY);
     }
 
     public void Handle(Event? ev, TimeSpan dt)

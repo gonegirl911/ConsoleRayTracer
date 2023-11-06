@@ -6,7 +6,7 @@ sealed record Scene<E, L, C, R>(E Entity, L Light, C Camera, R Renderer) : IDraw
     where C : ICamera
     where R : IRenderer<Scene<E, L, C, R>>
 {
-    public void Draw<V>(V canvas) where V : class, ICanvas<V>
+    public void Draw(ICanvas canvas)
     {
         var scaleX = 1f / canvas.Width;
         var scaleY = 1f / canvas.Height;

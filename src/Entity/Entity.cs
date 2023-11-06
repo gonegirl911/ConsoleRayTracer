@@ -4,19 +4,17 @@ namespace ConsoleRayTracer;
 
 readonly record struct Group(IEntity[] Entities) : IAnimatedEntity
 {
-    readonly IAnimatedEntity[] _animatedEntities =
-        Entities.Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
+    readonly IAnimatedEntity[] _animatedEntities = Entities.OfType<IAnimatedEntity>().ToArray();
 
     public HitRecord? Hit(Ray ray, float tMin, float tMax)
     {
         HitRecord? hitRecord = null;
-        var closest = tMax;
         foreach (var entity in Entities.AsSpan())
         {
-            if (entity.Hit(ray, tMin, closest) is HitRecord record)
+            if (entity.Hit(ray, tMin, tMax) is HitRecord record)
             {
                 hitRecord = record;
-                closest = record.T;
+                tMax = record.T;
             }
         }
         return hitRecord;
@@ -33,8 +31,7 @@ readonly record struct Group(IEntity[] Entities) : IAnimatedEntity
 
 readonly record struct Lights(IEntity[] Sources) : IAnimatedEntity
 {
-    readonly IAnimatedEntity[] _animatedSources =
-        Sources.Select(e => e as IAnimatedEntity).Where(e => e is not null).ToArray()!;
+    readonly IAnimatedEntity[] _animatedSources = Sources.OfType<IAnimatedEntity>().ToArray()!;
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
@@ -60,7 +57,7 @@ readonly record struct LightSource : IEntity
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
         Ray lightRay = new(record.Point, Vector3.Normalize(-record.Point));
-        return entity.Hit(lightRay, 0.001f, float.PositiveInfinity) is null
+        return entity.Hit(lightRay, 0.001f, float.MaxValue) is null
             ? float.Max(record.Brightness * Vector3.Dot(record.Normal, lightRay.Direction), 0f)
             : 0f;
     }

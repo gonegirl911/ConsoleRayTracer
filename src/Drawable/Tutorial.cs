@@ -27,7 +27,7 @@ sealed class Tutorial : IDrawable, IEventHandler
         _lastKey = null;
     }
 
-    public void Draw<C>(C canvas) where C : class, ICanvas<C>
+    public void Draw(ICanvas canvas)
     {
         if (LABELS[_stage] is Label label)
         {

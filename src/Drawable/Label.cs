@@ -5,7 +5,7 @@ readonly record struct Label(string Text) : IDrawable
     const int PADDING = 2;
     const int OUTLINE = 1;
 
-    public void Draw<C>(C canvas) where C : class, ICanvas<C>
+    public void Draw(ICanvas canvas)
     {
         var width = Text.Length + (PADDING + OUTLINE) * 2;
         var height = 1 + (PADDING + OUTLINE) * 2;

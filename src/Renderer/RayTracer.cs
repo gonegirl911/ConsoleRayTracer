@@ -23,5 +23,5 @@ readonly record struct RayTracer<E, L, C>(int Depth) : IRenderer<Scene<E, L, C, 
         return 0f;
     }
 
-    float Lerp(float a, float b, float t) => a * (1f - t) + b * t;
+    static float Lerp(float a, float b, float t) => a * (1f - t) + b * t;
 }

@@ -3,8 +3,8 @@ using ConsoleRayTracer;
 
 if (OperatingSystem.IsWindows())
 {
-    new App<WindowsTerminal, Game>(
-        Canvas: new(
+    new App<Game>(
+        Canvas: new WindowsTerminal(
             width: 95,
             height: 70,
             title: "ConsoleRayTracer"

@@ -7,7 +7,7 @@ using Windows.Win32.System.Console;
 namespace ConsoleRayTracer;
 
 [SupportedOSPlatform("windows")]
-sealed class WindowsTerminal : ICanvas<WindowsTerminal>
+sealed class WindowsTerminal : ICanvas
 {
     readonly SafeFileHandle _stdin;
     readonly SafeFileHandle _stdout;
@@ -56,11 +56,6 @@ sealed class WindowsTerminal : ICanvas<WindowsTerminal>
         return null;
     }
 
-    public void Set(int x, int y, float color)
-    {
-        Set(x, y, Character(color));
-    }
-
     public void Set(int x, int y, char ch)
     {
         _buf[y * Width + x] = new() { Char = new() { UnicodeChar = ch }, Attributes = 7 };
@@ -104,12 +99,5 @@ sealed class WindowsTerminal : ICanvas<WindowsTerminal>
     {
         PInvoke.GetConsoleScreenBufferInfo(_stdout, out var bufferInfo);
         return (bufferInfo.srWindow.Right + 1, bufferInfo.srWindow.Bottom + 1);
-    }
-
-    static char Character(float color)
-    {
-        const string ASCII = " .:+%#@";
-
-        return ASCII[(int)float.Round(float.Clamp(color, 0f, 1f) * (ASCII.Length - 1))];
     }
 }
