@@ -1,6 +1,6 @@
 namespace ConsoleRayTracer;
 
-sealed record Game(
+readonly record struct Game(
     Scene<Group, Lights, Camera, RayTracer<Group, Lights, Camera>> Scene,
     Animator Animator,
     Crosshair Crosshair,

@@ -12,7 +12,7 @@ sealed class Camera : ICamera, IEventHandler
     float _pitch;
     float _width;
     readonly float _height;
-    readonly Controller _controller;
+    Controller _controller;
 
     public Camera(
         Vector3 lookFrom,
@@ -47,7 +47,7 @@ sealed class Camera : ICamera, IEventHandler
         _controller.ApplyUpdates(this, dt);
     }
 
-    sealed class Controller
+    struct Controller
     {
         Keys _relevantKeys;
         Keys _keyHistory;
@@ -116,7 +116,7 @@ sealed class Camera : ICamera, IEventHandler
             _aspectRatio = ev.AspectRatio;
         }
 
-        void ApplyRotation(Camera camera, TimeSpan dt)
+        readonly void ApplyRotation(Camera camera, TimeSpan dt)
         {
             const float VERTICAL_BOUND = float.Pi * 0.5f - 0.0001f;
 
@@ -148,7 +148,7 @@ sealed class Camera : ICamera, IEventHandler
             camera._up = Vector3.Cross(camera._forward, camera._right);
         }
 
-        void ApplyMovement(Camera camera, TimeSpan dt)
+        readonly void ApplyMovement(Camera camera, TimeSpan dt)
         {
             var direction = Vector3.Zero;
             var right = camera._right;
@@ -188,7 +188,7 @@ sealed class Camera : ICamera, IEventHandler
             }
         }
 
-        void ApplyResize(Camera camera)
+        readonly void ApplyResize(Camera camera)
         {
             camera._width = camera._height * _aspectRatio;
         }
@@ -206,7 +206,7 @@ sealed class Camera : ICamera, IEventHandler
                 ConsoleKey.LeftArrow => (Keys.LeftArrow, Keys.RightArrow),
                 ConsoleKey.DownArrow => (Keys.DownArrow, Keys.UpArrow),
                 ConsoleKey.RightArrow => (Keys.RightArrow, Keys.LeftArrow),
-                _ => (default, default),
+                _ => default,
             };
 
         static Vector3 Forward(float yaw, float pitch) =>

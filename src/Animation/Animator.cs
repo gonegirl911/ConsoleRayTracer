@@ -3,7 +3,7 @@
 sealed class Animator : IEventHandler
 {
     float _timeElapsed;
-    readonly Controller _controller;
+    Controller _controller;
 
     public Animator(float speed, float sensitivity, bool isRunning = true)
     {
@@ -22,7 +22,7 @@ sealed class Animator : IEventHandler
         animatedEntity.Update(_timeElapsed);
     }
 
-    sealed class Controller
+    struct Controller
     {
         Keys _relevantKeys;
         Keys _keyHistory;
@@ -99,7 +99,7 @@ sealed class Animator : IEventHandler
             animator._timeElapsed += (float)dt.TotalMilliseconds * _speed;
         }
 
-        void TimeTravel(Animator animator, TimeSpan dt)
+        readonly void TimeTravel(Animator animator, TimeSpan dt)
         {
             var de = (float)dt.TotalMilliseconds * _speed;
             if ((_relevantKeys & Keys.L) != 0)
@@ -112,14 +112,14 @@ sealed class Animator : IEventHandler
             }
         }
 
-        (Keys, Keys) KeyPair(KeyEvent ev) =>
+        readonly (Keys, Keys) KeyPair(KeyEvent ev) =>
             ev switch
             {
                 { Key: ConsoleKey.P, State: KeyState.Pressed } when (_keyHistory & Keys.P) == 0 => (Keys.P, default),
                 { Key: ConsoleKey.P, State: KeyState.Released } => (Keys.P, default),
                 { Key: ConsoleKey.L, State: _ } => (Keys.L, Keys.K),
                 { Key: ConsoleKey.K, State: _ } => (Keys.K, Keys.L),
-                _ => (default, default),
+                _ => default,
             };
 
         enum Keys : byte

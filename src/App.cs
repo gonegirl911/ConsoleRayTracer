@@ -2,8 +2,7 @@
 
 namespace ConsoleRayTracer;
 
-sealed record App<D>(ICanvas Canvas, D Drawable)
-    where D : IDrawable, IEventHandler
+readonly record struct App<D>(ICanvas Canvas, D Drawable) where D : IDrawable, IEventHandler
 {
     public void Run()
     {
