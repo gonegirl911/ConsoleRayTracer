@@ -72,7 +72,7 @@ sealed class Camera : ICamera, IEventHandler
             }
             else if (ev?.ResizeEvent is ResizeEvent resizeEvent)
             {
-                OnResizeEvent(resizeEvent);
+                _aspectRatio = resizeEvent.AspectRatio;
             }
         }
 
@@ -86,14 +86,14 @@ sealed class Camera : ICamera, IEventHandler
 
             if (_aspectRatio != 0.0f)
             {
-                ApplyResize(camera);
+                camera._width = camera._height * _aspectRatio;
                 _aspectRatio = 0.0f;
             }
         }
 
         void OnKeyEvent(KeyEvent keyEvent)
         {
-            var (key, oppositeKey) = KeyPair(keyEvent);
+            var (key, oppositeKey) = KeyPair(keyEvent.Key);
             if (keyEvent.State == KeyState.Pressed)
             {
                 _relevantKeys |= key;
@@ -111,14 +111,9 @@ sealed class Camera : ICamera, IEventHandler
             }
         }
 
-        void OnResizeEvent(ResizeEvent resizeEvent)
-        {
-            _aspectRatio = resizeEvent.AspectRatio;
-        }
-
         readonly void ApplyRotation(Camera camera, TimeSpan dt)
         {
-            const float VERTICAL_BOUND = float.Pi * 0.5f - 0.0001f;
+            const float VERTICAL_BOUND = float.Pi * 0.5f - 1e-7f;
 
             var dr = _sensitivity * (float)dt.TotalSeconds;
 
@@ -188,13 +183,8 @@ sealed class Camera : ICamera, IEventHandler
             }
         }
 
-        readonly void ApplyResize(Camera camera)
-        {
-            camera._width = camera._height * _aspectRatio;
-        }
-
-        static (Keys, Keys) KeyPair(KeyEvent keyEvent) =>
-            keyEvent.Key switch
+        static (Keys, Keys) KeyPair(ConsoleKey key) =>
+            key switch
             {
                 ConsoleKey.W => (Keys.W, Keys.S),
                 ConsoleKey.A => (Keys.A, Keys.D),

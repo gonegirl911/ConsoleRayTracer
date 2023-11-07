@@ -14,7 +14,7 @@ sealed class WindowsTerminal : ICanvas
     SMALL_RECT _rect;
     CHAR_INFO[] _buf;
 
-    public WindowsTerminal(short width, short height, string title)
+    public WindowsTerminal(int width, int height, string title)
     {
         PInvoke.SetConsoleTitle(title);
 
@@ -30,7 +30,7 @@ sealed class WindowsTerminal : ICanvas
         _rect = new() { Left = 0, Top = 0, Right = (short)(width - 1), Bottom = (short)(height - 1) };
         _buf = new CHAR_INFO[width * height];
         PInvoke.SetConsoleWindowInfo(_stdout, true, new() { Left = 0, Top = 0, Right = 1, Bottom = 1 });
-        PInvoke.SetConsoleScreenBufferSize(_stdout, new() { X = width, Y = height });
+        PInvoke.SetConsoleScreenBufferSize(_stdout, new() { X = (short)width, Y = (short)height });
         PInvoke.SetConsoleWindowInfo(_stdout, true, _rect);
 
         PInvoke.GetNumberOfConsoleInputEvents(_stdin, out var eventsAvailable);

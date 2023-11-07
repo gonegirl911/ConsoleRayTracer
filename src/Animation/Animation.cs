@@ -31,6 +31,7 @@ readonly record struct Animation<T, M, I>(M Motion, I Interpolator, float Durati
 
 readonly record struct Constant<T>(T Value, float Duration) : IAnimation<T>
 {
+    public T GetValue(float timeElapsed) => Value;
     public T GetValueUnchecked(float timeElapsed) => Value;
 }
 

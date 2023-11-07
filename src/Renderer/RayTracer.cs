@@ -12,13 +12,13 @@ readonly record struct RayTracer<E, L, C>(int Depth) : IRenderer<Scene<E, L, C, 
 
     float Trace(in E entity, in L light, Ray ray, int depth)
     {
-        if (depth > 0f && entity.Hit(ray, 0.001f, float.MaxValue) is HitRecord record)
+        if (depth > 0 && entity.Hit(ray, 0.001f, float.MaxValue) is HitRecord record)
         {
             record = record with { Normal = ray.Opposite(record.Normal) };
             var diffused = light.Illuminate(entity, record);
             ray = new(record.Point, Vector3.Reflect(ray.Direction, record.Normal));
             var reflected = Trace(entity, light, ray, depth - 1);
-            return float.Clamp(Lerp(diffused, reflected, record.Reflectance), 0f, 1f);
+            return Lerp(diffused, reflected, record.Reflectance);
         }
         return 0f;
     }
