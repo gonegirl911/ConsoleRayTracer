@@ -25,40 +25,12 @@ interface ICanvas
     void Commit();
 }
 
-sealed class NativeTerminal : ICanvas
+static class NativeTerminal
 {
-    readonly ICanvas _terminal;
-
-    public NativeTerminal(int width, int height, string title)
+    public static ICanvas Get(int width, int height, string title)
     {
-        _terminal = OperatingSystem.IsWindows()
+        return OperatingSystem.IsWindows()
             ? new WindowsTerminal(width, height, title)
             : throw new InvalidOperationException("unsupported platform, expected one of \"Windows\"");
-    }
-
-    public int Width => _terminal.Width;
-
-    public int Height => _terminal.Height;
-
-    public Event? Refresh() => _terminal.Refresh();
-
-    public void Set(int x, int y, char ch)
-    {
-        _terminal.Set(x, y, ch);
-    }
-
-    public void Set(int x, int y, float color)
-    {
-        _terminal.Set(x, y, color);
-    }
-
-    public void Set(Func<int, int, float> color)
-    {
-        _terminal.Set(color);
-    }
-
-    public void Commit()
-    {
-        _terminal.Commit();
     }
 }

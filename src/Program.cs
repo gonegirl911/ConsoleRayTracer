@@ -2,7 +2,7 @@
 using ConsoleRayTracer;
 
 new App<Game>(
-    Canvas: new NativeTerminal(95, 70, "ConsoleRayTracer"),
+    Canvas: NativeTerminal.Get(95, 70, "ConsoleRayTracer"),
     Drawable: new(
         Scene: new(
             Entity: new(new IEntity[]
