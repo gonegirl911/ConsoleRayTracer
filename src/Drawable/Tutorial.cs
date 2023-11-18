@@ -18,14 +18,8 @@ sealed class Tutorial : IDrawable, IEventHandler
         null,
     };
 
-    int _stage;
-    ConsoleKey? _lastKey;
-
-    public Tutorial()
-    {
-        _stage = 0;
-        _lastKey = null;
-    }
+    int _stage = 0;
+    ConsoleKey? _lastKey = null;
 
     public void Draw(ICanvas canvas)
     {

@@ -1,15 +1,9 @@
 ﻿namespace ConsoleRayTracer;
 
-sealed class Animator : IEventHandler
+sealed class Animator(float speed, float sensitivity, bool isRunning = true) : IEventHandler
 {
-    float _timeElapsed;
-    Controller _controller;
-
-    public Animator(float speed, float sensitivity, bool isRunning = true)
-    {
-        _timeElapsed = 0f;
-        _controller = new(speed, sensitivity, isRunning);
-    }
+    float _timeElapsed = 0f;
+    Controller _controller = new(speed, sensitivity, isRunning);
 
     public void Handle(Event? ev, TimeSpan dt)
     {
@@ -22,22 +16,10 @@ sealed class Animator : IEventHandler
         animatedEntity.Update(_timeElapsed);
     }
 
-    struct Controller
+    struct Controller(float speed, float sensitivity, bool isRunning)
     {
-        Keys _relevantKeys;
-        Keys _keyHistory;
-        bool _isRunning;
-        float _speed;
-        readonly float _sensitivity;
-
-        public Controller(float speed, float sensitivity, bool isRunning)
-        {
-            _relevantKeys = 0;
-            _keyHistory = 0;
-            _isRunning = isRunning;
-            _speed = speed;
-            _sensitivity = sensitivity;
-        }
+        Keys _relevantKeys = 0;
+        Keys _keyHistory = 0;
 
         public void Handle(Event? ev)
         {
@@ -51,11 +33,11 @@ sealed class Animator : IEventHandler
         {
             if ((_relevantKeys & Keys.P) != 0)
             {
-                _isRunning = !_isRunning;
+                isRunning = !isRunning;
                 _relevantKeys &= ~Keys.P;
             }
 
-            if (_isRunning)
+            if (isRunning)
             {
                 Continue(animator, dt);
             }
@@ -87,21 +69,21 @@ sealed class Animator : IEventHandler
 
         void Continue(Animator animator, TimeSpan dt)
         {
-            var ds = _sensitivity * (float)dt.TotalSeconds;
+            var ds = sensitivity * (float)dt.TotalSeconds;
             if ((_relevantKeys & Keys.L) != 0)
             {
-                _speed += ds;
+                speed += ds;
             }
             else if ((_relevantKeys & Keys.K) != 0)
             {
-                _speed -= ds;
+                speed -= ds;
             }
-            animator._timeElapsed += (float)dt.TotalMilliseconds * _speed;
+            animator._timeElapsed += (float)dt.TotalMilliseconds * speed;
         }
 
         readonly void TimeTravel(Animator animator, TimeSpan dt)
         {
-            var de = (float)dt.TotalMilliseconds * _speed;
+            var de = (float)dt.TotalMilliseconds * speed;
             if ((_relevantKeys & Keys.L) != 0)
             {
                 animator._timeElapsed += de;

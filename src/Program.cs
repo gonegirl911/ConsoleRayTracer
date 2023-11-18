@@ -5,8 +5,8 @@ new App<Game>(
     Canvas: NativeTerminal.Get(95, 70, "ConsoleRayTracer"),
     Drawable: new(
         Scene: new(
-            Entity: new(new IEntity[]
-            {
+            Entity: new(
+            [
                 new Apply<Cylinder>(
                     Entity: new(4f, 1f),
                     Offset: new(-5f, 0f, 0f),
@@ -48,8 +48,8 @@ new App<Game>(
                         Offset: new(0f, 1f, 0f),
                         Brightness: 1.5f
                     ),
-                    Offset: new(new IAnimation<Vector3>[]
-                    {
+                    Offset: new(
+                    [
                         new Animation<Vector3, CircularPath<AxisY>, LinearInterpolator>(
                             Motion: new(10f),
                             Interpolator: new(),
@@ -75,9 +75,9 @@ new App<Game>(
                             Interpolator: new(2f),
                             Duration: 150f
                         ),
-                    }),
-                    Reflectance: new(new IAnimation<float>[]
-                    {
+                    ]),
+                    Reflectance: new(
+                    [
                         new Animation<float, LinearMotion, LinearInterpolator>(
                             Motion: new(1f),
                             Interpolator: new(),
@@ -88,16 +88,16 @@ new App<Game>(
                             Interpolator: new(),
                             Duration: 1900f
                         ),
-                    })
+                    ])
                 ),
                 new Apply<Plane<AxisY>>(
                     Entity: new(),
                     Brightness: 2.1f,
                     Reflectance: 0.7f
                 ),
-            }),
-            Light: new(new IEntity[]
-            {
+            ]),
+            Light: new(
+            [
                 new Animated<LightSource, Animation<Vector3, CircularPath<AxisZ>, SunInterpolator>, Constant<float>, Constant<float>>(
                     Entity: new(),
                     Offset: new(
@@ -106,7 +106,7 @@ new App<Game>(
                         Duration: 20_000f
                     )
                 ),
-            }),
+            ]),
             Camera: new(
                 lookFrom: new(-12f, 9f, -21f),
                 lookAt: new(0f, 3f, 0f),

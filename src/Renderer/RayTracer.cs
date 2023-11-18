@@ -10,7 +10,7 @@ readonly record struct RayTracer<E, L, C>(int Depth) : IRenderer<Scene<E, L, C, 
     public float Render(in Scene<E, L, C, RayTracer<E, L, C>> scene, float s, float t) =>
         Trace(scene.Entity, scene.Light, scene.Camera.CastRay(s, t), Depth);
 
-    float Trace(in E entity, in L light, Ray ray, int depth)
+    static float Trace(in E entity, in L light, Ray ray, int depth)
     {
         if (depth > 0 && entity.Hit(ray, 0.001f, float.MaxValue) is HitRecord record)
         {

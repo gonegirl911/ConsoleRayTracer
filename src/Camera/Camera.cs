@@ -47,22 +47,11 @@ sealed class Camera : ICamera, IEventHandler
         _controller.ApplyUpdates(this, dt);
     }
 
-    struct Controller
+    struct Controller(float speed, float sensitivity)
     {
-        Keys _relevantKeys;
-        Keys _keyHistory;
-        float _aspectRatio;
-        readonly float _speed;
-        readonly float _sensitivity;
-
-        public Controller(float speed, float sensitivity)
-        {
-            _relevantKeys = 0;
-            _keyHistory = 0;
-            _aspectRatio = 0f;
-            _speed = speed;
-            _sensitivity = sensitivity;
-        }
+        Keys _relevantKeys = 0;
+        Keys _keyHistory = 0;
+        float _aspectRatio = 0f;
 
         public void Handle(Event? ev)
         {
@@ -115,7 +104,7 @@ sealed class Camera : ICamera, IEventHandler
         {
             const float VERTICAL_BOUND = float.Pi * 0.5f - 1e-7f;
 
-            var dr = _sensitivity * (float)dt.TotalSeconds;
+            var dr = sensitivity * (float)dt.TotalSeconds;
 
             if ((_relevantKeys & Keys.UpArrow) != 0)
             {
@@ -179,7 +168,7 @@ sealed class Camera : ICamera, IEventHandler
 
             if (direction != Vector3.Zero)
             {
-                camera._origin += Vector3.Normalize(direction) * _speed * (float)dt.TotalSeconds;
+                camera._origin += Vector3.Normalize(direction) * speed * (float)dt.TotalSeconds;
             }
         }
 
