@@ -25,8 +25,8 @@ sealed class Camera : ICamera, IEventHandler
     {
         _origin = lookFrom;
         _forward = Vector3.Normalize(lookAt - lookFrom);
-        _right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, _forward));
-        _up = Vector3.Cross(_forward, _right);
+        _right = Right();
+        _up = Up();
         _yaw = float.Atan2(_forward.Z, _forward.X);
         _pitch = float.Asin(_forward.Y);
         _height = float.Tan(verticalFov * float.Pi / 360f * 0.5f);
@@ -46,6 +46,12 @@ sealed class Camera : ICamera, IEventHandler
         _controller.Handle(ev);
         _controller.ApplyUpdates(this, dt);
     }
+
+    Vector3 Forward() => new(float.Cos(_yaw) * float.Cos(_pitch), float.Sin(_pitch), float.Sin(_yaw) * float.Cos(_pitch));
+
+    Vector3 Right() => Vector3.Normalize(Vector3.Cross(Vector3.UnitY, _forward));
+
+    Vector3 Up() => Vector3.Cross(_forward, _right);
 
     struct Controller(float speed, float sensitivity)
     {
@@ -127,17 +133,15 @@ sealed class Camera : ICamera, IEventHandler
             camera._yaw %= float.Tau;
             camera._pitch = float.Clamp(camera._pitch, -VERTICAL_BOUND, VERTICAL_BOUND);
 
-            camera._forward = Forward(camera._yaw, camera._pitch);
-            camera._right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, camera._forward));
-            camera._up = Vector3.Cross(camera._forward, camera._right);
+            camera._forward = camera.Forward();
+            camera._right = camera.Right();
+            camera._up = camera.Up();
         }
 
         readonly void ApplyMovement(Camera camera, TimeSpan dt)
         {
             var direction = Vector3.Zero;
-            var right = camera._right;
-            var up = Vector3.UnitY;
-            var forward = Vector3.Cross(right, up);
+            var forward = Vector3.Cross(camera._right, Vector3.UnitY);
 
             if ((_relevantKeys & Keys.W) != 0)
             {
@@ -150,20 +154,20 @@ sealed class Camera : ICamera, IEventHandler
 
             if ((_relevantKeys & Keys.A) != 0)
             {
-                direction -= right;
+                direction -= camera._right;
             }
             else if ((_relevantKeys & Keys.D) != 0)
             {
-                direction += right;
+                direction += camera._right;
             }
 
             if ((_relevantKeys & Keys.Spacebar) != 0)
             {
-                direction += up;
+                direction.Y++;
             }
             else if ((_relevantKeys & Keys.Z) != 0)
             {
-                direction -= up;
+                direction.Y--;
             }
 
             if (direction != Vector3.Zero)
@@ -187,9 +191,6 @@ sealed class Camera : ICamera, IEventHandler
                 ConsoleKey.RightArrow => (Keys.RightArrow, Keys.LeftArrow),
                 _ => default,
             };
-
-        static Vector3 Forward(float yaw, float pitch) =>
-            new(float.Cos(yaw) * float.Cos(pitch), float.Sin(pitch), float.Sin(yaw) * float.Cos(pitch));
 
         enum Keys : ushort
         {
