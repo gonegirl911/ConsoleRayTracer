@@ -25,8 +25,8 @@ sealed class Camera : ICamera, IEventHandler
     {
         _origin = lookFrom;
         _forward = Vector3.Normalize(lookAt - lookFrom);
-        _right = Right();
-        _up = Up();
+        _right = Right;
+        _up = Up;
         _yaw = float.Atan2(_forward.Z, _forward.X);
         _pitch = float.Asin(_forward.Y);
         _height = float.Tan(verticalFov * float.Pi / 360f * 0.5f);
@@ -47,11 +47,9 @@ sealed class Camera : ICamera, IEventHandler
         _controller.ApplyUpdates(this, dt);
     }
 
-    Vector3 Forward() => new(float.Cos(_yaw) * float.Cos(_pitch), float.Sin(_pitch), float.Sin(_yaw) * float.Cos(_pitch));
-
-    Vector3 Right() => Vector3.Normalize(Vector3.Cross(Vector3.UnitY, _forward));
-
-    Vector3 Up() => Vector3.Cross(_forward, _right);
+    Vector3 Forward => new(float.Cos(_yaw) * float.Cos(_pitch), float.Sin(_pitch), float.Sin(_yaw) * float.Cos(_pitch));
+    Vector3 Right => Vector3.Normalize(Vector3.Cross(Vector3.UnitY, _forward));
+    Vector3 Up => Vector3.Cross(_forward, _right);
 
     struct Controller(float speed, float sensitivity)
     {
@@ -133,9 +131,9 @@ sealed class Camera : ICamera, IEventHandler
             camera._yaw %= float.Tau;
             camera._pitch = float.Clamp(camera._pitch, -VERTICAL_BOUND, VERTICAL_BOUND);
 
-            camera._forward = camera.Forward();
-            camera._right = camera.Right();
-            camera._up = camera.Up();
+            camera._forward = camera.Forward;
+            camera._right = camera.Right;
+            camera._up = camera.Up;
         }
 
         readonly void ApplyMovement(Camera camera, TimeSpan dt)
