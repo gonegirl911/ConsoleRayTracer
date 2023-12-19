@@ -3,7 +3,6 @@
 interface ICanvas
 {
     int Width { get; }
-
     int Height { get; }
 
     Event? Refresh();
