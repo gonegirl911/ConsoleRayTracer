@@ -13,7 +13,7 @@ interface ICanvas
     {
         const string ASCII = " .:+%#@";
 
-        Set(x, y, ASCII[(int)float.Round(float.Clamp(color, 0f, 1f) * (ASCII.Length - 1))]);
+        Set(x, y, ASCII[(int)float.Round(float.Clamp(color, 0F, 1F) * (ASCII.Length - 1))]);
     }
 
     void Set(Func<int, int, float> color)

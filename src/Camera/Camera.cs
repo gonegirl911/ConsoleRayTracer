@@ -29,15 +29,15 @@ sealed class Camera : ICamera, IEventHandler
         _up = Up(_forward, _right);
         _yaw = float.Atan2(_forward.Z, _forward.X);
         _pitch = float.Asin(_forward.Y);
-        _height = float.Tan(verticalFov * float.Pi / 360f * 0.5f);
+        _height = float.Tan(verticalFov * float.Pi / 360F * 0.5F);
         _width = _height * aspectRatio;
         _controller = new(speed, sensitivity);
     }
 
     public Ray CastRay(float s, float t)
     {
-        var screenX = (-1f + s * 2f) * _width;
-        var screenY = (1f - t * 2f) * _height;
+        var screenX = (-1F + s * 2F) * _width;
+        var screenY = (1F - t * 2F) * _height;
         return new(_origin, _forward + _right * screenX + _up * screenY);
     }
 
@@ -58,7 +58,7 @@ sealed class Camera : ICamera, IEventHandler
     {
         Keys _relevantKeys = 0;
         Keys _keyHistory = 0;
-        float _aspectRatio = 0f;
+        float _aspectRatio = 0F;
 
         public void Handle(Event? ev)
         {
@@ -80,10 +80,10 @@ sealed class Camera : ICamera, IEventHandler
                 ApplyMovement(camera, dt);
             }
 
-            if (_aspectRatio != 0.0f)
+            if (_aspectRatio != 0.0F)
             {
                 camera._width = camera._height * _aspectRatio;
-                _aspectRatio = 0.0f;
+                _aspectRatio = 0.0F;
             }
         }
 
@@ -109,7 +109,7 @@ sealed class Camera : ICamera, IEventHandler
 
         readonly void ApplyRotation(Camera camera, TimeSpan dt)
         {
-            const float VERTICAL_BOUND = float.Pi * 0.5f - 1e-7f;
+            const float VERTICAL_BOUND = float.Pi * 0.5F - 1e-7F;
 
             var dr = sensitivity * (float)dt.TotalSeconds;
 
@@ -163,11 +163,11 @@ sealed class Camera : ICamera, IEventHandler
 
             if ((_relevantKeys & Keys.Spacebar) != 0)
             {
-                direction.Y++;
+                ++direction.Y;
             }
             else if ((_relevantKeys & Keys.Z) != 0)
             {
-                direction.Y--;
+                --direction.Y;
             }
 
             if (direction != Vector3.Zero)

@@ -10,10 +10,10 @@ interface IAnimation<out T>
     T GetValue(float timeElapsed) => GetValueUnchecked(
         (timeElapsed, timeElapsed % Duration) switch
         {
-            ( > 0f, 0f) => Duration,
-            ( <= 0f, 0f) => 0f,
-            ( >= 0f, var elapsed) => elapsed,
-            ( < 0f, var elapsed) => elapsed + Duration,
+            ( > 0F, 0F) => Duration,
+            ( <= 0F, 0F) => 0F,
+            ( >= 0F, var elapsed) => elapsed,
+            ( < 0F, var elapsed) => elapsed + Duration,
             _ => throw new ArgumentException("invalid timeElapsed"),
         }
     );
@@ -41,8 +41,8 @@ readonly record struct MotionChain(IAnimation<float>[] Animations) : IAnimation<
 
     public float GetValueUnchecked(float timeElapsed)
     {
-        var accum = 0f;
-        var elapsed = 0f;
+        var accum = 0F;
+        var elapsed = 0F;
         foreach (var animation in Animations.AsSpan())
         {
             var dt = timeElapsed - elapsed;
@@ -67,7 +67,7 @@ readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAnimation<
     public Vector3 GetValueUnchecked(float timeElapsed)
     {
         var accum = Vector3.Zero;
-        var elapsed = 0f;
+        var elapsed = 0F;
         foreach (var animation in Animations.AsSpan())
         {
             var dt = timeElapsed - elapsed;

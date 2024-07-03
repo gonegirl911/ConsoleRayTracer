@@ -35,7 +35,7 @@ readonly record struct Lights(IEntity[] Sources) : IAnimatedEntity
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
-        var accum = 0f;
+        var accum = 0F;
         foreach (var source in Sources.AsSpan())
         {
             accum += source.Illuminate(entity, record);
@@ -57,9 +57,9 @@ readonly record struct LightSource : IEntity
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
         Ray lightRay = new(record.Point, Vector3.Normalize(-record.Point));
-        return entity.Hit(lightRay, 0.001f, float.MaxValue) is null
-            ? float.Max(record.Brightness * Vector3.Dot(record.Normal, lightRay.Direction), 0f)
-            : 0f;
+        return entity.Hit(lightRay, 0.001F, float.MaxValue) is null
+            ? float.Max(record.Brightness * Vector3.Dot(record.Normal, lightRay.Direction), 0F)
+            : 0F;
     }
 }
 
@@ -138,7 +138,7 @@ readonly record struct Cylinder(float Height, float Radius) : IEntity
 {
     readonly And<And<Apply<Circle<AxisY>>, Circle<AxisY>>, Lateral> _components = new(
         new(
-            new(new(Radius), new(0f, Height, 0f)),
+            new(new(Radius), new(0F, Height, 0F)),
             new(Radius)
         ),
         new(Height, Radius)
@@ -150,7 +150,7 @@ readonly record struct Cylinder(float Height, float Radius) : IEntity
     {
         public HitRecord? Hit(Ray ray, float tMin, float tMax)
         {
-            Ray sideRay = new(ray.Origin with { Y = 0 }, ray.Direction with { Y = 0f });
+            Ray sideRay = new(ray.Origin with { Y = 0 }, ray.Direction with { Y = 0F });
             var a = Vector3.Dot(sideRay.Direction, sideRay.Direction);
             var b = Vector3.Dot(sideRay.Origin, sideRay.Direction);
             var c = Vector3.Dot(sideRay.Origin, sideRay.Origin) - Radius * Radius;
@@ -171,9 +171,9 @@ readonly record struct Cylinder(float Height, float Radius) : IEntity
             }
 
             var point = ray.PointAt(t);
-            return point.Y < 0f || point.Y > Height
+            return point.Y < 0F || point.Y > Height
                 ? null
-                : new(t, point, Vector3.Normalize(point with { Y = 0f }));
+                : new(t, point, Vector3.Normalize(point with { Y = 0F }));
         }
     }
 }
@@ -190,7 +190,7 @@ readonly record struct Cone(float Height, float Radius) : IEntity
 
         public HitRecord? Hit(Ray ray, float tMin, float tMax)
         {
-            Ray sideRay = new(ray.Origin with { Y = 0f }, ray.Direction with { Y = 0f });
+            Ray sideRay = new(ray.Origin with { Y = 0F }, ray.Direction with { Y = 0F });
             var tan = _ratio * _ratio;
             var D = Height - ray.Origin.Y;
             var a = Vector3.Dot(sideRay.Direction, sideRay.Direction) - tan * ray.Direction.Y * ray.Direction.Y;
@@ -213,7 +213,7 @@ readonly record struct Cone(float Height, float Radius) : IEntity
             }
 
             var point = ray.PointAt(t);
-            return point.Y < 0f || point.Y > Height
+            return point.Y < 0F || point.Y > Height
                 ? null
                 : new(t, point, Vector3.Normalize(point with { Y = float.Sqrt(point.X * point.X + point.Z * point.Z) * _ratio }));
         }
@@ -226,10 +226,10 @@ readonly record struct Cuboid(float Width, float Height, float Depth) : IEntity
         new(new(new(Width, Height), new(Depth, Height)), new(Width, Depth)),
         new(
             new(
-                new(new(Width, Height), new(0f, 0f, Depth)),
-                new(new(Depth, Height), new(Width, 0f, 0f))
+                new(new(Width, Height), new(0F, 0F, Depth)),
+                new(new(Depth, Height), new(Width, 0F, 0F))
             ),
-            new(new(Width, Depth), new(0f, Height, 0f))
+            new(new(Width, Depth), new(0F, Height, 0F))
         )
     );
 

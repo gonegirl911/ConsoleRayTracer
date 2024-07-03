@@ -2,7 +2,7 @@
 
 sealed class Animator(float speed, float sensitivity, bool isRunning = true) : IEventHandler
 {
-    float _timeElapsed = 0f;
+    float _timeElapsed = 0F;
     Controller _controller = new(speed, sensitivity, isRunning);
 
     public void Handle(Event? ev, TimeSpan dt)

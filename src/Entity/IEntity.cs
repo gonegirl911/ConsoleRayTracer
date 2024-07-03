@@ -5,22 +5,22 @@ namespace ConsoleRayTracer;
 interface IEntity
 {
     HitRecord? Hit(Ray ray, float tMin, float tMax) => null;
-    float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity => 0f;
+    float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity => 0F;
 }
 
 readonly record struct HitRecord(
     float T,
     Vector3 Point,
     Vector3 Normal,
-    float Brightness = 1f,
-    float Reflectance = 0f
+    float Brightness = 1F,
+    float Reflectance = 0F
 );
 
 readonly record struct Apply<E>(
     E Entity,
     Vector3 Offset = default,
-    float Brightness = 1f,
-    float Reflectance = 0f
+    float Brightness = 1F,
+    float Reflectance = 0F
 ) : IEntity
     where E : IEntity
 {

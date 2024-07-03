@@ -12,7 +12,7 @@ readonly record struct RayTracer<E, L, C>(int Depth) : IRenderer<Scene<E, L, C, 
 
     static float Trace(in E entity, in L light, Ray ray, int depth)
     {
-        if (depth > 0 && entity.Hit(ray, 0.001f, float.MaxValue) is HitRecord record)
+        if (depth > 0 && entity.Hit(ray, 0.001F, float.MaxValue) is HitRecord record)
         {
             record = record with { Normal = ray.Opposite(record.Normal) };
             var diffused = light.Illuminate(entity, record);
@@ -23,5 +23,5 @@ readonly record struct RayTracer<E, L, C>(int Depth) : IRenderer<Scene<E, L, C, 
         return 0f;
     }
 
-    static float Lerp(float a, float b, float t) => a * (1f - t) + b * t;
+    static float Lerp(float a, float b, float t) => a * (1F - t) + b * t;
 }

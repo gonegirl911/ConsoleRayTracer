@@ -23,6 +23,6 @@ readonly record struct CircularPath<A>(float Radius) : IMotion<Vector3>
     public Vector3 GetValue(float progress)
     {
         var theta = float.Tau * progress;
-        return A.Apply(new(0f, float.Cos(theta), float.Sin(theta))) * Radius;
+        return A.Apply(new(0F, float.Cos(theta), float.Sin(theta))) * Radius;
     }
 }
