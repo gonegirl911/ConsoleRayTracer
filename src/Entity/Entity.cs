@@ -35,12 +35,12 @@ readonly record struct Lights(IEntity[] Sources) : IAnimatedEntity
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
-        var accum = 0F;
+        var acc = 0F;
         foreach (var source in Sources.AsSpan())
         {
-            accum += source.Illuminate(entity, record);
+            acc += source.Illuminate(entity, record);
         }
-        return accum;
+        return acc;
     }
 
     public void Update(float timeElapsed)
