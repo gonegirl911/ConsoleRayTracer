@@ -34,7 +34,7 @@ sealed class WindowsTerminal : ICanvas
         PInvoke.SetConsoleWindowInfo(_stdout, true, _rect);
 
         PInvoke.GetNumberOfConsoleInputEvents(_stdin, out var eventsAvailable);
-        PInvoke.ReadConsoleInput(_stdin, stackalloc INPUT_RECORD[(int)eventsAvailable - 1], out var _);
+        PInvoke.ReadConsoleInput(_stdin, stackalloc INPUT_RECORD[(int)eventsAvailable - 1], out _);
     }
 
     public int Width => _rect.Right + 1;
@@ -87,7 +87,7 @@ sealed class WindowsTerminal : ICanvas
         if (eventsAvailable != 0)
         {
             Span<INPUT_RECORD> events = stackalloc INPUT_RECORD[1];
-            PInvoke.ReadConsoleInput(_stdin, events, out var _);
+            PInvoke.ReadConsoleInput(_stdin, events, out _);
             return MemoryMarshal.GetReference(events);
         }
         return null;
