@@ -2,13 +2,13 @@
 
 namespace ConsoleRayTracer;
 
-readonly record struct RayTracer<E, L, C>(int Depth) : IRenderer<Scene<E, L, C, RayTracer<E, L, C>>>
+readonly struct RayTracer<E, L, C>(int depth) : IRenderer<Scene<E, L, C, RayTracer<E, L, C>>>
     where E : IEntity
     where L : IEntity
     where C : ICamera
 {
     public float Render(in Scene<E, L, C, RayTracer<E, L, C>> scene, float s, float t) =>
-        Trace(scene.Entity, scene.Light, scene.Camera.CastRay(s, t), Depth);
+        Trace(scene.Entity, scene.Light, scene.Camera.CastRay(s, t), depth);
 
     static float Trace(in E entity, in L light, Ray ray, int depth)
     {

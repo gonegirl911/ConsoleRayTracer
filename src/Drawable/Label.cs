@@ -1,13 +1,13 @@
 ﻿namespace ConsoleRayTracer;
 
-readonly record struct Label(string Text) : IDrawable
+readonly struct Label(string text) : IDrawable
 {
     const int PADDING = 2;
     const int OUTLINE = 1;
 
     public void Draw(ICanvas canvas)
     {
-        var width = Text.Length + (PADDING + OUTLINE) * 2;
+        var width = text.Length + (PADDING + OUTLINE) * 2;
         var height = 1 + (PADDING + OUTLINE) * 2;
         if (width > canvas.Width || height > canvas.Height)
         {
@@ -36,11 +36,11 @@ readonly record struct Label(string Text) : IDrawable
                 canvas.Set(topLeftX + dx, topLeftY + dy, 1F);
                 canvas.Set(topLeftX + width - OUTLINE + dx, topLeftY + dy, 1F);
             }
-            for (var dx = 0; dx < Text.Length; ++dx)
+            for (var dx = 0; dx < text.Length; ++dx)
             {
                 if (dy == PADDING + OUTLINE)
                 {
-                    canvas.Set(topLeftX + PADDING + OUTLINE + dx, topLeftY + dy, Text[dx]);
+                    canvas.Set(topLeftX + PADDING + OUTLINE + dx, topLeftY + dy, text[dx]);
                 }
                 else
                 {

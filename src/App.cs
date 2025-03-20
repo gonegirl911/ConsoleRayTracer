@@ -2,7 +2,7 @@
 
 namespace ConsoleRayTracer;
 
-readonly record struct App<D>(ICanvas Canvas, D Drawable) where D : IDrawable, IEventHandler
+readonly struct App<D>(ICanvas canvas, D drawable) where D : IDrawable, IEventHandler
 {
     public void Run()
     {
@@ -17,8 +17,8 @@ readonly record struct App<D>(ICanvas Canvas, D Drawable) where D : IDrawable, I
 
     public void RunFrame(TimeSpan dt)
     {
-        Drawable.Handle(Canvas.Refresh(), dt);
-        Drawable.Draw(Canvas);
-        Canvas.Commit();
+        drawable.Handle(canvas.Refresh(), dt);
+        drawable.Draw(canvas);
+        canvas.Commit();
     }
 }

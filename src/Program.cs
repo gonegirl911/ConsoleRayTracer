@@ -2,9 +2,9 @@
 using ConsoleRayTracer;
 
 new App<Game>(
-    Canvas: NativeTerminal.Get(95, 70, "ConsoleRayTracer"),
-    Drawable: new(
-        Scene: new(
+    canvas: NativeTerminal.Get(95, 70, "ConsoleRayTracer"),
+    drawable: new(
+        scene: new(
             Entity: new(
             [
                 new Apply<Cylinder>(
@@ -117,9 +117,9 @@ new App<Game>(
             ),
             Renderer: new(Depth: 50)
         ),
-        Animator: new(speed: 1F, sensitivity: 3F),
-        Crosshair: new(),
-        Tutorial: new()
+        animator: new(speed: 1F, sensitivity: 3F),
+        crosshair: new(),
+        tutorial: new()
     )
 )
 .Run();

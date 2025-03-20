@@ -2,14 +2,14 @@
 
 namespace ConsoleRayTracer;
 
-readonly record struct Group(IEntity[] Entities) : IAnimatedEntity
+readonly struct Group(IEntity[] entities) : IAnimatedEntity
 {
-    readonly IAnimatedEntity[] _animatedEntities = Entities.OfType<IAnimatedEntity>().ToArray();
+    readonly IAnimatedEntity[] _animatedEntities = entities.OfType<IAnimatedEntity>().ToArray();
 
     public HitRecord? Hit(Ray ray, float tMin, float tMax)
     {
         HitRecord? hitRecord = null;
-        foreach (var entity in Entities.AsSpan())
+        foreach (var entity in entities.AsSpan())
         {
             if (entity.Hit(ray, tMin, tMax) is HitRecord record)
             {
@@ -29,14 +29,14 @@ readonly record struct Group(IEntity[] Entities) : IAnimatedEntity
     }
 }
 
-readonly record struct Lights(IEntity[] Sources) : IAnimatedEntity
+readonly struct Lights(IEntity[] sources) : IAnimatedEntity
 {
-    readonly IAnimatedEntity[] _animatedSources = Sources.OfType<IAnimatedEntity>().ToArray()!;
+    readonly IAnimatedEntity[] _animatedSources = sources.OfType<IAnimatedEntity>().ToArray()!;
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
         var acc = 0F;
-        foreach (var source in Sources.AsSpan())
+        foreach (var source in sources.AsSpan())
         {
             acc += source.Illuminate(entity, record);
         }
@@ -52,7 +52,7 @@ readonly record struct Lights(IEntity[] Sources) : IAnimatedEntity
     }
 }
 
-readonly record struct LightSource : IEntity
+readonly struct LightSource : IEntity
 {
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
@@ -63,20 +63,20 @@ readonly record struct LightSource : IEntity
     }
 }
 
-readonly record struct And<L, R>(L Left, R Right) : IEntity
+readonly struct And<L, R>(L left, R right) : IEntity
     where L : IEntity
     where R : IEntity
 {
     public HitRecord? Hit(Ray ray, float tMin, float tMax) =>
-        Left.Hit(ray, tMin, tMax) is HitRecord left
-            ? Right.Hit(ray, tMin, left.T) ?? left
+        Left.Hit(ray, tMin, tMax) is HitRecord leftRecord
+            ? Right.Hit(ray, tMin, leftRecord.T) ?? leftRecord
             : Right.Hit(ray, tMin, tMax);
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity =>
         Left.Illuminate(entity, record) + Right.Illuminate(entity, record);
 }
 
-readonly record struct Plane<A> : IEntity where A : IAxis
+readonly struct Plane<A> : IEntity where A : IAxis
 {
     public HitRecord? Hit(Ray ray, float tMin, float tMax)
     {
@@ -85,34 +85,34 @@ readonly record struct Plane<A> : IEntity where A : IAxis
     }
 }
 
-readonly record struct Circle<A>(float Radius) : IEntity where A : IAxis
+readonly struct Circle<A>(float radius) : IEntity where A : IAxis
 {
     public HitRecord? Hit(Ray ray, float tMin, float tMax) =>
         new Plane<A>().Hit(ray, tMin, tMax) is HitRecord record
-            ? float.Sqrt(Vector3.Dot(record.Point, record.Point)) > Radius ? null : record
+            ? float.Sqrt(Vector3.Dot(record.Point, record.Point)) > radius ? null : record
             : null;
 }
 
-readonly record struct Rect<A>(float Width, float Height) : IEntity where A : IAxis
+readonly struct Rect<A>(float width, float height) : IEntity where A : IAxis
 {
     public HitRecord? Hit(Ray ray, float tMin, float tMax) =>
         new Plane<A>().Hit(ray, tMin, tMax) is HitRecord record
             ? A.GetMain(record.Point) < 0
-                || A.GetMain(record.Point) > Width
+                || A.GetMain(record.Point) > width
                 || A.GetSecondary(record.Point) < 0
-                || A.GetSecondary(record.Point) > Height
+                || A.GetSecondary(record.Point) > height
                 ? null
                 : record
             : null;
 }
 
-readonly record struct Sphere(float Radius) : IEntity
+readonly struct Sphere(float radius) : IEntity
 {
     public HitRecord? Hit(Ray ray, float tMin, float tMax)
     {
         var a = Vector3.Dot(ray.Direction, ray.Direction);
         var b = Vector3.Dot(ray.Origin, ray.Direction);
-        var c = Vector3.Dot(ray.Origin, ray.Origin) - Radius * Radius;
+        var c = Vector3.Dot(ray.Origin, ray.Origin) - radius * radius;
         var sqrtD = float.Sqrt(b * b - a * c);
         if (float.IsNaN(sqrtD))
         {
@@ -130,30 +130,30 @@ readonly record struct Sphere(float Radius) : IEntity
         }
 
         var point = ray.PointAt(t);
-        return new(t, point, point / Radius);
+        return new(t, point, point / radius);
     }
 }
 
-readonly record struct Cylinder(float Height, float Radius) : IEntity
+readonly struct Cylinder(float height, float radius) : IEntity
 {
     readonly And<And<Apply<Circle<AxisY>>, Circle<AxisY>>, Lateral> _components = new(
         new(
-            new(new(Radius), new(0F, Height, 0F)),
-            new(Radius)
+            new(new(radius), new(0F, height, 0F)),
+            new(radius)
         ),
-        new(Height, Radius)
+        new(height, radius)
     );
 
     public HitRecord? Hit(Ray ray, float tMin, float tMax) => _components.Hit(ray, tMin, tMax);
 
-    readonly record struct Lateral(float Height, float Radius) : IEntity
+    readonly struct Lateral(float height, float radius) : IEntity
     {
         public HitRecord? Hit(Ray ray, float tMin, float tMax)
         {
             Ray sideRay = new(ray.Origin with { Y = 0 }, ray.Direction with { Y = 0F });
             var a = Vector3.Dot(sideRay.Direction, sideRay.Direction);
             var b = Vector3.Dot(sideRay.Origin, sideRay.Direction);
-            var c = Vector3.Dot(sideRay.Origin, sideRay.Origin) - Radius * Radius;
+            var c = Vector3.Dot(sideRay.Origin, sideRay.Origin) - radius * radius;
             var sqrtD = float.Sqrt(b * b - a * c);
             if (float.IsNaN(sqrtD))
             {
@@ -171,28 +171,28 @@ readonly record struct Cylinder(float Height, float Radius) : IEntity
             }
 
             var point = ray.PointAt(t);
-            return point.Y < 0F || point.Y > Height
+            return point.Y < 0F || point.Y > height
                 ? null
                 : new(t, point, Vector3.Normalize(point with { Y = 0F }));
         }
     }
 }
 
-readonly record struct Cone(float Height, float Radius) : IEntity
+readonly struct Cone(float height, float radius) : IEntity
 {
-    readonly And<Circle<AxisY>, Lateral> _components = new(new(Radius), new(Height, Radius));
+    readonly And<Circle<AxisY>, Lateral> _components = new(new(radius), new(height, radius));
 
     public HitRecord? Hit(Ray ray, float tMin, float tMax) => _components.Hit(ray, tMin, tMax);
 
-    readonly record struct Lateral(float Height, float Radius) : IEntity
+    readonly struct Lateral(float height, float radius) : IEntity
     {
-        readonly float _ratio = Radius / Height;
+        readonly float _ratio = radius / height;
 
         public HitRecord? Hit(Ray ray, float tMin, float tMax)
         {
             Ray sideRay = new(ray.Origin with { Y = 0F }, ray.Direction with { Y = 0F });
             var tan = _ratio * _ratio;
-            var D = Height - ray.Origin.Y;
+            var D = height - ray.Origin.Y;
             var a = Vector3.Dot(sideRay.Direction, sideRay.Direction) - tan * ray.Direction.Y * ray.Direction.Y;
             var b = Vector3.Dot(sideRay.Origin, sideRay.Direction) + tan * D * ray.Direction.Y;
             var c = Vector3.Dot(sideRay.Origin, sideRay.Origin) - tan * D * D;
@@ -213,23 +213,23 @@ readonly record struct Cone(float Height, float Radius) : IEntity
             }
 
             var point = ray.PointAt(t);
-            return point.Y < 0F || point.Y > Height
+            return point.Y < 0F || point.Y > height
                 ? null
                 : new(t, point, Vector3.Normalize(point with { Y = float.Sqrt(point.X * point.X + point.Z * point.Z) * _ratio }));
         }
     }
 }
 
-readonly record struct Cuboid(float Width, float Height, float Depth) : IEntity
+readonly struct Cuboid(float width, float height, float depth) : IEntity
 {
     readonly And<And<And<Rect<AxisZ>, Rect<AxisX>>, Rect<AxisY>>, And<And<Apply<Rect<AxisZ>>, Apply<Rect<AxisX>>>, Apply<Rect<AxisY>>>> _components = new(
-        new(new(new(Width, Height), new(Depth, Height)), new(Width, Depth)),
+        new(new(new(width, height), new(depth, height)), new(width, depth)),
         new(
             new(
-                new(new(Width, Height), new(0F, 0F, Depth)),
-                new(new(Depth, Height), new(Width, 0F, 0F))
+                new(new(width, height), new(0F, 0F, depth)),
+                new(new(depth, height), new(width, 0F, 0F))
             ),
-            new(new(Width, Depth), new(0F, Height, 0F))
+            new(new(width, depth), new(0F, height, 0F))
         )
     );
 

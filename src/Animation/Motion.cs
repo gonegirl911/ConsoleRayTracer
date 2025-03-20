@@ -7,22 +7,22 @@ interface IMotion<out T>
     T GetValue(float progress);
 }
 
-readonly record struct LinearMotion(float Motion) : IMotion<float>
+readonly struct LinearMotion(float motion) : IMotion<float>
 {
-    public float GetValue(float progress) => Motion * progress;
+    public float GetValue(float progress) => motion * progress;
 }
 
-readonly record struct LinearPath(Vector3 Path) : IMotion<Vector3>
+readonly struct LinearPath(Vector3 path) : IMotion<Vector3>
 {
-    public Vector3 GetValue(float progress) => Path * progress;
+    public Vector3 GetValue(float progress) => path * progress;
 }
 
-readonly record struct CircularPath<A>(float Radius) : IMotion<Vector3>
+readonly struct CircularPath<A>(float radius) : IMotion<Vector3>
     where A : IAxis
 {
     public Vector3 GetValue(float progress)
     {
         var theta = float.Tau * progress;
-        return A.Apply(new(0F, float.Cos(theta), float.Sin(theta))) * Radius;
+        return A.Apply(new(0F, float.Cos(theta), float.Sin(theta))) * radius;
     }
 }

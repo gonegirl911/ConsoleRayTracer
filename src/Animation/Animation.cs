@@ -21,29 +21,34 @@ interface IAnimation<out T>
     T GetValueUnchecked(float timeElapsed);
 }
 
-readonly record struct Animation<T, M, I>(M Motion, I Interpolator, float Duration) : IAnimation<T>
+readonly struct Animation<T, M, I>(M motion, I interpolator, float duration) : IAnimation<T>
     where M : IMotion<T>
     where I : IInterpolator
 {
+    public float Duration { get; } = duration;
+
     public T GetValueUnchecked(float timeElapsed) =>
-        Motion.GetValue(Interpolator.GetInterpolation(timeElapsed / Duration));
+        motion.GetValue(interpolator.GetInterpolation(timeElapsed / Duration));
 }
 
-readonly record struct Constant<T>(T Value, float Duration) : IAnimation<T>
+readonly struct Constant<T>(T value, float duration) : IAnimation<T>
 {
-    public T GetValue(float timeElapsed) => Value;
-    public T GetValueUnchecked(float timeElapsed) => Value;
+    public float Duration { get; } = duration;
+
+    public T GetValue(float timeElapsed) => value;
+
+    public T GetValueUnchecked(float timeElapsed) => value;
 }
 
-readonly record struct MotionChain(IAnimation<float>[] Animations) : IAnimation<float>
+readonly struct MotionChain(IAnimation<float>[] animations) : IAnimation<float>
 {
-    public float Duration { get; } = Animations.Sum(a => a.Duration);
+    public float Duration { get; } = animations.Sum(a => a.Duration);
 
     public float GetValueUnchecked(float timeElapsed)
     {
         var acc = 0F;
         var elapsed = 0F;
-        foreach (var animation in Animations.AsSpan())
+        foreach (var animation in animations.AsSpan())
         {
             var dt = timeElapsed - elapsed;
             if (dt > animation.Duration)
@@ -60,15 +65,15 @@ readonly record struct MotionChain(IAnimation<float>[] Animations) : IAnimation<
     }
 }
 
-readonly record struct PathChain(IAnimation<Vector3>[] Animations) : IAnimation<Vector3>
+readonly struct PathChain(IAnimation<Vector3>[] animations) : IAnimation<Vector3>
 {
-    public float Duration { get; } = Animations.Sum(a => a.Duration);
+    public float Duration { get; } = animations.Sum(a => a.Duration);
 
     public Vector3 GetValueUnchecked(float timeElapsed)
     {
         var acc = Vector3.Zero;
         var elapsed = 0F;
-        foreach (var animation in Animations.AsSpan())
+        foreach (var animation in animations.AsSpan())
         {
             var dt = timeElapsed - elapsed;
             if (dt > animation.Duration)

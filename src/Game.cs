@@ -1,25 +1,25 @@
 namespace ConsoleRayTracer;
 
-readonly record struct Game(
-    Scene<Group, Lights, Camera, RayTracer<Group, Lights, Camera>> Scene,
-    Animator Animator,
-    Crosshair Crosshair,
-    Tutorial Tutorial
+readonly struct Game(
+    Scene<Group, Lights, Camera, RayTracer<Group, Lights, Camera>> scene,
+    Animator animator,
+    Crosshair crosshair,
+    Tutorial tutorial
 ) : IDrawable, IEventHandler
 {
     public void Draw(ICanvas canvas)
     {
-        Scene.Draw(canvas);
-        Crosshair.Draw(canvas);
-        Tutorial.Draw(canvas);
+        scene.Draw(canvas);
+        crosshair.Draw(canvas);
+        tutorial.Draw(canvas);
     }
 
     public void Handle(Event? ev, TimeSpan dt)
     {
-        Scene.Camera.Handle(ev, dt);
-        Animator.Handle(ev, dt);
-        Tutorial.Handle(ev, dt);
-        Animator.MoveForward(Scene.Entity);
-        Animator.MoveForward(Scene.Light);
+        scene.Camera.Handle(ev, dt);
+        animator.Handle(ev, dt);
+        tutorial.Handle(ev, dt);
+        animator.MoveForward(scene.Entity);
+        animator.MoveForward(scene.Light);
     }
 }

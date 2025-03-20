@@ -5,8 +5,8 @@ namespace ConsoleRayTracer;
 
 readonly record struct Event(Variant Variant, Data Data)
 {
-    public readonly KeyEvent? KeyEvent = Variant == Variant.Key ? Data.KeyEvent : null;
-    public readonly ResizeEvent? ResizeEvent = Variant == Variant.Resize ? Data.ResizeEvent : null;
+    public KeyEvent? KeyEvent => Variant == Variant.Key ? Data.KeyEvent : null;
+    public ResizeEvent? ResizeEvent => Variant == Variant.Resize ? Data.ResizeEvent : null;
 
     public Event(KeyEvent keyEvent) : this(Variant.Key, new(keyEvent)) { }
     public Event(ResizeEvent resizeEvent) : this(Variant.Resize, new(resizeEvent)) { }
@@ -39,8 +39,7 @@ readonly struct Data
 
 readonly record struct KeyEvent(ConsoleKey Key, KeyState State)
 {
-    public readonly ConsoleKey? PressedKey = State == KeyState.Pressed ? Key : null;
-    public readonly ConsoleKey? ReleasedKey = State == KeyState.Released ? Key : null;
+    public ConsoleKey? PressedKey => State == KeyState.Pressed ? Key : null;
 
     public KeyEvent(in INPUT_RECORD record)
         : this((ConsoleKey)record.Event.KeyEvent.wVirtualKeyCode, (KeyState)(byte)record.Event.KeyEvent.bKeyDown)
@@ -55,7 +54,7 @@ enum KeyState : byte
 
 readonly record struct ResizeEvent(int Width, int Height)
 {
-    public readonly float AspectRatio = (float)Width / Height;
+    public float AspectRatio => (float)Width / Height;
 
     public ResizeEvent(in INPUT_RECORD record)
         : this(record.Event.WindowBufferSizeEvent.dwSize.X, record.Event.WindowBufferSizeEvent.dwSize.Y)

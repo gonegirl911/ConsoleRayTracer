@@ -16,25 +16,25 @@ readonly record struct HitRecord(
     float Reflectance = 0F
 );
 
-readonly record struct Apply<E>(
-    E Entity,
-    Vector3 Offset = default,
-    float Brightness = 1F,
-    float Reflectance = 0F
+readonly struct Apply<E>(
+    E entity,
+    Vector3 offset = default,
+    float brightness = 1F,
+    float reflectance = 0F
 ) : IEntity
     where E : IEntity
 {
     public HitRecord? Hit(Ray ray, float tMin, float tMax) =>
-        Entity.Hit(ray with { Origin = ray.Origin - Offset }, tMin, tMax) is HitRecord record
+        entity.Hit(ray with { Origin = ray.Origin - offset }, tMin, tMax) is HitRecord record
             ? record with
             {
-                Point = record.Point + Offset,
-                Brightness = Brightness,
-                Reflectance = Reflectance,
+                Point = record.Point + offset,
+                Brightness = brightness,
+                Reflectance = reflectance,
             }
             : null;
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity =>
-        Entity.Illuminate(new Apply<I>(entity, -Offset), record with { Point = record.Point - Offset })
-            * Brightness;
+        entity.Illuminate(new Apply<I>(entity, -offset), record with { Point = record.Point - offset })
+            * brightness;
 }
