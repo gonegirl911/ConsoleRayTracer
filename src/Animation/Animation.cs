@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace ConsoleRayTracer;
@@ -39,7 +40,7 @@ readonly struct Constant<T>(T value, float duration) : IAnimation<T>
     public T GetValueUnchecked(float timeElapsed) => value;
 }
 
-readonly struct MotionChain(IAnimation<float>[] animations) : IAnimation<float>
+readonly struct MotionChain(ImmutableArray<IAnimation<float>> animations) : IAnimation<float>
 {
     public float Duration { get; } = animations.Sum(a => a.Duration);
 
@@ -47,7 +48,7 @@ readonly struct MotionChain(IAnimation<float>[] animations) : IAnimation<float>
     {
         var acc = 0F;
         var elapsed = 0F;
-        foreach (var animation in animations.AsSpan())
+        foreach (var animation in animations)
         {
             var dt = timeElapsed - elapsed;
             if (dt > animation.Duration)
@@ -64,7 +65,7 @@ readonly struct MotionChain(IAnimation<float>[] animations) : IAnimation<float>
     }
 }
 
-readonly struct PathChain(IAnimation<Vector3>[] animations) : IAnimation<Vector3>
+readonly struct PathChain(ImmutableArray<IAnimation<Vector3>> animations) : IAnimation<Vector3>
 {
     public float Duration { get; } = animations.Sum(a => a.Duration);
 
@@ -72,7 +73,7 @@ readonly struct PathChain(IAnimation<Vector3>[] animations) : IAnimation<Vector3
     {
         var acc = Vector3.Zero;
         var elapsed = 0F;
-        foreach (var animation in animations.AsSpan())
+        foreach (var animation in animations)
         {
             var dt = timeElapsed - elapsed;
             if (dt > animation.Duration)

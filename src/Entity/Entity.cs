@@ -1,15 +1,16 @@
-﻿using System.Numerics;
+﻿using System.Collections.Immutable;
+using System.Numerics;
 
 namespace ConsoleRayTracer;
 
-readonly struct Group(IEntity[] entities) : IAnimatedEntity
+readonly struct Group(ImmutableArray<IEntity> entities) : IAnimatedEntity
 {
-    readonly IAnimatedEntity[] _animatedEntities = entities.OfType<IAnimatedEntity>().ToArray();
+    readonly ImmutableArray<IAnimatedEntity> _animatedEntities = [.. entities.OfType<IAnimatedEntity>()];
 
     public HitRecord? Hit(Ray ray, float tMin, float tMax)
     {
         HitRecord? hitRecord = null;
-        foreach (var entity in entities.AsSpan())
+        foreach (var entity in entities)
         {
             if (entity.Hit(ray, tMin, tMax) is HitRecord record)
             {
@@ -22,21 +23,21 @@ readonly struct Group(IEntity[] entities) : IAnimatedEntity
 
     public void Update(float timeElapsed)
     {
-        foreach (var animatedEntity in _animatedEntities.AsSpan())
+        foreach (var animatedEntity in _animatedEntities)
         {
             animatedEntity.Update(timeElapsed);
         }
     }
 }
 
-readonly struct Lights(IEntity[] sources) : IAnimatedEntity
+readonly struct Lights(ImmutableArray<IEntity> sources) : IAnimatedEntity
 {
-    readonly IAnimatedEntity[] _animatedSources = sources.OfType<IAnimatedEntity>().ToArray()!;
+    readonly ImmutableArray<IAnimatedEntity> _animatedSources = [.. sources.OfType<IAnimatedEntity>()];
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
     {
         var acc = 0F;
-        foreach (var source in sources.AsSpan())
+        foreach (var source in sources)
         {
             acc += source.Illuminate(entity, record);
         }
@@ -45,7 +46,7 @@ readonly struct Lights(IEntity[] sources) : IAnimatedEntity
 
     public void Update(float timeElapsed)
     {
-        foreach (var animatedSource in _animatedSources.AsSpan())
+        foreach (var animatedSource in _animatedSources)
         {
             animatedSource.Update(timeElapsed);
         }
