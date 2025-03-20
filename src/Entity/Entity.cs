@@ -68,12 +68,12 @@ readonly struct And<L, R>(L left, R right) : IEntity
     where R : IEntity
 {
     public HitRecord? Hit(Ray ray, float tMin, float tMax) =>
-        Left.Hit(ray, tMin, tMax) is HitRecord leftRecord
-            ? Right.Hit(ray, tMin, leftRecord.T) ?? leftRecord
-            : Right.Hit(ray, tMin, tMax);
+        left.Hit(ray, tMin, tMax) is HitRecord leftRecord
+            ? right.Hit(ray, tMin, leftRecord.T) ?? leftRecord
+            : right.Hit(ray, tMin, tMax);
 
     public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity =>
-        Left.Illuminate(entity, record) + Right.Illuminate(entity, record);
+        left.Illuminate(entity, record) + right.Illuminate(entity, record);
 }
 
 readonly struct Plane<A> : IEntity where A : IAxis

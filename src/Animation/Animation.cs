@@ -36,7 +36,6 @@ readonly struct Constant<T>(T value, float duration) : IAnimation<T>
     public float Duration { get; } = duration;
 
     public T GetValue(float timeElapsed) => value;
-
     public T GetValueUnchecked(float timeElapsed) => value;
 }
 

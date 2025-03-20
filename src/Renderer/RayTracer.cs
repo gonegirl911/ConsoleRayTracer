@@ -20,7 +20,7 @@ readonly struct RayTracer<E, L, C>(int depth) : IRenderer<Scene<E, L, C, RayTrac
             var reflected = Trace(entity, light, ray, depth - 1);
             return Lerp(diffused, reflected, record.Reflectance);
         }
-        return 0f;
+        return 0F;
     }
 
     static float Lerp(float a, float b, float t) => a * (1F - t) + b * t;

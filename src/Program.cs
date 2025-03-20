@@ -8,102 +8,102 @@ new App<Game>(
             Entity: new(
             [
                 new Apply<Cylinder>(
-                    Entity: new(4F, 1F),
-                    Offset: new(-5F, 0F, 0F),
-                    Brightness: 1.5F,
-                    Reflectance: 0.3F
+                    entity: new(4F, 1F),
+                    offset: new(-5F, 0F, 0F),
+                    brightness: 1.5F,
+                    reflectance: 0.3F
                 ),
                 new Apply<Cone>(
-                    Entity: new(4F, 1F),
-                    Brightness: 1.5F,
-                    Reflectance: 0.3F
+                    entity: new(4F, 1F),
+                    brightness: 1.5F,
+                    reflectance: 0.3F
                 ),
                 new Apply<Cylinder>(
-                    Entity: new(4F, 1F),
-                    Offset: new(5F, 0F, 0F),
-                    Brightness: 1.5F,
-                    Reflectance: 0.3F
+                    entity: new(4F, 1F),
+                    offset: new(5F, 0F, 0F),
+                    brightness: 1.5F,
+                    reflectance: 0.3F
                 ),
                 new Apply<Sphere>(
-                    Entity: new(1F),
-                    Offset: new(-5F, 6F, 0F),
-                    Brightness: 1.5F,
-                    Reflectance: 0.3F
+                    entity: new(1F),
+                    offset: new(-5F, 6F, 0F),
+                    brightness: 1.5F,
+                    reflectance: 0.3F
                 ),
                 new Apply<Cuboid>(
-                    Entity: new(2F, 2F, 2F),
-                    Offset: new(-1F, 5F, -1F),
-                    Brightness: 1.5F,
-                    Reflectance: 0.3F
+                    entity: new(2F, 2F, 2F),
+                    offset: new(-1F, 5F, -1F),
+                    brightness: 1.5F,
+                    reflectance: 0.3F
                 ),
                 new Apply<Sphere>(
-                    Entity: new(1F),
-                    Offset: new(5F, 6F, 0F),
-                    Brightness: 1.5F,
-                    Reflectance: 0.3F
+                    entity: new(1F),
+                    offset: new(5F, 6F, 0F),
+                    brightness: 1.5F,
+                    reflectance: 0.3F
                 ),
                 new Animated<Apply<Sphere>, PathChain, Constant<float>, MotionChain>(
-                    Entity: new(
-                        Entity: new(1F),
-                        Offset: new(0F, 1F, 0F),
-                        Brightness: 1.5F
+                    entity: new(
+                        entity: new(1F),
+                        offset: new(0F, 1F, 0F),
+                        brightness: 1.5F
                     ),
-                    Offset: new(
+                    offset: new(
                     [
                         new Animation<Vector3, CircularPath<AxisY>, LinearInterpolator>(
-                            Motion: new(10F),
-                            Interpolator: new(),
-                            Duration: 2000F
+                            motion: new(10F),
+                            interpolator: new(),
+                            duration: 2000F
                         ),
                         new Animation<Vector3, LinearPath, DecelerateInterpolator>(
-                            Motion: new(new(0F, 10F, 0F)),
-                            Interpolator: new(2F),
-                            Duration: 750F
+                            motion: new(new(0F, 10F, 0F)),
+                            interpolator: new(2F),
+                            duration: 750F
                         ),
                         new Animation<Vector3, LinearPath, AccelerateInterpolator>(
-                            Motion: new(new(0F, -10F, 0F)),
-                            Interpolator: new(2F),
-                            Duration: 750F
+                            motion: new(new(0F, -10F, 0F)),
+                            interpolator: new(2F),
+                            duration: 750F
                         ),
                         new Animation<Vector3, LinearPath, DecelerateInterpolator>(
-                            Motion: new(new(0F, 2F, 0F)),
-                            Interpolator: new(2F),
-                            Duration: 150F
+                            motion: new(new(0F, 2F, 0F)),
+                            interpolator: new(2F),
+                            duration: 150F
                         ),
                         new Animation<Vector3, LinearPath, AccelerateInterpolator>(
-                            Motion: new(new(0F, -2F, 0F)),
-                            Interpolator: new(2F),
-                            Duration: 150F
+                            motion: new(new(0F, -2F, 0F)),
+                            interpolator: new(2F),
+                            duration: 150F
                         ),
                     ]),
-                    Reflectance: new(
+                    reflectance: new(
                     [
                         new Animation<float, LinearMotion, LinearInterpolator>(
-                            Motion: new(1F),
-                            Interpolator: new(),
-                            Duration: 1900F
+                            motion: new(1F),
+                            interpolator: new(),
+                            duration: 1900F
                         ),
                         new Animation<float, LinearMotion, LinearInterpolator>(
-                            Motion: new(-1F),
-                            Interpolator: new(),
-                            Duration: 1900F
+                            motion: new(-1F),
+                            interpolator: new(),
+                            duration: 1900F
                         ),
                     ])
                 ),
                 new Apply<Plane<AxisY>>(
-                    Entity: new(),
-                    Brightness: 2.1F,
-                    Reflectance: 0.7F
+                    entity: new(),
+                    brightness: 2.1F,
+                    reflectance: 0.7F
                 ),
             ]),
             Light: new(
             [
                 new Animated<LightSource, Animation<Vector3, CircularPath<AxisZ>, SunInterpolator>, Constant<float>, Constant<float>>(
-                    Entity: new(),
-                    Offset: new(
-                        Motion: new(1000F),
-                        Interpolator: new(),
-                        Duration: 20000F
+                    entity: new(),
+                    offset: new(
+                        motion: new(1000F),
+                        interpolator: new(),
+                        duration: 20000F
                     )
                 ),
             ]),
@@ -115,7 +115,7 @@ new App<Game>(
                 speed: 3F,
                 sensitivity: 0.5F
             ),
-            Renderer: new(Depth: 50)
+            Renderer: new(depth: 50)
         ),
         animator: new(speed: 1F, sensitivity: 3F),
         crosshair: new(),

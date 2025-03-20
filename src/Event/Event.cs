@@ -3,47 +3,59 @@ using Windows.Win32.System.Console;
 
 namespace ConsoleRayTracer;
 
-readonly record struct Event(Variant Variant, Data Data)
+readonly struct Event
 {
-    public KeyEvent? KeyEvent => Variant == Variant.Key ? Data.KeyEvent : null;
-    public ResizeEvent? ResizeEvent => Variant == Variant.Resize ? Data.ResizeEvent : null;
+    readonly Variant _variant;
+    readonly Data _data;
 
-    public Event(KeyEvent keyEvent) : this(Variant.Key, new(keyEvent)) { }
-    public Event(ResizeEvent resizeEvent) : this(Variant.Resize, new(resizeEvent)) { }
-}
-
-enum Variant : byte
-{
-    Key,
-    Resize,
-}
-
-[StructLayout(LayoutKind.Explicit)]
-readonly struct Data
-{
-    [FieldOffset(0)]
-    public readonly KeyEvent KeyEvent;
-    [FieldOffset(0)]
-    public readonly ResizeEvent ResizeEvent;
-
-    public Data(KeyEvent keyEvent)
+    public Event(KeyEvent keyEvent)
     {
-        KeyEvent = keyEvent;
+        _variant = Variant.Key;
+        _data = new(keyEvent);
     }
 
-    public Data(ResizeEvent resizeEvent)
+    public Event(ResizeEvent resizeEvent)
     {
-        ResizeEvent = resizeEvent;
+        _variant = Variant.Resize;
+        _data = new(resizeEvent);
+    }
+
+    public KeyEvent? KeyEvent => _variant == Variant.Key ? _data._keyEvent : null;
+    public ResizeEvent? ResizeEvent => _variant == Variant.Resize ? _data._resizeEvent : null;
+
+    enum Variant : byte
+    {
+        Key,
+        Resize,
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    readonly struct Data
+    {
+        [FieldOffset(0)]
+        public readonly KeyEvent _keyEvent;
+        [FieldOffset(0)]
+        public readonly ResizeEvent _resizeEvent;
+
+        public Data(KeyEvent keyEvent)
+        {
+            _keyEvent = keyEvent;
+        }
+
+        public Data(ResizeEvent resizeEvent)
+        {
+            _resizeEvent = resizeEvent;
+        }
     }
 }
 
 readonly record struct KeyEvent(ConsoleKey Key, KeyState State)
 {
-    public ConsoleKey? PressedKey => State == KeyState.Pressed ? Key : null;
-
     public KeyEvent(in INPUT_RECORD record)
         : this((ConsoleKey)record.Event.KeyEvent.wVirtualKeyCode, (KeyState)(byte)record.Event.KeyEvent.bKeyDown)
     { }
+
+    public ConsoleKey? PressedKey => State == KeyState.Pressed ? Key : null;
 }
 
 enum KeyState : byte
@@ -54,9 +66,9 @@ enum KeyState : byte
 
 readonly record struct ResizeEvent(int Width, int Height)
 {
-    public float AspectRatio => (float)Width / Height;
-
     public ResizeEvent(in INPUT_RECORD record)
         : this(record.Event.WindowBufferSizeEvent.dwSize.X, record.Event.WindowBufferSizeEvent.dwSize.Y)
     { }
+
+    public float AspectRatio => (float)Width / Height;
 }

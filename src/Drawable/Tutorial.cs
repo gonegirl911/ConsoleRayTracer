@@ -2,8 +2,8 @@
 
 sealed class Tutorial : IDrawable, IEventHandler
 {
-    private static readonly Label?[] LABELS =
-    {
+    static readonly Label?[] LABELS =
+    [
         new("Created by Damyan Slavov, Petar Dobrev, Simeon Obretenov, 11d"),
         new("Do you want to go through the tutorial?    Y/n"),
         new("Move around    W,A,S,D"),
@@ -16,7 +16,7 @@ sealed class Tutorial : IDrawable, IEventHandler
         new("Tutorial completed"),
         new("Feel free to resize the window"),
         null,
-    };
+    ];
 
     int _stage = 0;
     ConsoleKey? _lastKey = null;

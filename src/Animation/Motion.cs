@@ -17,8 +17,7 @@ readonly struct LinearPath(Vector3 path) : IMotion<Vector3>
     public Vector3 GetValue(float progress) => path * progress;
 }
 
-readonly struct CircularPath<A>(float radius) : IMotion<Vector3>
-    where A : IAxis
+readonly struct CircularPath<A>(float radius) : IMotion<Vector3> where A : IAxis
 {
     public Vector3 GetValue(float progress)
     {
