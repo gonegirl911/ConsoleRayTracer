@@ -26,15 +26,15 @@ readonly struct Animation<T, M, I>(M motion, I interpolator, float duration) : I
     where M : IMotion<T>
     where I : IInterpolator
 {
-    public float Duration { get; } = duration;
+    public float Duration => duration;
 
     public T GetValueUnchecked(float timeElapsed) =>
-        motion.GetValue(interpolator.GetInterpolation(timeElapsed / Duration));
+        motion.GetValue(interpolator.GetInterpolation(timeElapsed / duration));
 }
 
 readonly struct Constant<T>(T value, float duration) : IAnimation<T>
 {
-    public float Duration { get; } = duration;
+    public float Duration => duration;
 
     public T GetValue(float timeElapsed) => value;
     public T GetValueUnchecked(float timeElapsed) => value;
