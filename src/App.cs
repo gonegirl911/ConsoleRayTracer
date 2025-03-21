@@ -17,7 +17,8 @@ readonly struct App<D>(ICanvas canvas, D drawable) where D : IDrawable, IEventHa
 
     public void RunFrame(TimeSpan dt)
     {
-        drawable.Handle(canvas.Refresh(), dt);
+        var ev = canvas.Refresh();
+        drawable.Handle(ev, dt);
         drawable.Draw(canvas);
         canvas.Commit();
     }
