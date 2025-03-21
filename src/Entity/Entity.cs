@@ -90,7 +90,7 @@ readonly struct Circle<A>(float radius) : IEntity where A : IAxis
 {
     public HitRecord? Hit(Ray ray, float tMin, float tMax) =>
         new Plane<A>().Hit(ray, tMin, tMax) is HitRecord record
-            ? float.Sqrt(Vector3.Dot(record.Point, record.Point)) > radius ? null : record
+            ? record.Point.Length() > radius ? null : record
             : null;
 }
 
