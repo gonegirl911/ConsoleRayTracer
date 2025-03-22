@@ -34,12 +34,12 @@ readonly struct Lights(ImmutableArray<IEntity> sources) : IAnimatedEntity
 {
     readonly ImmutableArray<IAnimatedEntity> _animatedSources = [.. sources.OfType<IAnimatedEntity>()];
 
-    public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
+    public float Illuminate<I>(in I target, in HitRecord record) where I : IEntity
     {
         var acc = 0F;
         foreach (var source in sources)
         {
-            acc += source.Illuminate(entity, record);
+            acc += source.Illuminate(target, record);
         }
         return acc;
     }
@@ -55,10 +55,10 @@ readonly struct Lights(ImmutableArray<IEntity> sources) : IAnimatedEntity
 
 readonly struct LightSource : IEntity
 {
-    public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity
+    public float Illuminate<I>(in I target, in HitRecord record) where I : IEntity
     {
         Ray lightRay = new(record.Point, Vector3.Normalize(-record.Point));
-        return entity.Hit(lightRay, 0.001F, float.MaxValue) is null
+        return target.Hit(lightRay, 0.001F, float.MaxValue) is null
             ? float.Max(record.Brightness * Vector3.Dot(record.Normal, lightRay.Direction), 0F)
             : 0F;
     }
