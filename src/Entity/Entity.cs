@@ -98,9 +98,9 @@ readonly struct Rect<A>(float width, float height) : IEntity where A : IAxis
 {
     public HitRecord? Hit(Ray ray, float tMin, float tMax) =>
         new Plane<A>().Hit(ray, tMin, tMax) is HitRecord record
-            ? A.GetMain(record.Point) < 0
+            ? A.GetMain(record.Point) < 0F
                 || A.GetMain(record.Point) > width
-                || A.GetSecondary(record.Point) < 0
+                || A.GetSecondary(record.Point) < 0F
                 || A.GetSecondary(record.Point) > height
                 ? null
                 : record
@@ -151,7 +151,7 @@ readonly struct Cylinder(float height, float radius) : IEntity
     {
         public HitRecord? Hit(Ray ray, float tMin, float tMax)
         {
-            Ray sideRay = new(ray.Origin with { Y = 0 }, ray.Direction with { Y = 0F });
+            Ray sideRay = new(ray.Origin with { Y = 0F }, ray.Direction with { Y = 0F });
             var a = Vector3.Dot(sideRay.Direction, sideRay.Direction);
             var b = Vector3.Dot(sideRay.Origin, sideRay.Direction);
             var c = Vector3.Dot(sideRay.Origin, sideRay.Origin) - radius * radius;

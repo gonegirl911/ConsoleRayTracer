@@ -80,10 +80,10 @@ sealed class Camera : ICamera, IEventHandler
                 ApplyMovement(camera, dt);
             }
 
-            if (_aspectRatio != 0.0F)
+            if (_aspectRatio != 0F)
             {
                 camera._width = camera._height * _aspectRatio;
-                _aspectRatio = 0.0F;
+                _aspectRatio = 0F;
             }
         }
 
