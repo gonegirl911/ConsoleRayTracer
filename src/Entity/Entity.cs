@@ -34,7 +34,7 @@ readonly struct Lights(ImmutableArray<IEntity> sources) : IAnimatedEntity
 {
     readonly ImmutableArray<IAnimatedEntity> _animatedSources = [.. sources.OfType<IAnimatedEntity>()];
 
-    public float Illuminate<I>(in I target, in HitRecord record) where I : IEntity
+    public float Illuminate<T>(in T target, in HitRecord record) where T : IEntity
     {
         var acc = 0F;
         foreach (var source in sources)
@@ -55,7 +55,7 @@ readonly struct Lights(ImmutableArray<IEntity> sources) : IAnimatedEntity
 
 readonly struct LightSource : IEntity
 {
-    public float Illuminate<I>(in I target, in HitRecord record) where I : IEntity
+    public float Illuminate<T>(in T target, in HitRecord record) where T : IEntity
     {
         Ray lightRay = new(record.Point, Vector3.Normalize(-record.Point));
         return target.Hit(lightRay, 0.001F, float.MaxValue) is null
@@ -73,8 +73,8 @@ readonly struct And<L, R>(L left, R right) : IEntity
             ? right.Hit(ray, tMin, leftRecord.T) ?? leftRecord
             : right.Hit(ray, tMin, tMax);
 
-    public float Illuminate<I>(in I entity, in HitRecord record) where I : IEntity =>
-        left.Illuminate(entity, record) + right.Illuminate(entity, record);
+    public float Illuminate<T>(in T target, in HitRecord record) where T : IEntity =>
+        left.Illuminate(target, record) + right.Illuminate(target, record);
 }
 
 readonly struct Plane<A> : IEntity where A : IAxis

@@ -32,8 +32,8 @@ sealed class Animated<E, O, B, R>(
             }
             : null;
 
-    public float Illuminate<I>(in I target, in HitRecord record) where I : IEntity =>
-        entity.Illuminate(new Apply<I>(target, -_offset), record with { Point = record.Point - _offset })
+    public float Illuminate<T>(in T target, in HitRecord record) where T : IEntity =>
+        entity.Illuminate(new Apply<T>(target, -_offset), record with { Point = record.Point - _offset })
             * _brightness;
 
     public void Update(float timeElapsed)
