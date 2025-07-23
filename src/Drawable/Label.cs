@@ -16,6 +16,7 @@ readonly struct Label(string text) : IDrawable
 
         var topLeftX = (canvas.Width - width) / 2;
         var topLeftY = (canvas.Height - height) / 2;
+
         for (var dx = 0; dx < width; ++dx)
         {
             for (var dy = 0; dy < OUTLINE; ++dy)
